@@ -9,7 +9,6 @@ import (
 	"errors"
 	"fmt"
 	"sync"
-	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -34,11 +33,13 @@ type MembersMutation struct {
 	typ           string
 	id            *uint32
 	username      *string
+	email         *string
+	password      *string
 	nickname      *string
 	avatar        *string
 	gid           *uint8
 	addgid        *int8
-	register_time *time.Time
+	register_time *string
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Members, error)
@@ -185,6 +186,78 @@ func (m *MembersMutation) ResetUsername() {
 	m.username = nil
 }
 
+// SetEmail sets the "email" field.
+func (m *MembersMutation) SetEmail(s string) {
+	m.email = &s
+}
+
+// Email returns the value of the "email" field in the mutation.
+func (m *MembersMutation) Email() (r string, exists bool) {
+	v := m.email
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEmail returns the old "email" field's value of the Members entity.
+// If the Members object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MembersMutation) OldEmail(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEmail is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEmail requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEmail: %w", err)
+	}
+	return oldValue.Email, nil
+}
+
+// ResetEmail resets all changes to the "email" field.
+func (m *MembersMutation) ResetEmail() {
+	m.email = nil
+}
+
+// SetPassword sets the "password" field.
+func (m *MembersMutation) SetPassword(s string) {
+	m.password = &s
+}
+
+// Password returns the value of the "password" field in the mutation.
+func (m *MembersMutation) Password() (r string, exists bool) {
+	v := m.password
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPassword returns the old "password" field's value of the Members entity.
+// If the Members object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MembersMutation) OldPassword(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPassword is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPassword requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPassword: %w", err)
+	}
+	return oldValue.Password, nil
+}
+
+// ResetPassword resets all changes to the "password" field.
+func (m *MembersMutation) ResetPassword() {
+	m.password = nil
+}
+
 // SetNickname sets the "nickname" field.
 func (m *MembersMutation) SetNickname(s string) {
 	m.nickname = &s
@@ -314,12 +387,12 @@ func (m *MembersMutation) ResetGid() {
 }
 
 // SetRegisterTime sets the "register_time" field.
-func (m *MembersMutation) SetRegisterTime(t time.Time) {
-	m.register_time = &t
+func (m *MembersMutation) SetRegisterTime(s string) {
+	m.register_time = &s
 }
 
 // RegisterTime returns the value of the "register_time" field in the mutation.
-func (m *MembersMutation) RegisterTime() (r time.Time, exists bool) {
+func (m *MembersMutation) RegisterTime() (r string, exists bool) {
 	v := m.register_time
 	if v == nil {
 		return
@@ -330,7 +403,7 @@ func (m *MembersMutation) RegisterTime() (r time.Time, exists bool) {
 // OldRegisterTime returns the old "register_time" field's value of the Members entity.
 // If the Members object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MembersMutation) OldRegisterTime(ctx context.Context) (v time.Time, err error) {
+func (m *MembersMutation) OldRegisterTime(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldRegisterTime is only allowed on UpdateOne operations")
 	}
@@ -383,9 +456,15 @@ func (m *MembersMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MembersMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 7)
 	if m.username != nil {
 		fields = append(fields, members.FieldUsername)
+	}
+	if m.email != nil {
+		fields = append(fields, members.FieldEmail)
+	}
+	if m.password != nil {
+		fields = append(fields, members.FieldPassword)
 	}
 	if m.nickname != nil {
 		fields = append(fields, members.FieldNickname)
@@ -409,6 +488,10 @@ func (m *MembersMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case members.FieldUsername:
 		return m.Username()
+	case members.FieldEmail:
+		return m.Email()
+	case members.FieldPassword:
+		return m.Password()
 	case members.FieldNickname:
 		return m.Nickname()
 	case members.FieldAvatar:
@@ -428,6 +511,10 @@ func (m *MembersMutation) OldField(ctx context.Context, name string) (ent.Value,
 	switch name {
 	case members.FieldUsername:
 		return m.OldUsername(ctx)
+	case members.FieldEmail:
+		return m.OldEmail(ctx)
+	case members.FieldPassword:
+		return m.OldPassword(ctx)
 	case members.FieldNickname:
 		return m.OldNickname(ctx)
 	case members.FieldAvatar:
@@ -452,6 +539,20 @@ func (m *MembersMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetUsername(v)
 		return nil
+	case members.FieldEmail:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEmail(v)
+		return nil
+	case members.FieldPassword:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPassword(v)
+		return nil
 	case members.FieldNickname:
 		v, ok := value.(string)
 		if !ok {
@@ -474,7 +575,7 @@ func (m *MembersMutation) SetField(name string, value ent.Value) error {
 		m.SetGid(v)
 		return nil
 	case members.FieldRegisterTime:
-		v, ok := value.(time.Time)
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -546,6 +647,12 @@ func (m *MembersMutation) ResetField(name string) error {
 	switch name {
 	case members.FieldUsername:
 		m.ResetUsername()
+		return nil
+	case members.FieldEmail:
+		m.ResetEmail()
+		return nil
+	case members.FieldPassword:
+		m.ResetPassword()
 		return nil
 	case members.FieldNickname:
 		m.ResetNickname()

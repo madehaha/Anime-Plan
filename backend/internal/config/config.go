@@ -14,10 +14,11 @@ type AppConfig struct {
 	RedisUrl  string `yaml:"redis_url"`
 
 	Mysql struct {
-		Host string `yaml:"host"`
-		Port string `yaml:"port"`
-		user string `yaml:"user"`
-		db   string `yaml:"db"`
+		Host     string `yaml:"host"`
+		Port     string `yaml:"port"`
+		User     string `yaml:"user"`
+		Password string `yaml:"password"`
+		DB       string `yaml:"db"`
 	}
 }
 

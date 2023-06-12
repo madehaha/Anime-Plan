@@ -7,7 +7,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -34,6 +33,18 @@ func (mc *MembersCreate) SetNillableUsername(s *string) *MembersCreate {
 	return mc
 }
 
+// SetEmail sets the "email" field.
+func (mc *MembersCreate) SetEmail(s string) *MembersCreate {
+	mc.mutation.SetEmail(s)
+	return mc
+}
+
+// SetPassword sets the "password" field.
+func (mc *MembersCreate) SetPassword(s string) *MembersCreate {
+	mc.mutation.SetPassword(s)
+	return mc
+}
+
 // SetNickname sets the "nickname" field.
 func (mc *MembersCreate) SetNickname(s string) *MembersCreate {
 	mc.mutation.SetNickname(s)
@@ -43,6 +54,14 @@ func (mc *MembersCreate) SetNickname(s string) *MembersCreate {
 // SetAvatar sets the "avatar" field.
 func (mc *MembersCreate) SetAvatar(s string) *MembersCreate {
 	mc.mutation.SetAvatar(s)
+	return mc
+}
+
+// SetNillableAvatar sets the "avatar" field if the given value is not nil.
+func (mc *MembersCreate) SetNillableAvatar(s *string) *MembersCreate {
+	if s != nil {
+		mc.SetAvatar(*s)
+	}
 	return mc
 }
 
@@ -61,8 +80,8 @@ func (mc *MembersCreate) SetNillableGid(u *uint8) *MembersCreate {
 }
 
 // SetRegisterTime sets the "register_time" field.
-func (mc *MembersCreate) SetRegisterTime(t time.Time) *MembersCreate {
-	mc.mutation.SetRegisterTime(t)
+func (mc *MembersCreate) SetRegisterTime(s string) *MembersCreate {
+	mc.mutation.SetRegisterTime(s)
 	return mc
 }
 
@@ -111,6 +130,10 @@ func (mc *MembersCreate) defaults() {
 		v := members.DefaultUsername
 		mc.mutation.SetUsername(v)
 	}
+	if _, ok := mc.mutation.Avatar(); !ok {
+		v := members.DefaultAvatar
+		mc.mutation.SetAvatar(v)
+	}
 	if _, ok := mc.mutation.Gid(); !ok {
 		v := members.DefaultGid
 		mc.mutation.SetGid(v)
@@ -125,6 +148,22 @@ func (mc *MembersCreate) check() error {
 	if v, ok := mc.mutation.Username(); ok {
 		if err := members.UsernameValidator(v); err != nil {
 			return &ValidationError{Name: "username", err: fmt.Errorf(`ent: validator failed for field "Members.username": %w`, err)}
+		}
+	}
+	if _, ok := mc.mutation.Email(); !ok {
+		return &ValidationError{Name: "email", err: errors.New(`ent: missing required field "Members.email"`)}
+	}
+	if v, ok := mc.mutation.Email(); ok {
+		if err := members.EmailValidator(v); err != nil {
+			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "Members.email": %w`, err)}
+		}
+	}
+	if _, ok := mc.mutation.Password(); !ok {
+		return &ValidationError{Name: "password", err: errors.New(`ent: missing required field "Members.password"`)}
+	}
+	if v, ok := mc.mutation.Password(); ok {
+		if err := members.PasswordValidator(v); err != nil {
+			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "Members.password": %w`, err)}
 		}
 	}
 	if _, ok := mc.mutation.Nickname(); !ok {
@@ -185,6 +224,14 @@ func (mc *MembersCreate) createSpec() (*Members, *sqlgraph.CreateSpec) {
 		_spec.SetField(members.FieldUsername, field.TypeString, value)
 		_node.Username = value
 	}
+	if value, ok := mc.mutation.Email(); ok {
+		_spec.SetField(members.FieldEmail, field.TypeString, value)
+		_node.Email = value
+	}
+	if value, ok := mc.mutation.Password(); ok {
+		_spec.SetField(members.FieldPassword, field.TypeString, value)
+		_node.Password = value
+	}
 	if value, ok := mc.mutation.Nickname(); ok {
 		_spec.SetField(members.FieldNickname, field.TypeString, value)
 		_node.Nickname = value
@@ -198,7 +245,7 @@ func (mc *MembersCreate) createSpec() (*Members, *sqlgraph.CreateSpec) {
 		_node.Gid = value
 	}
 	if value, ok := mc.mutation.RegisterTime(); ok {
-		_spec.SetField(members.FieldRegisterTime, field.TypeTime, value)
+		_spec.SetField(members.FieldRegisterTime, field.TypeString, value)
 		_node.RegisterTime = value
 	}
 	return _node, _spec

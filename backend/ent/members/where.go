@@ -4,7 +4,6 @@ package members
 
 import (
 	"backend/ent/predicate"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 )
@@ -59,6 +58,16 @@ func Username(v string) predicate.Members {
 	return predicate.Members(sql.FieldEQ(FieldUsername, v))
 }
 
+// Email applies equality check predicate on the "email" field. It's identical to EmailEQ.
+func Email(v string) predicate.Members {
+	return predicate.Members(sql.FieldEQ(FieldEmail, v))
+}
+
+// Password applies equality check predicate on the "password" field. It's identical to PasswordEQ.
+func Password(v string) predicate.Members {
+	return predicate.Members(sql.FieldEQ(FieldPassword, v))
+}
+
 // Nickname applies equality check predicate on the "nickname" field. It's identical to NicknameEQ.
 func Nickname(v string) predicate.Members {
 	return predicate.Members(sql.FieldEQ(FieldNickname, v))
@@ -75,7 +84,7 @@ func Gid(v uint8) predicate.Members {
 }
 
 // RegisterTime applies equality check predicate on the "register_time" field. It's identical to RegisterTimeEQ.
-func RegisterTime(v time.Time) predicate.Members {
+func RegisterTime(v string) predicate.Members {
 	return predicate.Members(sql.FieldEQ(FieldRegisterTime, v))
 }
 
@@ -142,6 +151,136 @@ func UsernameEqualFold(v string) predicate.Members {
 // UsernameContainsFold applies the ContainsFold predicate on the "username" field.
 func UsernameContainsFold(v string) predicate.Members {
 	return predicate.Members(sql.FieldContainsFold(FieldUsername, v))
+}
+
+// EmailEQ applies the EQ predicate on the "email" field.
+func EmailEQ(v string) predicate.Members {
+	return predicate.Members(sql.FieldEQ(FieldEmail, v))
+}
+
+// EmailNEQ applies the NEQ predicate on the "email" field.
+func EmailNEQ(v string) predicate.Members {
+	return predicate.Members(sql.FieldNEQ(FieldEmail, v))
+}
+
+// EmailIn applies the In predicate on the "email" field.
+func EmailIn(vs ...string) predicate.Members {
+	return predicate.Members(sql.FieldIn(FieldEmail, vs...))
+}
+
+// EmailNotIn applies the NotIn predicate on the "email" field.
+func EmailNotIn(vs ...string) predicate.Members {
+	return predicate.Members(sql.FieldNotIn(FieldEmail, vs...))
+}
+
+// EmailGT applies the GT predicate on the "email" field.
+func EmailGT(v string) predicate.Members {
+	return predicate.Members(sql.FieldGT(FieldEmail, v))
+}
+
+// EmailGTE applies the GTE predicate on the "email" field.
+func EmailGTE(v string) predicate.Members {
+	return predicate.Members(sql.FieldGTE(FieldEmail, v))
+}
+
+// EmailLT applies the LT predicate on the "email" field.
+func EmailLT(v string) predicate.Members {
+	return predicate.Members(sql.FieldLT(FieldEmail, v))
+}
+
+// EmailLTE applies the LTE predicate on the "email" field.
+func EmailLTE(v string) predicate.Members {
+	return predicate.Members(sql.FieldLTE(FieldEmail, v))
+}
+
+// EmailContains applies the Contains predicate on the "email" field.
+func EmailContains(v string) predicate.Members {
+	return predicate.Members(sql.FieldContains(FieldEmail, v))
+}
+
+// EmailHasPrefix applies the HasPrefix predicate on the "email" field.
+func EmailHasPrefix(v string) predicate.Members {
+	return predicate.Members(sql.FieldHasPrefix(FieldEmail, v))
+}
+
+// EmailHasSuffix applies the HasSuffix predicate on the "email" field.
+func EmailHasSuffix(v string) predicate.Members {
+	return predicate.Members(sql.FieldHasSuffix(FieldEmail, v))
+}
+
+// EmailEqualFold applies the EqualFold predicate on the "email" field.
+func EmailEqualFold(v string) predicate.Members {
+	return predicate.Members(sql.FieldEqualFold(FieldEmail, v))
+}
+
+// EmailContainsFold applies the ContainsFold predicate on the "email" field.
+func EmailContainsFold(v string) predicate.Members {
+	return predicate.Members(sql.FieldContainsFold(FieldEmail, v))
+}
+
+// PasswordEQ applies the EQ predicate on the "password" field.
+func PasswordEQ(v string) predicate.Members {
+	return predicate.Members(sql.FieldEQ(FieldPassword, v))
+}
+
+// PasswordNEQ applies the NEQ predicate on the "password" field.
+func PasswordNEQ(v string) predicate.Members {
+	return predicate.Members(sql.FieldNEQ(FieldPassword, v))
+}
+
+// PasswordIn applies the In predicate on the "password" field.
+func PasswordIn(vs ...string) predicate.Members {
+	return predicate.Members(sql.FieldIn(FieldPassword, vs...))
+}
+
+// PasswordNotIn applies the NotIn predicate on the "password" field.
+func PasswordNotIn(vs ...string) predicate.Members {
+	return predicate.Members(sql.FieldNotIn(FieldPassword, vs...))
+}
+
+// PasswordGT applies the GT predicate on the "password" field.
+func PasswordGT(v string) predicate.Members {
+	return predicate.Members(sql.FieldGT(FieldPassword, v))
+}
+
+// PasswordGTE applies the GTE predicate on the "password" field.
+func PasswordGTE(v string) predicate.Members {
+	return predicate.Members(sql.FieldGTE(FieldPassword, v))
+}
+
+// PasswordLT applies the LT predicate on the "password" field.
+func PasswordLT(v string) predicate.Members {
+	return predicate.Members(sql.FieldLT(FieldPassword, v))
+}
+
+// PasswordLTE applies the LTE predicate on the "password" field.
+func PasswordLTE(v string) predicate.Members {
+	return predicate.Members(sql.FieldLTE(FieldPassword, v))
+}
+
+// PasswordContains applies the Contains predicate on the "password" field.
+func PasswordContains(v string) predicate.Members {
+	return predicate.Members(sql.FieldContains(FieldPassword, v))
+}
+
+// PasswordHasPrefix applies the HasPrefix predicate on the "password" field.
+func PasswordHasPrefix(v string) predicate.Members {
+	return predicate.Members(sql.FieldHasPrefix(FieldPassword, v))
+}
+
+// PasswordHasSuffix applies the HasSuffix predicate on the "password" field.
+func PasswordHasSuffix(v string) predicate.Members {
+	return predicate.Members(sql.FieldHasSuffix(FieldPassword, v))
+}
+
+// PasswordEqualFold applies the EqualFold predicate on the "password" field.
+func PasswordEqualFold(v string) predicate.Members {
+	return predicate.Members(sql.FieldEqualFold(FieldPassword, v))
+}
+
+// PasswordContainsFold applies the ContainsFold predicate on the "password" field.
+func PasswordContainsFold(v string) predicate.Members {
+	return predicate.Members(sql.FieldContainsFold(FieldPassword, v))
 }
 
 // NicknameEQ applies the EQ predicate on the "nickname" field.
@@ -315,43 +454,68 @@ func GidLTE(v uint8) predicate.Members {
 }
 
 // RegisterTimeEQ applies the EQ predicate on the "register_time" field.
-func RegisterTimeEQ(v time.Time) predicate.Members {
+func RegisterTimeEQ(v string) predicate.Members {
 	return predicate.Members(sql.FieldEQ(FieldRegisterTime, v))
 }
 
 // RegisterTimeNEQ applies the NEQ predicate on the "register_time" field.
-func RegisterTimeNEQ(v time.Time) predicate.Members {
+func RegisterTimeNEQ(v string) predicate.Members {
 	return predicate.Members(sql.FieldNEQ(FieldRegisterTime, v))
 }
 
 // RegisterTimeIn applies the In predicate on the "register_time" field.
-func RegisterTimeIn(vs ...time.Time) predicate.Members {
+func RegisterTimeIn(vs ...string) predicate.Members {
 	return predicate.Members(sql.FieldIn(FieldRegisterTime, vs...))
 }
 
 // RegisterTimeNotIn applies the NotIn predicate on the "register_time" field.
-func RegisterTimeNotIn(vs ...time.Time) predicate.Members {
+func RegisterTimeNotIn(vs ...string) predicate.Members {
 	return predicate.Members(sql.FieldNotIn(FieldRegisterTime, vs...))
 }
 
 // RegisterTimeGT applies the GT predicate on the "register_time" field.
-func RegisterTimeGT(v time.Time) predicate.Members {
+func RegisterTimeGT(v string) predicate.Members {
 	return predicate.Members(sql.FieldGT(FieldRegisterTime, v))
 }
 
 // RegisterTimeGTE applies the GTE predicate on the "register_time" field.
-func RegisterTimeGTE(v time.Time) predicate.Members {
+func RegisterTimeGTE(v string) predicate.Members {
 	return predicate.Members(sql.FieldGTE(FieldRegisterTime, v))
 }
 
 // RegisterTimeLT applies the LT predicate on the "register_time" field.
-func RegisterTimeLT(v time.Time) predicate.Members {
+func RegisterTimeLT(v string) predicate.Members {
 	return predicate.Members(sql.FieldLT(FieldRegisterTime, v))
 }
 
 // RegisterTimeLTE applies the LTE predicate on the "register_time" field.
-func RegisterTimeLTE(v time.Time) predicate.Members {
+func RegisterTimeLTE(v string) predicate.Members {
 	return predicate.Members(sql.FieldLTE(FieldRegisterTime, v))
+}
+
+// RegisterTimeContains applies the Contains predicate on the "register_time" field.
+func RegisterTimeContains(v string) predicate.Members {
+	return predicate.Members(sql.FieldContains(FieldRegisterTime, v))
+}
+
+// RegisterTimeHasPrefix applies the HasPrefix predicate on the "register_time" field.
+func RegisterTimeHasPrefix(v string) predicate.Members {
+	return predicate.Members(sql.FieldHasPrefix(FieldRegisterTime, v))
+}
+
+// RegisterTimeHasSuffix applies the HasSuffix predicate on the "register_time" field.
+func RegisterTimeHasSuffix(v string) predicate.Members {
+	return predicate.Members(sql.FieldHasSuffix(FieldRegisterTime, v))
+}
+
+// RegisterTimeEqualFold applies the EqualFold predicate on the "register_time" field.
+func RegisterTimeEqualFold(v string) predicate.Members {
+	return predicate.Members(sql.FieldEqualFold(FieldRegisterTime, v))
+}
+
+// RegisterTimeContainsFold applies the ContainsFold predicate on the "register_time" field.
+func RegisterTimeContainsFold(v string) predicate.Members {
+	return predicate.Members(sql.FieldContainsFold(FieldRegisterTime, v))
 }
 
 // And groups predicates with the AND operator between them.

@@ -9,4 +9,4 @@ mysql:
   port: 3306
   user: user
   password: password
-  db: AP
+  db: abyss

@@ -2,6 +2,9 @@ package web
 
 import (
 	"backend/internal/config"
+	"backend/internal/ctrl"
+	"backend/internal/driver"
+	"backend/internal/user"
 	"backend/web"
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/cobra"
@@ -23,11 +26,10 @@ func start() error {
 
 	err := fx.New(
 		fx.NopLogger,
+		fx.Provide(config.AppConfigReader, driver.NewMysqlClient),
+		fx.Provide(user.NewRepo),
 
-		fx.Provide(
-			config.AppConfigReader,
-		),
-
+		ctrl.Module,
 		web.Module,
 		fx.Populate(&cfg, &e),
 	).Err()

@@ -12,10 +12,12 @@ var (
 	MembersColumns = []*schema.Column{
 		{Name: "uid", Type: field.TypeUint32, Increment: true},
 		{Name: "username", Type: field.TypeString, Size: 30, Default: ""},
+		{Name: "email", Type: field.TypeString, Size: 50},
+		{Name: "password", Type: field.TypeString, Size: 30},
 		{Name: "nickname", Type: field.TypeString, Size: 30},
-		{Name: "avatar", Type: field.TypeString, Size: 255},
+		{Name: "avatar", Type: field.TypeString, Size: 255, Default: "https://lain.bgm.tv/pic/user/l/icon.jpg"},
 		{Name: "gid", Type: field.TypeUint8, Default: 0},
-		{Name: "register_time", Type: field.TypeTime},
+		{Name: "register_time", Type: field.TypeString},
 	}
 	// MembersTable holds the schema information for the "members" table.
 	MembersTable = &schema.Table{

@@ -6,7 +6,6 @@ import (
 	"backend/ent/members"
 	"fmt"
 	"strings"
-	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -19,6 +18,10 @@ type Members struct {
 	ID uint32 `json:"id,omitempty"`
 	// Username holds the value of the "username" field.
 	Username string `json:"username,omitempty"`
+	// Email holds the value of the "email" field.
+	Email string `json:"email,omitempty"`
+	// Password holds the value of the "password" field.
+	Password string `json:"password,omitempty"`
 	// Nickname holds the value of the "nickname" field.
 	Nickname string `json:"nickname,omitempty"`
 	// Avatar holds the value of the "avatar" field.
@@ -26,7 +29,7 @@ type Members struct {
 	// Gid holds the value of the "gid" field.
 	Gid uint8 `json:"gid,omitempty"`
 	// RegisterTime holds the value of the "register_time" field.
-	RegisterTime time.Time `json:"register_time,omitempty"`
+	RegisterTime string `json:"register_time,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -37,10 +40,8 @@ func (*Members) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case members.FieldID, members.FieldGid:
 			values[i] = new(sql.NullInt64)
-		case members.FieldUsername, members.FieldNickname, members.FieldAvatar:
+		case members.FieldUsername, members.FieldEmail, members.FieldPassword, members.FieldNickname, members.FieldAvatar, members.FieldRegisterTime:
 			values[i] = new(sql.NullString)
-		case members.FieldRegisterTime:
-			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -68,6 +69,18 @@ func (m *Members) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				m.Username = value.String
 			}
+		case members.FieldEmail:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field email", values[i])
+			} else if value.Valid {
+				m.Email = value.String
+			}
+		case members.FieldPassword:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field password", values[i])
+			} else if value.Valid {
+				m.Password = value.String
+			}
 		case members.FieldNickname:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field nickname", values[i])
@@ -87,10 +100,10 @@ func (m *Members) assignValues(columns []string, values []any) error {
 				m.Gid = uint8(value.Int64)
 			}
 		case members.FieldRegisterTime:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field register_time", values[i])
 			} else if value.Valid {
-				m.RegisterTime = value.Time
+				m.RegisterTime = value.String
 			}
 		default:
 			m.selectValues.Set(columns[i], values[i])
@@ -131,6 +144,12 @@ func (m *Members) String() string {
 	builder.WriteString("username=")
 	builder.WriteString(m.Username)
 	builder.WriteString(", ")
+	builder.WriteString("email=")
+	builder.WriteString(m.Email)
+	builder.WriteString(", ")
+	builder.WriteString("password=")
+	builder.WriteString(m.Password)
+	builder.WriteString(", ")
 	builder.WriteString("nickname=")
 	builder.WriteString(m.Nickname)
 	builder.WriteString(", ")
@@ -141,7 +160,7 @@ func (m *Members) String() string {
 	builder.WriteString(fmt.Sprintf("%v", m.Gid))
 	builder.WriteString(", ")
 	builder.WriteString("register_time=")
-	builder.WriteString(m.RegisterTime.Format(time.ANSIC))
+	builder.WriteString(m.RegisterTime)
 	builder.WriteByte(')')
 	return builder.String()
 }

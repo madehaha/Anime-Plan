@@ -8,7 +8,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -42,6 +41,18 @@ func (mu *MembersUpdate) SetNillableUsername(s *string) *MembersUpdate {
 	return mu
 }
 
+// SetEmail sets the "email" field.
+func (mu *MembersUpdate) SetEmail(s string) *MembersUpdate {
+	mu.mutation.SetEmail(s)
+	return mu
+}
+
+// SetPassword sets the "password" field.
+func (mu *MembersUpdate) SetPassword(s string) *MembersUpdate {
+	mu.mutation.SetPassword(s)
+	return mu
+}
+
 // SetNickname sets the "nickname" field.
 func (mu *MembersUpdate) SetNickname(s string) *MembersUpdate {
 	mu.mutation.SetNickname(s)
@@ -51,6 +62,14 @@ func (mu *MembersUpdate) SetNickname(s string) *MembersUpdate {
 // SetAvatar sets the "avatar" field.
 func (mu *MembersUpdate) SetAvatar(s string) *MembersUpdate {
 	mu.mutation.SetAvatar(s)
+	return mu
+}
+
+// SetNillableAvatar sets the "avatar" field if the given value is not nil.
+func (mu *MembersUpdate) SetNillableAvatar(s *string) *MembersUpdate {
+	if s != nil {
+		mu.SetAvatar(*s)
+	}
 	return mu
 }
 
@@ -76,8 +95,8 @@ func (mu *MembersUpdate) AddGid(u int8) *MembersUpdate {
 }
 
 // SetRegisterTime sets the "register_time" field.
-func (mu *MembersUpdate) SetRegisterTime(t time.Time) *MembersUpdate {
-	mu.mutation.SetRegisterTime(t)
+func (mu *MembersUpdate) SetRegisterTime(s string) *MembersUpdate {
+	mu.mutation.SetRegisterTime(s)
 	return mu
 }
 
@@ -120,6 +139,16 @@ func (mu *MembersUpdate) check() error {
 			return &ValidationError{Name: "username", err: fmt.Errorf(`ent: validator failed for field "Members.username": %w`, err)}
 		}
 	}
+	if v, ok := mu.mutation.Email(); ok {
+		if err := members.EmailValidator(v); err != nil {
+			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "Members.email": %w`, err)}
+		}
+	}
+	if v, ok := mu.mutation.Password(); ok {
+		if err := members.PasswordValidator(v); err != nil {
+			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "Members.password": %w`, err)}
+		}
+	}
 	if v, ok := mu.mutation.Nickname(); ok {
 		if err := members.NicknameValidator(v); err != nil {
 			return &ValidationError{Name: "nickname", err: fmt.Errorf(`ent: validator failed for field "Members.nickname": %w`, err)}
@@ -148,6 +177,12 @@ func (mu *MembersUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := mu.mutation.Username(); ok {
 		_spec.SetField(members.FieldUsername, field.TypeString, value)
 	}
+	if value, ok := mu.mutation.Email(); ok {
+		_spec.SetField(members.FieldEmail, field.TypeString, value)
+	}
+	if value, ok := mu.mutation.Password(); ok {
+		_spec.SetField(members.FieldPassword, field.TypeString, value)
+	}
 	if value, ok := mu.mutation.Nickname(); ok {
 		_spec.SetField(members.FieldNickname, field.TypeString, value)
 	}
@@ -161,7 +196,7 @@ func (mu *MembersUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.AddField(members.FieldGid, field.TypeUint8, value)
 	}
 	if value, ok := mu.mutation.RegisterTime(); ok {
-		_spec.SetField(members.FieldRegisterTime, field.TypeTime, value)
+		_spec.SetField(members.FieldRegisterTime, field.TypeString, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, mu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -197,6 +232,18 @@ func (muo *MembersUpdateOne) SetNillableUsername(s *string) *MembersUpdateOne {
 	return muo
 }
 
+// SetEmail sets the "email" field.
+func (muo *MembersUpdateOne) SetEmail(s string) *MembersUpdateOne {
+	muo.mutation.SetEmail(s)
+	return muo
+}
+
+// SetPassword sets the "password" field.
+func (muo *MembersUpdateOne) SetPassword(s string) *MembersUpdateOne {
+	muo.mutation.SetPassword(s)
+	return muo
+}
+
 // SetNickname sets the "nickname" field.
 func (muo *MembersUpdateOne) SetNickname(s string) *MembersUpdateOne {
 	muo.mutation.SetNickname(s)
@@ -206,6 +253,14 @@ func (muo *MembersUpdateOne) SetNickname(s string) *MembersUpdateOne {
 // SetAvatar sets the "avatar" field.
 func (muo *MembersUpdateOne) SetAvatar(s string) *MembersUpdateOne {
 	muo.mutation.SetAvatar(s)
+	return muo
+}
+
+// SetNillableAvatar sets the "avatar" field if the given value is not nil.
+func (muo *MembersUpdateOne) SetNillableAvatar(s *string) *MembersUpdateOne {
+	if s != nil {
+		muo.SetAvatar(*s)
+	}
 	return muo
 }
 
@@ -231,8 +286,8 @@ func (muo *MembersUpdateOne) AddGid(u int8) *MembersUpdateOne {
 }
 
 // SetRegisterTime sets the "register_time" field.
-func (muo *MembersUpdateOne) SetRegisterTime(t time.Time) *MembersUpdateOne {
-	muo.mutation.SetRegisterTime(t)
+func (muo *MembersUpdateOne) SetRegisterTime(s string) *MembersUpdateOne {
+	muo.mutation.SetRegisterTime(s)
 	return muo
 }
 
@@ -288,6 +343,16 @@ func (muo *MembersUpdateOne) check() error {
 			return &ValidationError{Name: "username", err: fmt.Errorf(`ent: validator failed for field "Members.username": %w`, err)}
 		}
 	}
+	if v, ok := muo.mutation.Email(); ok {
+		if err := members.EmailValidator(v); err != nil {
+			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "Members.email": %w`, err)}
+		}
+	}
+	if v, ok := muo.mutation.Password(); ok {
+		if err := members.PasswordValidator(v); err != nil {
+			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "Members.password": %w`, err)}
+		}
+	}
 	if v, ok := muo.mutation.Nickname(); ok {
 		if err := members.NicknameValidator(v); err != nil {
 			return &ValidationError{Name: "nickname", err: fmt.Errorf(`ent: validator failed for field "Members.nickname": %w`, err)}
@@ -333,6 +398,12 @@ func (muo *MembersUpdateOne) sqlSave(ctx context.Context) (_node *Members, err e
 	if value, ok := muo.mutation.Username(); ok {
 		_spec.SetField(members.FieldUsername, field.TypeString, value)
 	}
+	if value, ok := muo.mutation.Email(); ok {
+		_spec.SetField(members.FieldEmail, field.TypeString, value)
+	}
+	if value, ok := muo.mutation.Password(); ok {
+		_spec.SetField(members.FieldPassword, field.TypeString, value)
+	}
 	if value, ok := muo.mutation.Nickname(); ok {
 		_spec.SetField(members.FieldNickname, field.TypeString, value)
 	}
@@ -346,7 +417,7 @@ func (muo *MembersUpdateOne) sqlSave(ctx context.Context) (_node *Members, err e
 		_spec.AddField(members.FieldGid, field.TypeUint8, value)
 	}
 	if value, ok := muo.mutation.RegisterTime(); ok {
-		_spec.SetField(members.FieldRegisterTime, field.TypeTime, value)
+		_spec.SetField(members.FieldRegisterTime, field.TypeString, value)
 	}
 	_node = &Members{config: muo.config}
 	_spec.Assign = _node.assignValues

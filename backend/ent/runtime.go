@@ -19,16 +19,40 @@ func init() {
 	members.DefaultUsername = membersDescUsername.Default.(string)
 	// members.UsernameValidator is a validator for the "username" field. It is called by the builders before save.
 	members.UsernameValidator = membersDescUsername.Validators[0].(func(string) error)
+	// membersDescEmail is the schema descriptor for email field.
+	membersDescEmail := membersFields[2].Descriptor()
+	// members.EmailValidator is a validator for the "email" field. It is called by the builders before save.
+	members.EmailValidator = membersDescEmail.Validators[0].(func(string) error)
+	// membersDescPassword is the schema descriptor for password field.
+	membersDescPassword := membersFields[3].Descriptor()
+	// members.PasswordValidator is a validator for the "password" field. It is called by the builders before save.
+	members.PasswordValidator = func() func(string) error {
+		validators := membersDescPassword.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(password string) error {
+			for _, fn := range fns {
+				if err := fn(password); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	// membersDescNickname is the schema descriptor for nickname field.
-	membersDescNickname := membersFields[2].Descriptor()
+	membersDescNickname := membersFields[4].Descriptor()
 	// members.NicknameValidator is a validator for the "nickname" field. It is called by the builders before save.
 	members.NicknameValidator = membersDescNickname.Validators[0].(func(string) error)
 	// membersDescAvatar is the schema descriptor for avatar field.
-	membersDescAvatar := membersFields[3].Descriptor()
+	membersDescAvatar := membersFields[5].Descriptor()
+	// members.DefaultAvatar holds the default value on creation for the avatar field.
+	members.DefaultAvatar = membersDescAvatar.Default.(string)
 	// members.AvatarValidator is a validator for the "avatar" field. It is called by the builders before save.
 	members.AvatarValidator = membersDescAvatar.Validators[0].(func(string) error)
 	// membersDescGid is the schema descriptor for gid field.
-	membersDescGid := membersFields[4].Descriptor()
+	membersDescGid := membersFields[6].Descriptor()
 	// members.DefaultGid holds the default value on creation for the gid field.
 	members.DefaultGid = membersDescGid.Default.(uint8)
 }
