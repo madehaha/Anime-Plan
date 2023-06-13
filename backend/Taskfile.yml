@@ -1,0 +1,31 @@
+version: '3'
+
+tasks:
+  default:
+    desc: List all tasks
+    cmds:
+      - task --list
+    silent: true
+
+  build:
+    desc: Build
+    cmds:
+      - go build -o bin/backend main.go
+    silent: false
+
+  gen:
+    desc: Generate ent
+    cmds:
+      - go generate ./ent
+    silent: true
+
+  add:
+    desc: Add new ent schema. For example, task add -- Members
+    cmds:
+      - go run -mod=mod entgo.io/ent/cmd/ent new {{.CLI_ARGS}}
+    silent: false
+
+  clean:
+    desc: Clean
+    cmds:
+      - rm -rf bin/

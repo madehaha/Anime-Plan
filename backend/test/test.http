@@ -1,0 +1,9 @@
+### Register
+POST http://localhost:2333/user/register
+Content-Type: application/json
+
+{
+  "email": "114514@lll.com",
+  "nickname": "abyss111",
+  "password": "1919810"
+}
