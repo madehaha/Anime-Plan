@@ -6,6 +6,6 @@ import (
 )
 
 func AddRouters(app *echo.Echo, userHandler user.Handler) {
-	userWithoutJWT := app.Group("user")
-	userWithoutJWT.POST("/register", userHandler.Register)
+	app.POST("/register", userHandler.Register)
+	app.POST("/login", userHandler.Login)
 }

@@ -1,9 +1,28 @@
 ### Register
-POST http://localhost:2333/user/register
+POST http://localhost:2333/register
 Content-Type: application/json
 
 {
-  "email": "114514@lll.com",
-  "nickname": "abyss111",
-  "password": "1919810"
+  "email": "a@a.com",
+  "nickname": "a",
+  "password": "b"
+}
+
+### Register
+POST http://localhost:2333/register
+Content-Type: application/json
+
+{
+  "email": "b@b.com",
+  "nickname": "a",
+  "password": "b"
+}
+
+### Register Error
+POST http://localhost:2333/login
+Content-Type: application/json
+
+{
+  "email": "a@a.com",
+  "password": "b"
 }

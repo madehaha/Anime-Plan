@@ -5,6 +5,7 @@ package ent
 import (
 	"backend/ent/members"
 	"backend/ent/predicate"
+	"backend/ent/subject"
 	"context"
 	"errors"
 	"fmt"
@@ -24,6 +25,7 @@ const (
 
 	// Node types.
 	TypeMembers = "Members"
+	TypeSubject = "Subject"
 )
 
 // MembersMutation represents an operation that mutates the Members nodes in the graph.
@@ -716,4 +718,990 @@ func (m *MembersMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *MembersMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Members edge %s", name)
+}
+
+// SubjectMutation represents an operation that mutates the Subject nodes in the graph.
+type SubjectMutation struct {
+	config
+	op              Op
+	typ             string
+	id              *uint32
+	image           *string
+	summary         *string
+	name            *string
+	date            *string
+	name_cn         *string
+	on_hold         *uint32
+	addon_hold      *int32
+	wish            *uint32
+	addwish         *int32
+	doing           *uint32
+	adddoing        *int32
+	subject_type    *uint8
+	addsubject_type *int8
+	collect         *uint32
+	addcollect      *int32
+	clearedFields   map[string]struct{}
+	done            bool
+	oldValue        func(context.Context) (*Subject, error)
+	predicates      []predicate.Subject
+}
+
+var _ ent.Mutation = (*SubjectMutation)(nil)
+
+// subjectOption allows management of the mutation configuration using functional options.
+type subjectOption func(*SubjectMutation)
+
+// newSubjectMutation creates new mutation for the Subject entity.
+func newSubjectMutation(c config, op Op, opts ...subjectOption) *SubjectMutation {
+	m := &SubjectMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeSubject,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withSubjectID sets the ID field of the mutation.
+func withSubjectID(id uint32) subjectOption {
+	return func(m *SubjectMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Subject
+		)
+		m.oldValue = func(ctx context.Context) (*Subject, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Subject.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withSubject sets the old Subject of the mutation.
+func withSubject(node *Subject) subjectOption {
+	return func(m *SubjectMutation) {
+		m.oldValue = func(context.Context) (*Subject, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m SubjectMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m SubjectMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Subject entities.
+func (m *SubjectMutation) SetID(id uint32) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *SubjectMutation) ID() (id uint32, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *SubjectMutation) IDs(ctx context.Context) ([]uint32, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uint32{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Subject.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetImage sets the "image" field.
+func (m *SubjectMutation) SetImage(s string) {
+	m.image = &s
+}
+
+// Image returns the value of the "image" field in the mutation.
+func (m *SubjectMutation) Image() (r string, exists bool) {
+	v := m.image
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldImage returns the old "image" field's value of the Subject entity.
+// If the Subject object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubjectMutation) OldImage(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldImage is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldImage requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldImage: %w", err)
+	}
+	return oldValue.Image, nil
+}
+
+// ResetImage resets all changes to the "image" field.
+func (m *SubjectMutation) ResetImage() {
+	m.image = nil
+}
+
+// SetSummary sets the "summary" field.
+func (m *SubjectMutation) SetSummary(s string) {
+	m.summary = &s
+}
+
+// Summary returns the value of the "summary" field in the mutation.
+func (m *SubjectMutation) Summary() (r string, exists bool) {
+	v := m.summary
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSummary returns the old "summary" field's value of the Subject entity.
+// If the Subject object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubjectMutation) OldSummary(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSummary is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSummary requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSummary: %w", err)
+	}
+	return oldValue.Summary, nil
+}
+
+// ResetSummary resets all changes to the "summary" field.
+func (m *SubjectMutation) ResetSummary() {
+	m.summary = nil
+}
+
+// SetName sets the "name" field.
+func (m *SubjectMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *SubjectMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Subject entity.
+// If the Subject object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubjectMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *SubjectMutation) ResetName() {
+	m.name = nil
+}
+
+// SetDate sets the "date" field.
+func (m *SubjectMutation) SetDate(s string) {
+	m.date = &s
+}
+
+// Date returns the value of the "date" field in the mutation.
+func (m *SubjectMutation) Date() (r string, exists bool) {
+	v := m.date
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDate returns the old "date" field's value of the Subject entity.
+// If the Subject object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubjectMutation) OldDate(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDate: %w", err)
+	}
+	return oldValue.Date, nil
+}
+
+// ResetDate resets all changes to the "date" field.
+func (m *SubjectMutation) ResetDate() {
+	m.date = nil
+}
+
+// SetNameCn sets the "name_cn" field.
+func (m *SubjectMutation) SetNameCn(s string) {
+	m.name_cn = &s
+}
+
+// NameCn returns the value of the "name_cn" field in the mutation.
+func (m *SubjectMutation) NameCn() (r string, exists bool) {
+	v := m.name_cn
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNameCn returns the old "name_cn" field's value of the Subject entity.
+// If the Subject object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubjectMutation) OldNameCn(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNameCn is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNameCn requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNameCn: %w", err)
+	}
+	return oldValue.NameCn, nil
+}
+
+// ResetNameCn resets all changes to the "name_cn" field.
+func (m *SubjectMutation) ResetNameCn() {
+	m.name_cn = nil
+}
+
+// SetOnHold sets the "on_hold" field.
+func (m *SubjectMutation) SetOnHold(u uint32) {
+	m.on_hold = &u
+	m.addon_hold = nil
+}
+
+// OnHold returns the value of the "on_hold" field in the mutation.
+func (m *SubjectMutation) OnHold() (r uint32, exists bool) {
+	v := m.on_hold
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOnHold returns the old "on_hold" field's value of the Subject entity.
+// If the Subject object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubjectMutation) OldOnHold(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOnHold is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOnHold requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOnHold: %w", err)
+	}
+	return oldValue.OnHold, nil
+}
+
+// AddOnHold adds u to the "on_hold" field.
+func (m *SubjectMutation) AddOnHold(u int32) {
+	if m.addon_hold != nil {
+		*m.addon_hold += u
+	} else {
+		m.addon_hold = &u
+	}
+}
+
+// AddedOnHold returns the value that was added to the "on_hold" field in this mutation.
+func (m *SubjectMutation) AddedOnHold() (r int32, exists bool) {
+	v := m.addon_hold
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetOnHold resets all changes to the "on_hold" field.
+func (m *SubjectMutation) ResetOnHold() {
+	m.on_hold = nil
+	m.addon_hold = nil
+}
+
+// SetWish sets the "wish" field.
+func (m *SubjectMutation) SetWish(u uint32) {
+	m.wish = &u
+	m.addwish = nil
+}
+
+// Wish returns the value of the "wish" field in the mutation.
+func (m *SubjectMutation) Wish() (r uint32, exists bool) {
+	v := m.wish
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldWish returns the old "wish" field's value of the Subject entity.
+// If the Subject object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubjectMutation) OldWish(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldWish is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldWish requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldWish: %w", err)
+	}
+	return oldValue.Wish, nil
+}
+
+// AddWish adds u to the "wish" field.
+func (m *SubjectMutation) AddWish(u int32) {
+	if m.addwish != nil {
+		*m.addwish += u
+	} else {
+		m.addwish = &u
+	}
+}
+
+// AddedWish returns the value that was added to the "wish" field in this mutation.
+func (m *SubjectMutation) AddedWish() (r int32, exists bool) {
+	v := m.addwish
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetWish resets all changes to the "wish" field.
+func (m *SubjectMutation) ResetWish() {
+	m.wish = nil
+	m.addwish = nil
+}
+
+// SetDoing sets the "doing" field.
+func (m *SubjectMutation) SetDoing(u uint32) {
+	m.doing = &u
+	m.adddoing = nil
+}
+
+// Doing returns the value of the "doing" field in the mutation.
+func (m *SubjectMutation) Doing() (r uint32, exists bool) {
+	v := m.doing
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDoing returns the old "doing" field's value of the Subject entity.
+// If the Subject object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubjectMutation) OldDoing(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDoing is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDoing requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDoing: %w", err)
+	}
+	return oldValue.Doing, nil
+}
+
+// AddDoing adds u to the "doing" field.
+func (m *SubjectMutation) AddDoing(u int32) {
+	if m.adddoing != nil {
+		*m.adddoing += u
+	} else {
+		m.adddoing = &u
+	}
+}
+
+// AddedDoing returns the value that was added to the "doing" field in this mutation.
+func (m *SubjectMutation) AddedDoing() (r int32, exists bool) {
+	v := m.adddoing
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDoing resets all changes to the "doing" field.
+func (m *SubjectMutation) ResetDoing() {
+	m.doing = nil
+	m.adddoing = nil
+}
+
+// SetSubjectType sets the "subject_type" field.
+func (m *SubjectMutation) SetSubjectType(u uint8) {
+	m.subject_type = &u
+	m.addsubject_type = nil
+}
+
+// SubjectType returns the value of the "subject_type" field in the mutation.
+func (m *SubjectMutation) SubjectType() (r uint8, exists bool) {
+	v := m.subject_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSubjectType returns the old "subject_type" field's value of the Subject entity.
+// If the Subject object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubjectMutation) OldSubjectType(ctx context.Context) (v uint8, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSubjectType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSubjectType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSubjectType: %w", err)
+	}
+	return oldValue.SubjectType, nil
+}
+
+// AddSubjectType adds u to the "subject_type" field.
+func (m *SubjectMutation) AddSubjectType(u int8) {
+	if m.addsubject_type != nil {
+		*m.addsubject_type += u
+	} else {
+		m.addsubject_type = &u
+	}
+}
+
+// AddedSubjectType returns the value that was added to the "subject_type" field in this mutation.
+func (m *SubjectMutation) AddedSubjectType() (r int8, exists bool) {
+	v := m.addsubject_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSubjectType resets all changes to the "subject_type" field.
+func (m *SubjectMutation) ResetSubjectType() {
+	m.subject_type = nil
+	m.addsubject_type = nil
+}
+
+// SetCollect sets the "collect" field.
+func (m *SubjectMutation) SetCollect(u uint32) {
+	m.collect = &u
+	m.addcollect = nil
+}
+
+// Collect returns the value of the "collect" field in the mutation.
+func (m *SubjectMutation) Collect() (r uint32, exists bool) {
+	v := m.collect
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCollect returns the old "collect" field's value of the Subject entity.
+// If the Subject object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubjectMutation) OldCollect(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCollect is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCollect requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCollect: %w", err)
+	}
+	return oldValue.Collect, nil
+}
+
+// AddCollect adds u to the "collect" field.
+func (m *SubjectMutation) AddCollect(u int32) {
+	if m.addcollect != nil {
+		*m.addcollect += u
+	} else {
+		m.addcollect = &u
+	}
+}
+
+// AddedCollect returns the value that was added to the "collect" field in this mutation.
+func (m *SubjectMutation) AddedCollect() (r int32, exists bool) {
+	v := m.addcollect
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCollect resets all changes to the "collect" field.
+func (m *SubjectMutation) ResetCollect() {
+	m.collect = nil
+	m.addcollect = nil
+}
+
+// Where appends a list predicates to the SubjectMutation builder.
+func (m *SubjectMutation) Where(ps ...predicate.Subject) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the SubjectMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *SubjectMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Subject, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *SubjectMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *SubjectMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Subject).
+func (m *SubjectMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *SubjectMutation) Fields() []string {
+	fields := make([]string, 0, 10)
+	if m.image != nil {
+		fields = append(fields, subject.FieldImage)
+	}
+	if m.summary != nil {
+		fields = append(fields, subject.FieldSummary)
+	}
+	if m.name != nil {
+		fields = append(fields, subject.FieldName)
+	}
+	if m.date != nil {
+		fields = append(fields, subject.FieldDate)
+	}
+	if m.name_cn != nil {
+		fields = append(fields, subject.FieldNameCn)
+	}
+	if m.on_hold != nil {
+		fields = append(fields, subject.FieldOnHold)
+	}
+	if m.wish != nil {
+		fields = append(fields, subject.FieldWish)
+	}
+	if m.doing != nil {
+		fields = append(fields, subject.FieldDoing)
+	}
+	if m.subject_type != nil {
+		fields = append(fields, subject.FieldSubjectType)
+	}
+	if m.collect != nil {
+		fields = append(fields, subject.FieldCollect)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *SubjectMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case subject.FieldImage:
+		return m.Image()
+	case subject.FieldSummary:
+		return m.Summary()
+	case subject.FieldName:
+		return m.Name()
+	case subject.FieldDate:
+		return m.Date()
+	case subject.FieldNameCn:
+		return m.NameCn()
+	case subject.FieldOnHold:
+		return m.OnHold()
+	case subject.FieldWish:
+		return m.Wish()
+	case subject.FieldDoing:
+		return m.Doing()
+	case subject.FieldSubjectType:
+		return m.SubjectType()
+	case subject.FieldCollect:
+		return m.Collect()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *SubjectMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case subject.FieldImage:
+		return m.OldImage(ctx)
+	case subject.FieldSummary:
+		return m.OldSummary(ctx)
+	case subject.FieldName:
+		return m.OldName(ctx)
+	case subject.FieldDate:
+		return m.OldDate(ctx)
+	case subject.FieldNameCn:
+		return m.OldNameCn(ctx)
+	case subject.FieldOnHold:
+		return m.OldOnHold(ctx)
+	case subject.FieldWish:
+		return m.OldWish(ctx)
+	case subject.FieldDoing:
+		return m.OldDoing(ctx)
+	case subject.FieldSubjectType:
+		return m.OldSubjectType(ctx)
+	case subject.FieldCollect:
+		return m.OldCollect(ctx)
+	}
+	return nil, fmt.Errorf("unknown Subject field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *SubjectMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case subject.FieldImage:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetImage(v)
+		return nil
+	case subject.FieldSummary:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSummary(v)
+		return nil
+	case subject.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case subject.FieldDate:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDate(v)
+		return nil
+	case subject.FieldNameCn:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNameCn(v)
+		return nil
+	case subject.FieldOnHold:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOnHold(v)
+		return nil
+	case subject.FieldWish:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetWish(v)
+		return nil
+	case subject.FieldDoing:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDoing(v)
+		return nil
+	case subject.FieldSubjectType:
+		v, ok := value.(uint8)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSubjectType(v)
+		return nil
+	case subject.FieldCollect:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCollect(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Subject field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *SubjectMutation) AddedFields() []string {
+	var fields []string
+	if m.addon_hold != nil {
+		fields = append(fields, subject.FieldOnHold)
+	}
+	if m.addwish != nil {
+		fields = append(fields, subject.FieldWish)
+	}
+	if m.adddoing != nil {
+		fields = append(fields, subject.FieldDoing)
+	}
+	if m.addsubject_type != nil {
+		fields = append(fields, subject.FieldSubjectType)
+	}
+	if m.addcollect != nil {
+		fields = append(fields, subject.FieldCollect)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *SubjectMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case subject.FieldOnHold:
+		return m.AddedOnHold()
+	case subject.FieldWish:
+		return m.AddedWish()
+	case subject.FieldDoing:
+		return m.AddedDoing()
+	case subject.FieldSubjectType:
+		return m.AddedSubjectType()
+	case subject.FieldCollect:
+		return m.AddedCollect()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *SubjectMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case subject.FieldOnHold:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddOnHold(v)
+		return nil
+	case subject.FieldWish:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddWish(v)
+		return nil
+	case subject.FieldDoing:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDoing(v)
+		return nil
+	case subject.FieldSubjectType:
+		v, ok := value.(int8)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSubjectType(v)
+		return nil
+	case subject.FieldCollect:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCollect(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Subject numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *SubjectMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *SubjectMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *SubjectMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Subject nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *SubjectMutation) ResetField(name string) error {
+	switch name {
+	case subject.FieldImage:
+		m.ResetImage()
+		return nil
+	case subject.FieldSummary:
+		m.ResetSummary()
+		return nil
+	case subject.FieldName:
+		m.ResetName()
+		return nil
+	case subject.FieldDate:
+		m.ResetDate()
+		return nil
+	case subject.FieldNameCn:
+		m.ResetNameCn()
+		return nil
+	case subject.FieldOnHold:
+		m.ResetOnHold()
+		return nil
+	case subject.FieldWish:
+		m.ResetWish()
+		return nil
+	case subject.FieldDoing:
+		m.ResetDoing()
+		return nil
+	case subject.FieldSubjectType:
+		m.ResetSubjectType()
+		return nil
+	case subject.FieldCollect:
+		m.ResetCollect()
+		return nil
+	}
+	return fmt.Errorf("unknown Subject field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *SubjectMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *SubjectMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *SubjectMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *SubjectMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *SubjectMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *SubjectMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *SubjectMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown Subject unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *SubjectMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown Subject edge %s", name)
 }

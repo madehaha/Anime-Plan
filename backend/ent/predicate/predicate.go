@@ -8,3 +8,6 @@ import (
 
 // Members is the predicate function for members builders.
 type Members func(*sql.Selector)
+
+// Subject is the predicate function for subject builders.
+type Subject func(*sql.Selector)

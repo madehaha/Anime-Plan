@@ -161,11 +161,6 @@ func (mc *MembersCreate) check() error {
 	if _, ok := mc.mutation.Password(); !ok {
 		return &ValidationError{Name: "password", err: errors.New(`ent: missing required field "Members.password"`)}
 	}
-	if v, ok := mc.mutation.Password(); ok {
-		if err := members.PasswordValidator(v); err != nil {
-			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "Members.password": %w`, err)}
-		}
-	}
 	if _, ok := mc.mutation.Nickname(); !ok {
 		return &ValidationError{Name: "nickname", err: errors.New(`ent: missing required field "Members.nickname"`)}
 	}

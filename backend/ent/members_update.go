@@ -144,11 +144,6 @@ func (mu *MembersUpdate) check() error {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "Members.email": %w`, err)}
 		}
 	}
-	if v, ok := mu.mutation.Password(); ok {
-		if err := members.PasswordValidator(v); err != nil {
-			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "Members.password": %w`, err)}
-		}
-	}
 	if v, ok := mu.mutation.Nickname(); ok {
 		if err := members.NicknameValidator(v); err != nil {
 			return &ValidationError{Name: "nickname", err: fmt.Errorf(`ent: validator failed for field "Members.nickname": %w`, err)}
@@ -346,11 +341,6 @@ func (muo *MembersUpdateOne) check() error {
 	if v, ok := muo.mutation.Email(); ok {
 		if err := members.EmailValidator(v); err != nil {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "Members.email": %w`, err)}
-		}
-	}
-	if v, ok := muo.mutation.Password(); ok {
-		if err := members.PasswordValidator(v); err != nil {
-			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "Members.password": %w`, err)}
 		}
 	}
 	if v, ok := muo.mutation.Nickname(); ok {

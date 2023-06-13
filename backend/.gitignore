@@ -1,3 +1,4 @@
 main
 .idea/
 bin/**
+config.yaml

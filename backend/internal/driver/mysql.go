@@ -7,10 +7,9 @@ import (
 
 	"context"
 	"fmt"
-	"go.uber.org/fx"
-	"log"
 
 	_ "github.com/go-sql-driver/mysql"
+	"go.uber.org/fx"
 )
 
 func NewMysqlClient(config config.AppConfig, lifecycle fx.Lifecycle) *ent.Client {
@@ -28,7 +27,8 @@ func NewMysqlClient(config config.AppConfig, lifecycle fx.Lifecycle) *ent.Client
 
 	err = client.Schema.Create(context.Background())
 	if err != nil {
-		log.Fatalf("Failed to create schema")
+		info := fmt.Sprintf("Failed to create schema %v", err)
+		logger.Fatal(info)
 	}
 
 	lifecycle.Append(fx.Hook{

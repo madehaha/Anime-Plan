@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// Members is the client for interacting with the Members builders.
 	Members *MembersClient
+	// Subject is the client for interacting with the Subject builders.
+	Subject *SubjectClient
 
 	// lazily loaded.
 	client     *Client
@@ -146,6 +148,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Members = NewMembersClient(tx.config)
+	tx.Subject = NewSubjectClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

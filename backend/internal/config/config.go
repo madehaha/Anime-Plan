@@ -20,22 +20,22 @@ type AppConfig struct {
 		Password string `yaml:"password"`
 		DB       string `yaml:"db"`
 	}
+
+	JwtSecret string `yaml:"jwt"`
 }
 
-func AppConfigReader() (config AppConfig, err error) {
+func AppConfigReader() AppConfig {
+	var config AppConfig
 	data, err := os.ReadFile("./config.yaml")
 	if err != nil {
-		logger.Error("Failed to read config.yaml")
-		return
+		logger.Fatal("Failed to read config.yaml")
 	}
 
 	err = yaml.Unmarshal(data, &config)
 	if err != nil {
-		// TODO log
-		logger.Error("Failed to parse config")
-		return
+		logger.Fatal("Failed to parse config")
 	}
-	return
+	return config
 }
 
 func (c *AppConfig) ListenAddr() string {
