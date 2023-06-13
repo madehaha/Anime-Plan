@@ -11,6 +11,7 @@ import (
 	"backend/ent/migrate"
 
 	"backend/ent/members"
+	"backend/ent/subject"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -24,6 +25,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// Members is the client for interacting with the Members builders.
 	Members *MembersClient
+	// Subject is the client for interacting with the Subject builders.
+	Subject *SubjectClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -38,6 +41,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Members = NewMembersClient(c.config)
+	c.Subject = NewSubjectClient(c.config)
 }
 
 type (
@@ -121,6 +125,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:     ctx,
 		config:  cfg,
 		Members: NewMembersClient(cfg),
+		Subject: NewSubjectClient(cfg),
 	}, nil
 }
 
@@ -141,6 +146,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:     ctx,
 		config:  cfg,
 		Members: NewMembersClient(cfg),
+		Subject: NewSubjectClient(cfg),
 	}, nil
 }
 
@@ -170,12 +176,14 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.Members.Use(hooks...)
+	c.Subject.Use(hooks...)
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Members.Intercept(interceptors...)
+	c.Subject.Intercept(interceptors...)
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -183,6 +191,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *MembersMutation:
 		return c.Members.mutate(ctx, m)
+	case *SubjectMutation:
+		return c.Subject.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
@@ -306,12 +316,130 @@ func (c *MembersClient) mutate(ctx context.Context, m *MembersMutation) (Value, 
 	}
 }
 
+// SubjectClient is a client for the Subject schema.
+type SubjectClient struct {
+	config
+}
+
+// NewSubjectClient returns a client for the Subject from the given config.
+func NewSubjectClient(c config) *SubjectClient {
+	return &SubjectClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `subject.Hooks(f(g(h())))`.
+func (c *SubjectClient) Use(hooks ...Hook) {
+	c.hooks.Subject = append(c.hooks.Subject, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `subject.Intercept(f(g(h())))`.
+func (c *SubjectClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Subject = append(c.inters.Subject, interceptors...)
+}
+
+// Create returns a builder for creating a Subject entity.
+func (c *SubjectClient) Create() *SubjectCreate {
+	mutation := newSubjectMutation(c.config, OpCreate)
+	return &SubjectCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Subject entities.
+func (c *SubjectClient) CreateBulk(builders ...*SubjectCreate) *SubjectCreateBulk {
+	return &SubjectCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Subject.
+func (c *SubjectClient) Update() *SubjectUpdate {
+	mutation := newSubjectMutation(c.config, OpUpdate)
+	return &SubjectUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SubjectClient) UpdateOne(s *Subject) *SubjectUpdateOne {
+	mutation := newSubjectMutation(c.config, OpUpdateOne, withSubject(s))
+	return &SubjectUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SubjectClient) UpdateOneID(id uint32) *SubjectUpdateOne {
+	mutation := newSubjectMutation(c.config, OpUpdateOne, withSubjectID(id))
+	return &SubjectUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Subject.
+func (c *SubjectClient) Delete() *SubjectDelete {
+	mutation := newSubjectMutation(c.config, OpDelete)
+	return &SubjectDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SubjectClient) DeleteOne(s *Subject) *SubjectDeleteOne {
+	return c.DeleteOneID(s.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *SubjectClient) DeleteOneID(id uint32) *SubjectDeleteOne {
+	builder := c.Delete().Where(subject.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SubjectDeleteOne{builder}
+}
+
+// Query returns a query builder for Subject.
+func (c *SubjectClient) Query() *SubjectQuery {
+	return &SubjectQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSubject},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Subject entity by its id.
+func (c *SubjectClient) Get(ctx context.Context, id uint32) (*Subject, error) {
+	return c.Query().Where(subject.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SubjectClient) GetX(ctx context.Context, id uint32) *Subject {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *SubjectClient) Hooks() []Hook {
+	return c.hooks.Subject
+}
+
+// Interceptors returns the client interceptors.
+func (c *SubjectClient) Interceptors() []Interceptor {
+	return c.inters.Subject
+}
+
+func (c *SubjectClient) mutate(ctx context.Context, m *SubjectMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SubjectCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SubjectUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SubjectUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SubjectDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Subject mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Members []ent.Hook
+		Members, Subject []ent.Hook
 	}
 	inters struct {
-		Members []ent.Interceptor
+		Members, Subject []ent.Interceptor
 	}
 )

@@ -4,6 +4,7 @@ package ent
 
 import (
 	"backend/ent/members"
+	"backend/ent/subject"
 	"context"
 	"errors"
 	"fmt"
@@ -74,6 +75,7 @@ func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			members.Table: members.ValidColumn,
+			subject.Table: subject.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

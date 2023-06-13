@@ -10,7 +10,7 @@ tasks:
   build:
     desc: Build
     cmds:
-      - go build -o bin/backend main.go
+      - go build -o bin/backend.exe main.go
     silent: false
 
   gen:

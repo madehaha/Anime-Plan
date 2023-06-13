@@ -5,6 +5,7 @@ package ent
 import (
 	"backend/ent/members"
 	"backend/ent/schema"
+	"backend/ent/subject"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -55,4 +56,22 @@ func init() {
 	membersDescGid := membersFields[6].Descriptor()
 	// members.DefaultGid holds the default value on creation for the gid field.
 	members.DefaultGid = membersDescGid.Default.(uint8)
+	subjectFields := schema.Subject{}.Fields()
+	_ = subjectFields
+	// subjectDescImage is the schema descriptor for image field.
+	subjectDescImage := subjectFields[1].Descriptor()
+	// subject.DefaultImage holds the default value on creation for the image field.
+	subject.DefaultImage = subjectDescImage.Default.(string)
+	// subjectDescSummary is the schema descriptor for summary field.
+	subjectDescSummary := subjectFields[2].Descriptor()
+	// subject.SummaryValidator is a validator for the "summary" field. It is called by the builders before save.
+	subject.SummaryValidator = subjectDescSummary.Validators[0].(func(string) error)
+	// subjectDescSubjectType is the schema descriptor for subject_type field.
+	subjectDescSubjectType := subjectFields[9].Descriptor()
+	// subject.DefaultSubjectType holds the default value on creation for the subject_type field.
+	subject.DefaultSubjectType = subjectDescSubjectType.Default.(uint8)
+	// subjectDescCollect is the schema descriptor for collect field.
+	subjectDescCollect := subjectFields[10].Descriptor()
+	// subject.DefaultCollect holds the default value on creation for the collect field.
+	subject.DefaultCollect = subjectDescCollect.Default.(uint32)
 }
