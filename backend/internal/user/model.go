@@ -42,3 +42,12 @@ func (m MysqlRepo) GetByEmail(ctx context.Context, email string) (member *ent.Me
 	member, err = m.client.Members.Query().Where(members.EmailEQ(email)).Only(ctx)
 	return
 }
+
+func (m MysqlRepo) DeleteByUid(ctx context.Context, uid uint32) error {
+	err := m.client.Members.DeleteOneID(uid).Exec(ctx)
+	if err != nil {
+		logger.Error("Failed to delete user")
+		return err
+	}
+	return nil
+}

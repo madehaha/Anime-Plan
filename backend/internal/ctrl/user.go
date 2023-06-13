@@ -45,3 +45,12 @@ func (uc UserCtrl) Login(email string, password string) (token string, err error
 	token = uc.Jwt.GenerateNewToken(member.ID, member.Gid)
 	return
 }
+
+func (uc UserCtrl) Cancel(uid uint32) error {
+	err := uc.Repo.DeleteByUid(context.Background(), uid)
+	if err != nil {
+		logger.Error("Failed to delete by uid")
+		return err
+	}
+	return nil
+}

@@ -35,12 +35,14 @@ func (jm JwtMiddleware) extractAndCheckToken(ctx echo.Context) (token string, cl
 }
 
 func (jm JwtMiddleware) UserJWTAuth(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(ctx echo.Context) error {
-		_, _, err := jm.extractAndCheckToken(ctx)
+	return func(c echo.Context) error {
+		_, claims, err := jm.extractAndCheckToken(c)
 		if err != nil {
 			logger.Error("extract token or check token error")
 			return err
 		}
-		return nil
+		c.Set("uid", claims.Uid)
+		c.Set("gid", claims.Gid)
+		return next(c)
 	}
 }

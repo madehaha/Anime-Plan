@@ -32,8 +32,6 @@ func start() error {
 
 		ctrl.Module,
 		web.Module,
-		// util
-		fx.Invoke(util.NewJwtUtil),
 		fx.Populate(&cfg, &e),
 	).Err()
 

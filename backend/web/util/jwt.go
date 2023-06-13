@@ -27,7 +27,7 @@ func (j JwtUtil) GenerateNewToken(uid uint32, gid uint8) string {
 		Uid: uid,
 		Gid: gid,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(7 * 24 * time.Hour).UnixMilli(),
+			ExpiresAt: time.Now().Add(7 * 24 * time.Hour).Unix(),
 		},
 	}
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

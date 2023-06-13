@@ -4,9 +4,13 @@ import (
 	"backend/ent"
 	"backend/internal/logger"
 	"backend/web/request/user"
-	"github.com/labstack/echo/v4"
-	"net/http"
+
+	"strconv"
 	"time"
+
+	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
+	"net/http"
 )
 
 // Register POST
@@ -58,4 +62,17 @@ func (h Handler) Login(c echo.Context) error {
 	_ = c.JSON(http.StatusOK, token)
 	logger.Info(token)
 	return err
+}
+
+func (h Handler) Cancel(c echo.Context) error {
+	uid := c.Get("uid").(uint32)
+	logger.Info("", zap.String("uid", strconv.Itoa(int(uid))))
+	err := h.ctrl.Cancel(uid)
+	if err != nil {
+		logger.Error("Failed to cancel user")
+		_ = c.JSON(http.StatusBadRequest, err.Error())
+		return err
+	}
+	_ = c.NoContent(http.StatusOK)
+	return nil
 }
