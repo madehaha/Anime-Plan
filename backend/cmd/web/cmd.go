@@ -6,6 +6,7 @@ import (
 	"backend/internal/driver"
 	"backend/internal/user"
 	"backend/web"
+	"backend/web/util"
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/cobra"
 	"go.uber.org/fx"
@@ -26,7 +27,7 @@ func start() error {
 
 	err := fx.New(
 		fx.NopLogger,
-		fx.Provide(config.AppConfigReader, driver.NewMysqlClient),
+		fx.Provide(config.AppConfigReader, driver.NewMysqlClient, util.NewJwtUtil),
 		fx.Provide(user.NewRepo),
 
 		ctrl.Module,

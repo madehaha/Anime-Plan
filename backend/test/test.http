@@ -1,9 +1,24 @@
 ### Register
-POST http://localhost:2333/user/register
+POST http://localhost:2333/register
 Content-Type: application/json
 
 {
-  "email": "114514@lll.com",
-  "nickname": "abyss111",
-  "password": "1919810"
+  "email": "a@a.com",
+  "nickname": "a",
+  "password": "b"
 }
+
+### Login
+POST http://localhost:2333/login
+Content-Type: application/json
+
+{
+  "email": "a@a.com",
+  "password": "b"
+}
+
+### Cancel
+POST http://localhost:2333/cancel
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjE2LCJnaWQiOjAsImV4cCI6MTY4NzI2MDYyMn0.22mhLSniGYNBImhso94en2jSTImtsm1RJpkhuIP97XQ
+

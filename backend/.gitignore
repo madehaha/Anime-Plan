@@ -1,5 +1,5 @@
 main
 .idea/
 bin/**
-Taskfile.yml
 config.yaml
+

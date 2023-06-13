@@ -15,8 +15,8 @@ func (Members) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint32("id").StorageKey("uid").Unique(),
 		field.String("username").MaxLen(30).Default(""),
-		field.String("email").MaxLen(50),
-		field.String("password").MaxLen(30).MinLen(5),
+		field.String("email").MaxLen(50).Unique(),
+		field.String("password"),
 		field.String("nickname").MaxLen(30),
 		field.String("avatar").MaxLen(255).Default("https://lain.bgm.tv/pic/user/l/icon.jpg"),
 		field.Uint8("gid").Default(0), // group id

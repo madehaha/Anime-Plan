@@ -58,8 +58,6 @@ var (
 	UsernameValidator func(string) error
 	// EmailValidator is a validator for the "email" field. It is called by the builders before save.
 	EmailValidator func(string) error
-	// PasswordValidator is a validator for the "password" field. It is called by the builders before save.
-	PasswordValidator func(string) error
 	// NicknameValidator is a validator for the "nickname" field. It is called by the builders before save.
 	NicknameValidator func(string) error
 	// DefaultAvatar holds the default value on creation for the "avatar" field.
