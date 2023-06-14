@@ -10,7 +10,7 @@ const (
 	// Label holds the string label denoting the subject type in the database.
 	Label = "subject"
 	// FieldID holds the string denoting the id field in the database.
-	FieldID = "uid"
+	FieldID = "id"
 	// FieldImage holds the string denoting the image field in the database.
 	FieldImage = "image"
 	// FieldSummary holds the string denoting the summary field in the database.
@@ -63,8 +63,16 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultImage holds the default value on creation for the "image" field.
 	DefaultImage string
+	// ImageValidator is a validator for the "image" field. It is called by the builders before save.
+	ImageValidator func(string) error
 	// SummaryValidator is a validator for the "summary" field. It is called by the builders before save.
 	SummaryValidator func(string) error
+	// DefaultOnHold holds the default value on creation for the "on_hold" field.
+	DefaultOnHold uint32
+	// DefaultWish holds the default value on creation for the "wish" field.
+	DefaultWish uint32
+	// DefaultDoing holds the default value on creation for the "doing" field.
+	DefaultDoing uint32
 	// DefaultSubjectType holds the default value on creation for the "subject_type" field.
 	DefaultSubjectType uint8
 	// DefaultCollect holds the default value on creation for the "collect" field.

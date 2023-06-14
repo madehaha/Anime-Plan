@@ -3,7 +3,6 @@
 package migrate
 
 import (
-	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/dialect/sql/schema"
 	"entgo.io/ent/schema/field"
 )
@@ -28,15 +27,15 @@ var (
 	}
 	// SubjectsColumns holds the columns for the "subjects" table.
 	SubjectsColumns = []*schema.Column{
-		{Name: "uid", Type: field.TypeUint32, Increment: true},
-		{Name: "image", Type: field.TypeString, Default: "https://lain.bgm.tv/pic/user/l/icon.jpg"},
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "image", Type: field.TypeString, Size: 255, Default: "https://lain.bgm.tv/pic/user/l/icon.jpg"},
 		{Name: "summary", Type: field.TypeString, Size: 300},
 		{Name: "name", Type: field.TypeString},
 		{Name: "date", Type: field.TypeString},
 		{Name: "name_cn", Type: field.TypeString},
-		{Name: "on_hold", Type: field.TypeUint32},
-		{Name: "wish", Type: field.TypeUint32},
-		{Name: "doing", Type: field.TypeUint32},
+		{Name: "on_hold", Type: field.TypeUint32, Default: 0},
+		{Name: "wish", Type: field.TypeUint32, Default: 0},
+		{Name: "doing", Type: field.TypeUint32, Default: 0},
 		{Name: "subject_type", Type: field.TypeUint8, Default: 0},
 		{Name: "collect", Type: field.TypeUint32, Default: 0},
 	}
@@ -54,7 +53,4 @@ var (
 )
 
 func init() {
-	SubjectsTable.Annotation = &entsql.Annotation{
-		Table: "subjects",
-	}
 }

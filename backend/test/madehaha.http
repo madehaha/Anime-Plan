@@ -1,0 +1,46 @@
+### Register
+POST http://localhost:2333/register
+Content-Type: application/json
+
+{
+  "email": "lazijier.com",
+  "nickname": "ass",
+  "password": "b",
+  "gid": 1
+}
+
+### Create Subject
+POST http://localhost:2333/subject/create
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEzLCJnaWQiOjEsImV4cCI6MTY4NzI4NzA5MX0.hMkbN70ttP5mRlmJ8U4rrK9z96JrkIE1kmw4zJwCX1I
+Content-Type: application/json
+
+{
+  "name": "lolitas",
+  "name_cn": "洛丽塔",
+  "image": "http://www.csdn.com",
+  "date": "2023-06-07",
+  "summary": "非常非常非常非常非常好看",
+  "type": 1
+}
+
+### Login
+POST http://localhost:2333/login
+Content-Type: application/json
+
+{
+  "email": "lazijier.com",
+  "password": "b"
+}
+
+### Cancel
+POST http://localhost:2333/cancel
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjE2LCJnaWQiOjAsImV4cCI6MTY4NzI2MDYyMn0.22mhLSniGYNBImhso94en2jSTImtsm1RJpkhuIP97XQ
+
+### GET subject
+GET http://localhost:2333/subject/get
+Content-Type: application/json
+
+### GET subject by ID
+GET http://localhost:2333/subject/2
+Content-Type: application/json

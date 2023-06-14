@@ -63,15 +63,39 @@ func (sc *SubjectCreate) SetOnHold(u uint32) *SubjectCreate {
 	return sc
 }
 
+// SetNillableOnHold sets the "on_hold" field if the given value is not nil.
+func (sc *SubjectCreate) SetNillableOnHold(u *uint32) *SubjectCreate {
+	if u != nil {
+		sc.SetOnHold(*u)
+	}
+	return sc
+}
+
 // SetWish sets the "wish" field.
 func (sc *SubjectCreate) SetWish(u uint32) *SubjectCreate {
 	sc.mutation.SetWish(u)
 	return sc
 }
 
+// SetNillableWish sets the "wish" field if the given value is not nil.
+func (sc *SubjectCreate) SetNillableWish(u *uint32) *SubjectCreate {
+	if u != nil {
+		sc.SetWish(*u)
+	}
+	return sc
+}
+
 // SetDoing sets the "doing" field.
 func (sc *SubjectCreate) SetDoing(u uint32) *SubjectCreate {
 	sc.mutation.SetDoing(u)
+	return sc
+}
+
+// SetNillableDoing sets the "doing" field if the given value is not nil.
+func (sc *SubjectCreate) SetNillableDoing(u *uint32) *SubjectCreate {
+	if u != nil {
+		sc.SetDoing(*u)
+	}
 	return sc
 }
 
@@ -100,12 +124,6 @@ func (sc *SubjectCreate) SetNillableCollect(u *uint32) *SubjectCreate {
 	if u != nil {
 		sc.SetCollect(*u)
 	}
-	return sc
-}
-
-// SetID sets the "id" field.
-func (sc *SubjectCreate) SetID(u uint32) *SubjectCreate {
-	sc.mutation.SetID(u)
 	return sc
 }
 
@@ -148,6 +166,18 @@ func (sc *SubjectCreate) defaults() {
 		v := subject.DefaultImage
 		sc.mutation.SetImage(v)
 	}
+	if _, ok := sc.mutation.OnHold(); !ok {
+		v := subject.DefaultOnHold
+		sc.mutation.SetOnHold(v)
+	}
+	if _, ok := sc.mutation.Wish(); !ok {
+		v := subject.DefaultWish
+		sc.mutation.SetWish(v)
+	}
+	if _, ok := sc.mutation.Doing(); !ok {
+		v := subject.DefaultDoing
+		sc.mutation.SetDoing(v)
+	}
 	if _, ok := sc.mutation.SubjectType(); !ok {
 		v := subject.DefaultSubjectType
 		sc.mutation.SetSubjectType(v)
@@ -162,6 +192,11 @@ func (sc *SubjectCreate) defaults() {
 func (sc *SubjectCreate) check() error {
 	if _, ok := sc.mutation.Image(); !ok {
 		return &ValidationError{Name: "image", err: errors.New(`ent: missing required field "Subject.image"`)}
+	}
+	if v, ok := sc.mutation.Image(); ok {
+		if err := subject.ImageValidator(v); err != nil {
+			return &ValidationError{Name: "image", err: fmt.Errorf(`ent: validator failed for field "Subject.image": %w`, err)}
+		}
 	}
 	if _, ok := sc.mutation.Summary(); !ok {
 		return &ValidationError{Name: "summary", err: errors.New(`ent: missing required field "Subject.summary"`)}
@@ -209,10 +244,8 @@ func (sc *SubjectCreate) sqlSave(ctx context.Context) (*Subject, error) {
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != _node.ID {
-		id := _spec.ID.Value.(int64)
-		_node.ID = uint32(id)
-	}
+	id := _spec.ID.Value.(int64)
+	_node.ID = int(id)
 	sc.mutation.id = &_node.ID
 	sc.mutation.done = true
 	return _node, nil
@@ -221,12 +254,8 @@ func (sc *SubjectCreate) sqlSave(ctx context.Context) (*Subject, error) {
 func (sc *SubjectCreate) createSpec() (*Subject, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Subject{config: sc.config}
-		_spec = sqlgraph.NewCreateSpec(subject.Table, sqlgraph.NewFieldSpec(subject.FieldID, field.TypeUint32))
+		_spec = sqlgraph.NewCreateSpec(subject.Table, sqlgraph.NewFieldSpec(subject.FieldID, field.TypeInt))
 	)
-	if id, ok := sc.mutation.ID(); ok {
-		_node.ID = id
-		_spec.ID.Value = id
-	}
 	if value, ok := sc.mutation.Image(); ok {
 		_spec.SetField(subject.FieldImage, field.TypeString, value)
 		_node.Image = value
@@ -311,9 +340,9 @@ func (scb *SubjectCreateBulk) Save(ctx context.Context) ([]*Subject, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
+				if specs[i].ID.Value != nil {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = uint32(id)
+					nodes[i].ID = int(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

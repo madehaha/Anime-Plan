@@ -13,8 +13,8 @@ POST http://localhost:2333/login
 Content-Type: application/json
 
 {
-  "email": "a@a.com",
-  "password": "b"
+  "email": "114514@lll.com",
+  "password": "1919810"
 }
 
 ### Cancel

@@ -2,8 +2,6 @@ package schema
 
 import (
 	"entgo.io/ent"
-	"entgo.io/ent/dialect/entsql"
-	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/field"
 )
 
@@ -16,7 +14,7 @@ type Subject struct {
 func (Subject) Fields() []ent.Field {
 	return []ent.Field{
 
-		field.String("image").Default("https://lain.bgm.tv/pic/user/l/icon.jpg"),
+		field.String("image").MaxLen(255).Default("https://lain.bgm.tv/pic/user/l/icon.jpg"),
 		field.String("summary").MaxLen(300),
 		field.String("name"),
 		field.String("date"), //release date
@@ -30,11 +28,6 @@ func (Subject) Fields() []ent.Field {
 }
 
 // Annotations of the User.
-func (Subject) Annotations() []schema.Annotation {
-	return []schema.Annotation{
-		entsql.Annotation{Table: "subjects"},
-	}
-}
 
 // Edges of the Subject.
 func (Subject) Edges() []ent.Edge {

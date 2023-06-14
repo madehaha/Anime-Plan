@@ -72,6 +72,14 @@ func (su *SubjectUpdate) SetOnHold(u uint32) *SubjectUpdate {
 	return su
 }
 
+// SetNillableOnHold sets the "on_hold" field if the given value is not nil.
+func (su *SubjectUpdate) SetNillableOnHold(u *uint32) *SubjectUpdate {
+	if u != nil {
+		su.SetOnHold(*u)
+	}
+	return su
+}
+
 // AddOnHold adds u to the "on_hold" field.
 func (su *SubjectUpdate) AddOnHold(u int32) *SubjectUpdate {
 	su.mutation.AddOnHold(u)
@@ -85,6 +93,14 @@ func (su *SubjectUpdate) SetWish(u uint32) *SubjectUpdate {
 	return su
 }
 
+// SetNillableWish sets the "wish" field if the given value is not nil.
+func (su *SubjectUpdate) SetNillableWish(u *uint32) *SubjectUpdate {
+	if u != nil {
+		su.SetWish(*u)
+	}
+	return su
+}
+
 // AddWish adds u to the "wish" field.
 func (su *SubjectUpdate) AddWish(u int32) *SubjectUpdate {
 	su.mutation.AddWish(u)
@@ -95,6 +111,14 @@ func (su *SubjectUpdate) AddWish(u int32) *SubjectUpdate {
 func (su *SubjectUpdate) SetDoing(u uint32) *SubjectUpdate {
 	su.mutation.ResetDoing()
 	su.mutation.SetDoing(u)
+	return su
+}
+
+// SetNillableDoing sets the "doing" field if the given value is not nil.
+func (su *SubjectUpdate) SetNillableDoing(u *uint32) *SubjectUpdate {
+	if u != nil {
+		su.SetDoing(*u)
+	}
 	return su
 }
 
@@ -180,6 +204,11 @@ func (su *SubjectUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (su *SubjectUpdate) check() error {
+	if v, ok := su.mutation.Image(); ok {
+		if err := subject.ImageValidator(v); err != nil {
+			return &ValidationError{Name: "image", err: fmt.Errorf(`ent: validator failed for field "Subject.image": %w`, err)}
+		}
+	}
 	if v, ok := su.mutation.Summary(); ok {
 		if err := subject.SummaryValidator(v); err != nil {
 			return &ValidationError{Name: "summary", err: fmt.Errorf(`ent: validator failed for field "Subject.summary": %w`, err)}
@@ -192,7 +221,7 @@ func (su *SubjectUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := su.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(subject.Table, subject.Columns, sqlgraph.NewFieldSpec(subject.FieldID, field.TypeUint32))
+	_spec := sqlgraph.NewUpdateSpec(subject.Table, subject.Columns, sqlgraph.NewFieldSpec(subject.FieldID, field.TypeInt))
 	if ps := su.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -310,6 +339,14 @@ func (suo *SubjectUpdateOne) SetOnHold(u uint32) *SubjectUpdateOne {
 	return suo
 }
 
+// SetNillableOnHold sets the "on_hold" field if the given value is not nil.
+func (suo *SubjectUpdateOne) SetNillableOnHold(u *uint32) *SubjectUpdateOne {
+	if u != nil {
+		suo.SetOnHold(*u)
+	}
+	return suo
+}
+
 // AddOnHold adds u to the "on_hold" field.
 func (suo *SubjectUpdateOne) AddOnHold(u int32) *SubjectUpdateOne {
 	suo.mutation.AddOnHold(u)
@@ -323,6 +360,14 @@ func (suo *SubjectUpdateOne) SetWish(u uint32) *SubjectUpdateOne {
 	return suo
 }
 
+// SetNillableWish sets the "wish" field if the given value is not nil.
+func (suo *SubjectUpdateOne) SetNillableWish(u *uint32) *SubjectUpdateOne {
+	if u != nil {
+		suo.SetWish(*u)
+	}
+	return suo
+}
+
 // AddWish adds u to the "wish" field.
 func (suo *SubjectUpdateOne) AddWish(u int32) *SubjectUpdateOne {
 	suo.mutation.AddWish(u)
@@ -333,6 +378,14 @@ func (suo *SubjectUpdateOne) AddWish(u int32) *SubjectUpdateOne {
 func (suo *SubjectUpdateOne) SetDoing(u uint32) *SubjectUpdateOne {
 	suo.mutation.ResetDoing()
 	suo.mutation.SetDoing(u)
+	return suo
+}
+
+// SetNillableDoing sets the "doing" field if the given value is not nil.
+func (suo *SubjectUpdateOne) SetNillableDoing(u *uint32) *SubjectUpdateOne {
+	if u != nil {
+		suo.SetDoing(*u)
+	}
 	return suo
 }
 
@@ -431,6 +484,11 @@ func (suo *SubjectUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (suo *SubjectUpdateOne) check() error {
+	if v, ok := suo.mutation.Image(); ok {
+		if err := subject.ImageValidator(v); err != nil {
+			return &ValidationError{Name: "image", err: fmt.Errorf(`ent: validator failed for field "Subject.image": %w`, err)}
+		}
+	}
 	if v, ok := suo.mutation.Summary(); ok {
 		if err := subject.SummaryValidator(v); err != nil {
 			return &ValidationError{Name: "summary", err: fmt.Errorf(`ent: validator failed for field "Subject.summary": %w`, err)}
@@ -443,7 +501,7 @@ func (suo *SubjectUpdateOne) sqlSave(ctx context.Context) (_node *Subject, err e
 	if err := suo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(subject.Table, subject.Columns, sqlgraph.NewFieldSpec(subject.FieldID, field.TypeUint32))
+	_spec := sqlgraph.NewUpdateSpec(subject.Table, subject.Columns, sqlgraph.NewFieldSpec(subject.FieldID, field.TypeInt))
 	id, ok := suo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Subject.id" for update`)}

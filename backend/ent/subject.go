@@ -15,7 +15,7 @@ import (
 type Subject struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID uint32 `json:"id,omitempty"`
+	ID int `json:"id,omitempty"`
 	// Image holds the value of the "image" field.
 	Image string `json:"image,omitempty"`
 	// Summary holds the value of the "summary" field.
@@ -68,7 +68,7 @@ func (s *Subject) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			s.ID = uint32(value.Int64)
+			s.ID = int(value.Int64)
 		case subject.FieldImage:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field image", values[i])

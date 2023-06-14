@@ -41,19 +41,33 @@ func init() {
 	subjectFields := schema.Subject{}.Fields()
 	_ = subjectFields
 	// subjectDescImage is the schema descriptor for image field.
-	subjectDescImage := subjectFields[1].Descriptor()
+	subjectDescImage := subjectFields[0].Descriptor()
 	// subject.DefaultImage holds the default value on creation for the image field.
 	subject.DefaultImage = subjectDescImage.Default.(string)
+	// subject.ImageValidator is a validator for the "image" field. It is called by the builders before save.
+	subject.ImageValidator = subjectDescImage.Validators[0].(func(string) error)
 	// subjectDescSummary is the schema descriptor for summary field.
-	subjectDescSummary := subjectFields[2].Descriptor()
+	subjectDescSummary := subjectFields[1].Descriptor()
 	// subject.SummaryValidator is a validator for the "summary" field. It is called by the builders before save.
 	subject.SummaryValidator = subjectDescSummary.Validators[0].(func(string) error)
+	// subjectDescOnHold is the schema descriptor for on_hold field.
+	subjectDescOnHold := subjectFields[5].Descriptor()
+	// subject.DefaultOnHold holds the default value on creation for the on_hold field.
+	subject.DefaultOnHold = subjectDescOnHold.Default.(uint32)
+	// subjectDescWish is the schema descriptor for wish field.
+	subjectDescWish := subjectFields[6].Descriptor()
+	// subject.DefaultWish holds the default value on creation for the wish field.
+	subject.DefaultWish = subjectDescWish.Default.(uint32)
+	// subjectDescDoing is the schema descriptor for doing field.
+	subjectDescDoing := subjectFields[7].Descriptor()
+	// subject.DefaultDoing holds the default value on creation for the doing field.
+	subject.DefaultDoing = subjectDescDoing.Default.(uint32)
 	// subjectDescSubjectType is the schema descriptor for subject_type field.
-	subjectDescSubjectType := subjectFields[9].Descriptor()
+	subjectDescSubjectType := subjectFields[8].Descriptor()
 	// subject.DefaultSubjectType holds the default value on creation for the subject_type field.
 	subject.DefaultSubjectType = subjectDescSubjectType.Default.(uint8)
 	// subjectDescCollect is the schema descriptor for collect field.
-	subjectDescCollect := subjectFields[10].Descriptor()
+	subjectDescCollect := subjectFields[9].Descriptor()
 	// subject.DefaultCollect holds the default value on creation for the collect field.
 	subject.DefaultCollect = subjectDescCollect.Default.(uint32)
 }

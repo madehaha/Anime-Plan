@@ -725,7 +725,7 @@ type SubjectMutation struct {
 	config
 	op              Op
 	typ             string
-	id              *uint32
+	id              *int
 	image           *string
 	summary         *string
 	name            *string
@@ -767,7 +767,7 @@ func newSubjectMutation(c config, op Op, opts ...subjectOption) *SubjectMutation
 }
 
 // withSubjectID sets the ID field of the mutation.
-func withSubjectID(id uint32) subjectOption {
+func withSubjectID(id int) subjectOption {
 	return func(m *SubjectMutation) {
 		var (
 			err   error
@@ -817,15 +817,9 @@ func (m SubjectMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
-// SetID sets the value of the id field. Note that this
-// operation is only accepted on creation of Subject entities.
-func (m *SubjectMutation) SetID(id uint32) {
-	m.id = &id
-}
-
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *SubjectMutation) ID() (id uint32, exists bool) {
+func (m *SubjectMutation) ID() (id int, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -836,12 +830,12 @@ func (m *SubjectMutation) ID() (id uint32, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *SubjectMutation) IDs(ctx context.Context) ([]uint32, error) {
+func (m *SubjectMutation) IDs(ctx context.Context) ([]int, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []uint32{id}, nil
+			return []int{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
