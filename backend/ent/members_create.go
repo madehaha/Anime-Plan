@@ -25,14 +25,6 @@ func (mc *MembersCreate) SetUsername(s string) *MembersCreate {
 	return mc
 }
 
-// SetNillableUsername sets the "username" field if the given value is not nil.
-func (mc *MembersCreate) SetNillableUsername(s *string) *MembersCreate {
-	if s != nil {
-		mc.SetUsername(*s)
-	}
-	return mc
-}
-
 // SetEmail sets the "email" field.
 func (mc *MembersCreate) SetEmail(s string) *MembersCreate {
 	mc.mutation.SetEmail(s)
@@ -126,10 +118,6 @@ func (mc *MembersCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (mc *MembersCreate) defaults() {
-	if _, ok := mc.mutation.Username(); !ok {
-		v := members.DefaultUsername
-		mc.mutation.SetUsername(v)
-	}
 	if _, ok := mc.mutation.Avatar(); !ok {
 		v := members.DefaultAvatar
 		mc.mutation.SetAvatar(v)
@@ -217,7 +205,7 @@ func (mc *MembersCreate) createSpec() (*Members, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := mc.mutation.Username(); ok {
 		_spec.SetField(members.FieldUsername, field.TypeString, value)
-		_node.Username = value
+		_node.Username = &value
 	}
 	if value, ok := mc.mutation.Email(); ok {
 		_spec.SetField(members.FieldEmail, field.TypeString, value)

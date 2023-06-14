@@ -1,12 +1,14 @@
 package ctrl
 
 import (
-	"backend/ent"
+	"context"
+
+	"golang.org/x/crypto/bcrypt"
+
 	"backend/internal/logger"
 	"backend/internal/user"
+	userReq "backend/web/request/user"
 	"backend/web/util"
-	"context"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type UserCtrl struct {
@@ -21,22 +23,26 @@ func NewUserCtrl(repo user.MysqlRepo, jwtUtil util.JwtUtil) UserCtrl {
 	}
 }
 
-func (uc UserCtrl) Register(members *ent.Members) error {
-	if err := uc.Repo.CreateNewUser(context.Background(), members); err != nil {
+func (uc UserCtrl) Register(r userReq.UserRegisterReq) error {
+	if err := uc.Repo.CreateNewUser(context.Background(), r); err != nil {
 		logger.Error("Failed to create new user")
 		return err
 	}
 	return nil
 }
 
-func (uc UserCtrl) Login(email string, password string) (token string, err error) {
+func (uc UserCtrl) Login(email string, password string) (
+	token string, err error,
+) {
 	member, err := uc.Repo.GetByEmail(context.Background(), email)
 	if err != nil {
 		logger.Error("Failed to get member by email")
 		return
 	}
 	encryptedPassword := member.Password
-	err = bcrypt.CompareHashAndPassword([]byte(encryptedPassword), []byte(password))
+	err = bcrypt.CompareHashAndPassword(
+		[]byte(encryptedPassword), []byte(password),
+	)
 	if err != nil {
 		// wrong password
 		logger.Info("Wrong password")
@@ -53,4 +59,13 @@ func (uc UserCtrl) Cancel(uid uint32) error {
 		return err
 	}
 	return nil
+}
+
+func (uc UserCtrl) GetAvtar(uid uint32) (string, error) {
+	member, err := uc.Repo.GetByUid(context.Background(), uid)
+	if err != nil {
+		logger.Error("Failed to get user by uid")
+		return "", err
+	}
+	return member.Avatar, nil
 }

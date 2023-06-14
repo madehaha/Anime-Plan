@@ -16,10 +16,22 @@ func init() {
 	_ = membersFields
 	// membersDescUsername is the schema descriptor for username field.
 	membersDescUsername := membersFields[1].Descriptor()
-	// members.DefaultUsername holds the default value on creation for the username field.
-	members.DefaultUsername = membersDescUsername.Default.(string)
 	// members.UsernameValidator is a validator for the "username" field. It is called by the builders before save.
-	members.UsernameValidator = membersDescUsername.Validators[0].(func(string) error)
+	members.UsernameValidator = func() func(string) error {
+		validators := membersDescUsername.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(username string) error {
+			for _, fn := range fns {
+				if err := fn(username); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	// membersDescEmail is the schema descriptor for email field.
 	membersDescEmail := membersFields[2].Descriptor()
 	// members.EmailValidator is a validator for the "email" field. It is called by the builders before save.

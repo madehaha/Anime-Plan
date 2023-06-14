@@ -169,7 +169,7 @@ func (m *MembersMutation) Username() (r string, exists bool) {
 // OldUsername returns the old "username" field's value of the Members entity.
 // If the Members object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MembersMutation) OldUsername(ctx context.Context) (v string, err error) {
+func (m *MembersMutation) OldUsername(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUsername is only allowed on UpdateOne operations")
 	}

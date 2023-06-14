@@ -52,8 +52,6 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultUsername holds the default value on creation for the "username" field.
-	DefaultUsername string
 	// UsernameValidator is a validator for the "username" field. It is called by the builders before save.
 	UsernameValidator func(string) error
 	// EmailValidator is a validator for the "email" field. It is called by the builders before save.

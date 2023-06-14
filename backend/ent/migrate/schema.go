@@ -11,7 +11,7 @@ var (
 	// MembersColumns holds the columns for the "members" table.
 	MembersColumns = []*schema.Column{
 		{Name: "uid", Type: field.TypeUint32, Increment: true},
-		{Name: "username", Type: field.TypeString, Size: 30, Default: ""},
+		{Name: "username", Type: field.TypeString, Unique: true, Size: 30},
 		{Name: "email", Type: field.TypeString, Unique: true, Size: 50},
 		{Name: "password", Type: field.TypeString},
 		{Name: "nickname", Type: field.TypeString, Size: 30},

@@ -3,7 +3,8 @@ POST http://localhost:2333/register
 Content-Type: application/json
 
 {
-  "email": "a@a.com",
+  "username": "_uuu111",
+  "email": "9@99.com",
   "nickname": "a",
   "password": "b"
 }
@@ -13,12 +14,22 @@ POST http://localhost:2333/login
 Content-Type: application/json
 
 {
-  "email": "114514@lll.com",
-  "password": "1919810"
+
+  "email": "9@99.com",
+  "password": "b"
+
 }
 
 ### Cancel
 POST http://localhost:2333/cancel
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjE2LCJnaWQiOjAsImV4cCI6MTY4NzI2MDYyMn0.22mhLSniGYNBImhso94en2jSTImtsm1RJpkhuIP97XQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsImdpZCI6MCwiZXhwIjoxNjg3Mjg0MzM0fQ.R0LuZ7cupUNYSGFTcnkSenRt4yQgFBgu-sNkgMbVv9c
 
+### Get me
+GET http://localhost:2333/me
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjksImdpZCI6MCwiZXhwIjoxNjg3MzA5NTcyfQ.sZvpb-pvsP5QNFYRRdQJKiPhO-gozWq-2RmzEH2kLzU
+
+### Get avatar
+GET http://localhost:2333/user/3/avatar
+Content-Type: application/json

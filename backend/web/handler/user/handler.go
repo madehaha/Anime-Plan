@@ -2,14 +2,17 @@ package user
 
 import (
 	"backend/internal/ctrl"
+	"backend/internal/user"
 )
 
 type Handler struct {
-	ctrl ctrl.UserCtrl
+	ctrl     ctrl.UserCtrl
+	userRepo user.MysqlRepo
 }
 
-func NewUserHandler(ctrl ctrl.UserCtrl) Handler {
+func NewUserHandler(ctrl ctrl.UserCtrl, userRepo user.MysqlRepo) Handler {
 	return Handler{
-		ctrl: ctrl,
+		ctrl:     ctrl,
+		userRepo: userRepo,
 	}
 }

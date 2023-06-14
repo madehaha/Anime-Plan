@@ -1,78 +1,95 @@
 package user
 
 import (
-	"backend/ent"
+	"context"
+	"net/http"
+	"strconv"
+
 	"backend/internal/logger"
 	"backend/web/request/user"
-
-	"strconv"
-	"time"
+	"backend/web/response"
+	"backend/web/util"
 
 	"github.com/labstack/echo/v4"
-	"go.uber.org/zap"
-	"net/http"
 )
 
 // Register POST
 func (h Handler) Register(c echo.Context) error {
 	// TODO Error handling
-	var req user.UserRegisterReq
-	if err := c.Bind(&req); err != nil {
-		_ = c.JSON(http.StatusBadRequest, err)
-		return err
+	var r user.UserRegisterReq
+	if err := c.Bind(&r); err != nil {
+		logger.Error("Register bind failed")
+		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
-	if err := c.Validate(&req); err != nil {
-		_ = c.JSON(http.StatusBadRequest, err)
-		return err
-	}
-	member := ent.Members{
-		Username:     req.Username,
-		Email:        req.Email,
-		Password:     req.Password,
-		Nickname:     req.Nickname,
-		RegisterTime: time.Now().Format("2006-01-02"),
+	if err := c.Validate(&r); err != nil {
+		logger.Error("Register Validate failed")
+		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
 
-	err := h.ctrl.Register(&member)
+	err := h.ctrl.Register(r)
 	if err != nil {
 		logger.Error("Failed to create new user")
-		_ = c.JSON(http.StatusBadRequest, err)
-		return err
+		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
-	_ = c.NoContent(http.StatusOK)
-	return nil
+	return c.NoContent(http.StatusOK)
 }
 
 func (h Handler) Login(c echo.Context) error {
 	var req user.UserLoginReq
+	var resp response.UserLoginResp
 	if err := c.Bind(&req); err != nil {
 		logger.Error("Login bind failed")
-		_ = c.JSON(http.StatusBadRequest, err)
-		return err
+		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
 	if err := c.Validate(&req); err != nil {
 		logger.Error("Login Validate failed")
-		return err
+		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
 	token, err := h.ctrl.Login(req.Email, req.Password)
 	if err != nil {
-		_ = c.JSON(http.StatusBadRequest, err)
-		return err
+		logger.Error("Failed to login")
+		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
-	_ = c.JSON(http.StatusOK, token)
-	logger.Info(token)
-	return err
+	resp.Token = token
+	return util.Success(c, http.StatusOK, resp)
 }
 
 func (h Handler) Cancel(c echo.Context) error {
 	uid := c.Get("uid").(uint32)
-	logger.Info("", zap.String("uid", strconv.Itoa(int(uid))))
 	err := h.ctrl.Cancel(uid)
 	if err != nil {
 		logger.Error("Failed to cancel user")
-		_ = c.JSON(http.StatusBadRequest, err.Error())
-		return err
+		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
-	_ = c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusOK)
+}
+
+func (h Handler) Modify(c echo.Context) error {
+	// TODO
 	return nil
+}
+
+func (h Handler) GetAvatar(c echo.Context) error {
+	param := c.Param("id")
+	id, err := strconv.Atoi(param)
+	if err != nil || id <= 0 {
+		logger.Error("Invalid id")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	url, err := h.ctrl.GetAvtar(uint32(id))
+	if err != nil {
+		logger.Error("Failed to get avtar")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	return util.Success(c, http.StatusOK, echo.Map{"url": url})
+}
+
+func (h Handler) GetMe(c echo.Context) error {
+	uid := c.Get("uid").(uint32)
+	member, err := h.userRepo.GetByUid(context.Background(), uid)
+	if err != nil {
+		logger.Error("Failed to get me")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	return util.Success(c, http.StatusOK, response.NewUserGetResp(member))
 }

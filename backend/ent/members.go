@@ -17,7 +17,7 @@ type Members struct {
 	// ID of the ent.
 	ID uint32 `json:"id,omitempty"`
 	// Username holds the value of the "username" field.
-	Username string `json:"username,omitempty"`
+	Username *string `json:"username,omitempty"`
 	// Email holds the value of the "email" field.
 	Email string `json:"email,omitempty"`
 	// Password holds the value of the "password" field.
@@ -67,7 +67,8 @@ func (m *Members) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field username", values[i])
 			} else if value.Valid {
-				m.Username = value.String
+				m.Username = new(string)
+				*m.Username = value.String
 			}
 		case members.FieldEmail:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -141,8 +142,10 @@ func (m *Members) String() string {
 	var builder strings.Builder
 	builder.WriteString("Members(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", m.ID))
-	builder.WriteString("username=")
-	builder.WriteString(m.Username)
+	if v := m.Username; v != nil {
+		builder.WriteString("username=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("email=")
 	builder.WriteString(m.Email)
