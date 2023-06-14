@@ -86,12 +86,6 @@ func (mu *MembersUpdate) AddGid(u int8) *MembersUpdate {
 	return mu
 }
 
-// SetRegisterTime sets the "register_time" field.
-func (mu *MembersUpdate) SetRegisterTime(s string) *MembersUpdate {
-	mu.mutation.SetRegisterTime(s)
-	return mu
-}
-
 // Mutation returns the MembersMutation object of the builder.
 func (mu *MembersUpdate) Mutation() *MembersMutation {
 	return mu.mutation
@@ -182,9 +176,6 @@ func (mu *MembersUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := mu.mutation.AddedGid(); ok {
 		_spec.AddField(members.FieldGid, field.TypeUint8, value)
 	}
-	if value, ok := mu.mutation.RegisterTime(); ok {
-		_spec.SetField(members.FieldRegisterTime, field.TypeString, value)
-	}
 	if n, err = sqlgraph.UpdateNodes(ctx, mu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{members.Label}
@@ -261,12 +252,6 @@ func (muo *MembersUpdateOne) SetNillableGid(u *uint8) *MembersUpdateOne {
 // AddGid adds u to the "gid" field.
 func (muo *MembersUpdateOne) AddGid(u int8) *MembersUpdateOne {
 	muo.mutation.AddGid(u)
-	return muo
-}
-
-// SetRegisterTime sets the "register_time" field.
-func (muo *MembersUpdateOne) SetRegisterTime(s string) *MembersUpdateOne {
-	muo.mutation.SetRegisterTime(s)
 	return muo
 }
 
@@ -389,9 +374,6 @@ func (muo *MembersUpdateOne) sqlSave(ctx context.Context) (_node *Members, err e
 	}
 	if value, ok := muo.mutation.AddedGid(); ok {
 		_spec.AddField(members.FieldGid, field.TypeUint8, value)
-	}
-	if value, ok := muo.mutation.RegisterTime(); ok {
-		_spec.SetField(members.FieldRegisterTime, field.TypeString, value)
 	}
 	_node = &Members{config: muo.config}
 	_spec.Assign = _node.assignValues

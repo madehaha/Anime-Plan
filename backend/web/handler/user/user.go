@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
+	jsoniter "github.com/json-iterator/go"
+
 	"backend/internal/logger"
 	"backend/web/request/user"
 	"backend/web/response"
@@ -64,9 +66,25 @@ func (h Handler) Cancel(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
-func (h Handler) Modify(c echo.Context) error {
-	// TODO
-	return nil
+func (h Handler) ModifyInfo(c echo.Context) (err error) {
+	var req user.UserModifyInfoResp
+	uid := c.Get("uid").(uint32)
+	jsonData := c.FormValue("info")
+	if err := jsoniter.Unmarshal([]byte(jsonData), &req.Info); err != nil {
+		logger.Error("Failed to parse json")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	req.FileData, err = c.FormFile("image")
+	if err != nil {
+		logger.Error("Failed to get file")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	err = h.ctrl.ModifyInfo(uid, req)
+	if err != nil {
+		logger.Error("Failed to modify information")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	return c.NoContent(http.StatusOK)
 }
 
 func (h Handler) GetAvatar(c echo.Context) error {

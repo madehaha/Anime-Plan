@@ -1,5 +1,8 @@
 main
 .idea/
-bin/**
+bin/
 config.yaml
+public
+test/image
 
+config.yaml

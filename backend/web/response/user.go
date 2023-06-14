@@ -1,6 +1,8 @@
 package response
 
-import "backend/ent"
+import (
+	"backend/ent"
+)
 
 type UserLoginResp struct {
 	Token string `json:"token"`

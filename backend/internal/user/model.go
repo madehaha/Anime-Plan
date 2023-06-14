@@ -63,3 +63,24 @@ func (m MysqlRepo) DeleteByUid(ctx context.Context, uid uint32) error {
 	}
 	return nil
 }
+
+func (m MysqlRepo) UpdateByUid(
+	ctx context.Context, uid uint32, info userReq.Info, avatarUrl string,
+) error {
+	encryptedPassword, err := bcrypt.GenerateFromPassword(
+		[]byte(info.Password), bcrypt.DefaultCost,
+	)
+	if err != nil {
+		logger.Error("Failed to encrypt password")
+		return err
+	}
+	_, err = m.client.Members.UpdateOneID(uid).
+		SetEmail(info.Email).SetPassword(string(encryptedPassword)).
+		SetNickname(info.Nickname).SetUsername(info.Username).
+		SetAvatar(avatarUrl).
+		Save(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
