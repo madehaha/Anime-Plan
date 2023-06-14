@@ -3,7 +3,6 @@ package main
 import (
 	"backend/cmd"
 	"backend/internal/logger"
-	"fmt"
 )
 
 func main() {
@@ -11,5 +10,4 @@ func main() {
 	if err != nil {
 		logger.Fatal("Failed to Start")
 	}
-	fmt.Println("here")
 }

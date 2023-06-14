@@ -33,14 +33,6 @@ func (mu *MembersUpdate) SetUsername(s string) *MembersUpdate {
 	return mu
 }
 
-// SetNillableUsername sets the "username" field if the given value is not nil.
-func (mu *MembersUpdate) SetNillableUsername(s *string) *MembersUpdate {
-	if s != nil {
-		mu.SetUsername(*s)
-	}
-	return mu
-}
-
 // SetEmail sets the "email" field.
 func (mu *MembersUpdate) SetEmail(s string) *MembersUpdate {
 	mu.mutation.SetEmail(s)
@@ -216,14 +208,6 @@ type MembersUpdateOne struct {
 // SetUsername sets the "username" field.
 func (muo *MembersUpdateOne) SetUsername(s string) *MembersUpdateOne {
 	muo.mutation.SetUsername(s)
-	return muo
-}
-
-// SetNillableUsername sets the "username" field if the given value is not nil.
-func (muo *MembersUpdateOne) SetNillableUsername(s *string) *MembersUpdateOne {
-	if s != nil {
-		muo.SetUsername(*s)
-	}
 	return muo
 }
 

@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"regexp"
+
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
 )
@@ -14,7 +16,10 @@ type Members struct {
 func (Members) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint32("id").StorageKey("uid").Unique(),
-		field.String("username").MaxLen(30).Default(""),
+		field.String("username").MaxLen(30).Nillable().Unique().Match(
+			regexp.
+				MustCompile("^[a-zA-Z_]{1,}[a-zA-Z0-9_]*$"),
+		),
 		field.String("email").MaxLen(50).Unique(),
 		field.String("password"),
 		field.String("nickname").MaxLen(30),
