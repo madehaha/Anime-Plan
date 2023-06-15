@@ -2,8 +2,11 @@ package subject
 
 import (
 	"backend/ent"
+	collection2 "backend/ent/collection"
 	"backend/ent/subject"
 	"backend/internal/logger"
+	"backend/internal/model"
+	"backend/web/request/collection"
 	"context"
 	"errors"
 )
@@ -15,7 +18,7 @@ type MysqlRepo struct {
 func NewRepo(client *ent.Client) MysqlRepo {
 	return MysqlRepo{client: client}
 }
-func (m *MysqlRepo) GetSubject(ctx context.Context) (ent.Subjects, error) {
+func (m MysqlRepo) GetSubject(ctx context.Context) (ent.Subjects, error) {
 	subjects, err := m.client.Subject.Query().All(ctx)
 	if err != nil {
 		return nil, err
@@ -23,15 +26,51 @@ func (m *MysqlRepo) GetSubject(ctx context.Context) (ent.Subjects, error) {
 	return subjects, nil
 }
 
-func (m *MysqlRepo) GetSubjectByID(ctx context.Context, id int64) (ent.Subject, error) {
+func (m MysqlRepo) GetSubjectByID(ctx context.Context, id int64) (ent.Subject, error) {
 	subject, err := m.client.Subject.Query().Where(subject.ID(int(id))).First(ctx)
 	if err != nil {
 		return *subject, err
 	}
 	return *subject, nil
 }
+func (m MysqlRepo) UpdateCollection(ctx context.Context, MemberId uint32, SubjectId int, req collection.UpdateCollectionReq) error {
+	col, err := m.client.Collection.Query().Where(collection2.UID(MemberId)).Where(collection2.SubID(SubjectId)).First(ctx)
+	if err != nil {
+		return err
+	}
+	if req.Comment != "" {
+		col.Update().SetType(req.CollectionType).SetIfComment(true).SetComment(req.Comment).SetScore(req.Score).Save(ctx)
+	}
 
-func (m *MysqlRepo) CreateSubject(ctx context.Context, subject1 *ent.Subject) error {
+	col.Update().AddType(int8(req.CollectionType)).SetScore(req.Score).Save(ctx)
+	return nil
+}
+func (m MysqlRepo) AddCollection(ctx context.Context, MemberId uint32, SubjectId int, AddType model.CollectionType) error {
+	//member, _ := m.client.Members.Query().Where(members.ID(MemberId)).First(ctx)
+	sub, _ := m.client.Subject.Query().Where(subject.ID(SubjectId)).First(ctx)
+	_, err := m.client.Collection.Create().
+		SetUID(MemberId).SetType(AddType).SetSubID(SubjectId).Save(ctx)
+	if err != nil {
+		return err
+	}
+	switch AddType {
+	case 1:
+		sub.Update().AddCollect(1).AddWish(1).Save(ctx)
+	case 2:
+		sub.Update().AddCollect(1).AddOnHold(1).Save(ctx)
+	case 3:
+		sub.Update().AddCollect(1).AddDoing(1).Save(ctx)
+	case 4:
+		sub.Update().AddCollect(1).AddDrop(1).Save(ctx)
+	case 5:
+		sub.Update().AddCollect(1).AddWatched(1).Save(ctx)
+	default:
+		return errors.New("unknown collection type")
+	}
+	sub.Update().AddCollect(1).AddWish(1).Save(ctx)
+	return nil
+}
+func (m MysqlRepo) CreateSubject(ctx context.Context, subject1 *ent.Subject) error {
 	if u, _ := m.client.Subject.Query().Where(subject.Name(subject1.Name)).First(ctx); u != nil {
 		logger.Error("created same subject")
 		err := errors.New("already created same subject")

@@ -103,6 +103,16 @@ func Collect(v uint32) predicate.Subject {
 	return predicate.Subject(sql.FieldEQ(FieldCollect, v))
 }
 
+// Drop applies equality check predicate on the "drop" field. It's identical to DropEQ.
+func Drop(v uint32) predicate.Subject {
+	return predicate.Subject(sql.FieldEQ(FieldDrop, v))
+}
+
+// Watched applies equality check predicate on the "watched" field. It's identical to WatchedEQ.
+func Watched(v uint32) predicate.Subject {
+	return predicate.Subject(sql.FieldEQ(FieldWatched, v))
+}
+
 // ImageEQ applies the EQ predicate on the "image" field.
 func ImageEQ(v string) predicate.Subject {
 	return predicate.Subject(sql.FieldEQ(FieldImage, v))
@@ -626,6 +636,86 @@ func CollectLT(v uint32) predicate.Subject {
 // CollectLTE applies the LTE predicate on the "collect" field.
 func CollectLTE(v uint32) predicate.Subject {
 	return predicate.Subject(sql.FieldLTE(FieldCollect, v))
+}
+
+// DropEQ applies the EQ predicate on the "drop" field.
+func DropEQ(v uint32) predicate.Subject {
+	return predicate.Subject(sql.FieldEQ(FieldDrop, v))
+}
+
+// DropNEQ applies the NEQ predicate on the "drop" field.
+func DropNEQ(v uint32) predicate.Subject {
+	return predicate.Subject(sql.FieldNEQ(FieldDrop, v))
+}
+
+// DropIn applies the In predicate on the "drop" field.
+func DropIn(vs ...uint32) predicate.Subject {
+	return predicate.Subject(sql.FieldIn(FieldDrop, vs...))
+}
+
+// DropNotIn applies the NotIn predicate on the "drop" field.
+func DropNotIn(vs ...uint32) predicate.Subject {
+	return predicate.Subject(sql.FieldNotIn(FieldDrop, vs...))
+}
+
+// DropGT applies the GT predicate on the "drop" field.
+func DropGT(v uint32) predicate.Subject {
+	return predicate.Subject(sql.FieldGT(FieldDrop, v))
+}
+
+// DropGTE applies the GTE predicate on the "drop" field.
+func DropGTE(v uint32) predicate.Subject {
+	return predicate.Subject(sql.FieldGTE(FieldDrop, v))
+}
+
+// DropLT applies the LT predicate on the "drop" field.
+func DropLT(v uint32) predicate.Subject {
+	return predicate.Subject(sql.FieldLT(FieldDrop, v))
+}
+
+// DropLTE applies the LTE predicate on the "drop" field.
+func DropLTE(v uint32) predicate.Subject {
+	return predicate.Subject(sql.FieldLTE(FieldDrop, v))
+}
+
+// WatchedEQ applies the EQ predicate on the "watched" field.
+func WatchedEQ(v uint32) predicate.Subject {
+	return predicate.Subject(sql.FieldEQ(FieldWatched, v))
+}
+
+// WatchedNEQ applies the NEQ predicate on the "watched" field.
+func WatchedNEQ(v uint32) predicate.Subject {
+	return predicate.Subject(sql.FieldNEQ(FieldWatched, v))
+}
+
+// WatchedIn applies the In predicate on the "watched" field.
+func WatchedIn(vs ...uint32) predicate.Subject {
+	return predicate.Subject(sql.FieldIn(FieldWatched, vs...))
+}
+
+// WatchedNotIn applies the NotIn predicate on the "watched" field.
+func WatchedNotIn(vs ...uint32) predicate.Subject {
+	return predicate.Subject(sql.FieldNotIn(FieldWatched, vs...))
+}
+
+// WatchedGT applies the GT predicate on the "watched" field.
+func WatchedGT(v uint32) predicate.Subject {
+	return predicate.Subject(sql.FieldGT(FieldWatched, v))
+}
+
+// WatchedGTE applies the GTE predicate on the "watched" field.
+func WatchedGTE(v uint32) predicate.Subject {
+	return predicate.Subject(sql.FieldGTE(FieldWatched, v))
+}
+
+// WatchedLT applies the LT predicate on the "watched" field.
+func WatchedLT(v uint32) predicate.Subject {
+	return predicate.Subject(sql.FieldLT(FieldWatched, v))
+}
+
+// WatchedLTE applies the LTE predicate on the "watched" field.
+func WatchedLTE(v uint32) predicate.Subject {
+	return predicate.Subject(sql.FieldLTE(FieldWatched, v))
 }
 
 // And groups predicates with the AND operator between them.

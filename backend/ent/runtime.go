@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"backend/ent/collection"
 	"backend/ent/members"
 	"backend/ent/schema"
 	"backend/ent/subject"
@@ -12,6 +13,22 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	collectionFields := schema.Collection{}.Fields()
+	_ = collectionFields
+	// collectionDescIfComment is the schema descriptor for if_comment field.
+	collectionDescIfComment := collectionFields[3].Descriptor()
+	// collection.DefaultIfComment holds the default value on creation for the if_comment field.
+	collection.DefaultIfComment = collectionDescIfComment.Default.(bool)
+	// collectionDescComment is the schema descriptor for comment field.
+	collectionDescComment := collectionFields[4].Descriptor()
+	// collection.DefaultComment holds the default value on creation for the comment field.
+	collection.DefaultComment = collectionDescComment.Default.(string)
+	// collection.CommentValidator is a validator for the "comment" field. It is called by the builders before save.
+	collection.CommentValidator = collectionDescComment.Validators[0].(func(string) error)
+	// collectionDescScore is the schema descriptor for score field.
+	collectionDescScore := collectionFields[5].Descriptor()
+	// collection.DefaultScore holds the default value on creation for the score field.
+	collection.DefaultScore = collectionDescScore.Default.(int8)
 	membersFields := schema.Members{}.Fields()
 	_ = membersFields
 	// membersDescUsername is the schema descriptor for username field.
@@ -82,4 +99,12 @@ func init() {
 	subjectDescCollect := subjectFields[9].Descriptor()
 	// subject.DefaultCollect holds the default value on creation for the collect field.
 	subject.DefaultCollect = subjectDescCollect.Default.(uint32)
+	// subjectDescDrop is the schema descriptor for drop field.
+	subjectDescDrop := subjectFields[10].Descriptor()
+	// subject.DefaultDrop holds the default value on creation for the drop field.
+	subject.DefaultDrop = subjectDescDrop.Default.(uint32)
+	// subjectDescWatched is the schema descriptor for watched field.
+	subjectDescWatched := subjectFields[11].Descriptor()
+	// subject.DefaultWatched holds the default value on creation for the watched field.
+	subject.DefaultWatched = subjectDescWatched.Default.(uint32)
 }

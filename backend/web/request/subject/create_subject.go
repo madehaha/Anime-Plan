@@ -1,4 +1,4 @@
-package request
+package subject
 
 import "backend/internal/model"
 

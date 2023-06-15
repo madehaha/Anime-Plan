@@ -2,7 +2,6 @@ package web
 
 import (
 	"backend/web/handler/subject"
-
 	"github.com/labstack/echo/v4"
 
 	"backend/web/handler/user"
@@ -18,4 +17,8 @@ func AddRouters(app *echo.Echo, middleware middleware.JwtMiddleware, userHandler
 	app.POST("/subject/create", subjectHandler.CreateSubject, middleware.UserJWTAuth)
 	app.GET("/user/:id/avatar", userHandler.GetAvatar)
 	app.GET("/me", userHandler.GetMe, middleware.UserJWTAuth)
+	app.POST("/collection/add/:id/:type", subjectHandler.AddCollection, middleware.UserJWTAuth)
+	app.POST("/collection/update/:id", subjectHandler.UpdateCollection, middleware.UserJWTAuth)
+	app.DELETE("/collection/update/:id", subjectHandler.UpdateCollection, middleware.UserJWTAuth)
+
 }

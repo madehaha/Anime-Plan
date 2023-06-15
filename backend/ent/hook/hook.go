@@ -8,6 +8,18 @@ import (
 	"fmt"
 )
 
+// The CollectionFunc type is an adapter to allow the use of ordinary
+// function as Collection mutator.
+type CollectionFunc func(context.Context, *ent.CollectionMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CollectionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.CollectionMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CollectionMutation", m)
+}
+
 // The MembersFunc type is an adapter to allow the use of ordinary
 // function as Members mutator.
 type MembersFunc func(context.Context, *ent.MembersMutation) (ent.Value, error)

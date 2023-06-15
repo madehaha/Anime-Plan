@@ -24,6 +24,8 @@ func (Subject) Fields() []ent.Field {
 		field.Uint32("doing").Default(0),
 		field.Uint8("subject_type").Default(0),
 		field.Uint32("collect").Default(0),
+		field.Uint32("drop").Default(0),
+		field.Uint32("watched").Default(0),
 	}
 }
 

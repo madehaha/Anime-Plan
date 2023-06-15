@@ -35,7 +35,11 @@ type Subject struct {
 	// SubjectType holds the value of the "subject_type" field.
 	SubjectType uint8 `json:"subject_type,omitempty"`
 	// Collect holds the value of the "collect" field.
-	Collect      uint32 `json:"collect,omitempty"`
+	Collect uint32 `json:"collect,omitempty"`
+	// Drop holds the value of the "drop" field.
+	Drop uint32 `json:"drop,omitempty"`
+	// Watched holds the value of the "watched" field.
+	Watched      uint32 `json:"watched,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -44,7 +48,7 @@ func (*Subject) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case subject.FieldID, subject.FieldOnHold, subject.FieldWish, subject.FieldDoing, subject.FieldSubjectType, subject.FieldCollect:
+		case subject.FieldID, subject.FieldOnHold, subject.FieldWish, subject.FieldDoing, subject.FieldSubjectType, subject.FieldCollect, subject.FieldDrop, subject.FieldWatched:
 			values[i] = new(sql.NullInt64)
 		case subject.FieldImage, subject.FieldSummary, subject.FieldName, subject.FieldDate, subject.FieldNameCn:
 			values[i] = new(sql.NullString)
@@ -129,6 +133,18 @@ func (s *Subject) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.Collect = uint32(value.Int64)
 			}
+		case subject.FieldDrop:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field drop", values[i])
+			} else if value.Valid {
+				s.Drop = uint32(value.Int64)
+			}
+		case subject.FieldWatched:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field watched", values[i])
+			} else if value.Valid {
+				s.Watched = uint32(value.Int64)
+			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
 		}
@@ -194,6 +210,12 @@ func (s *Subject) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("collect=")
 	builder.WriteString(fmt.Sprintf("%v", s.Collect))
+	builder.WriteString(", ")
+	builder.WriteString("drop=")
+	builder.WriteString(fmt.Sprintf("%v", s.Drop))
+	builder.WriteString(", ")
+	builder.WriteString("watched=")
+	builder.WriteString(fmt.Sprintf("%v", s.Watched))
 	builder.WriteByte(')')
 	return builder.String()
 }

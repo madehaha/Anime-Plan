@@ -26,7 +26,7 @@ func (cc *CollectionCreate) SetUID(u uint32) *CollectionCreate {
 }
 
 // SetSubID sets the "sub_id" field.
-func (cc *CollectionCreate) SetSubID(i int64) *CollectionCreate {
+func (cc *CollectionCreate) SetSubID(i int) *CollectionCreate {
 	cc.mutation.SetSubID(i)
 	return cc
 }
@@ -54,6 +54,14 @@ func (cc *CollectionCreate) SetNillableIfComment(b *bool) *CollectionCreate {
 // SetComment sets the "comment" field.
 func (cc *CollectionCreate) SetComment(s string) *CollectionCreate {
 	cc.mutation.SetComment(s)
+	return cc
+}
+
+// SetNillableComment sets the "comment" field if the given value is not nil.
+func (cc *CollectionCreate) SetNillableComment(s *string) *CollectionCreate {
+	if s != nil {
+		cc.SetComment(*s)
+	}
 	return cc
 }
 
@@ -109,6 +117,10 @@ func (cc *CollectionCreate) defaults() {
 	if _, ok := cc.mutation.IfComment(); !ok {
 		v := collection.DefaultIfComment
 		cc.mutation.SetIfComment(v)
+	}
+	if _, ok := cc.mutation.Comment(); !ok {
+		v := collection.DefaultComment
+		cc.mutation.SetComment(v)
 	}
 	if _, ok := cc.mutation.Score(); !ok {
 		v := collection.DefaultScore
@@ -172,7 +184,7 @@ func (cc *CollectionCreate) createSpec() (*Collection, *sqlgraph.CreateSpec) {
 		_node.UID = value
 	}
 	if value, ok := cc.mutation.SubID(); ok {
-		_spec.SetField(collection.FieldSubID, field.TypeInt64, value)
+		_spec.SetField(collection.FieldSubID, field.TypeInt, value)
 		_node.SubID = value
 	}
 	if value, ok := cc.mutation.GetType(); ok {

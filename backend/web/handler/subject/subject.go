@@ -2,7 +2,9 @@ package subject
 
 import (
 	"backend/internal/logger"
-	"backend/web/request"
+	"backend/web/request/collection"
+	"backend/web/request/subject"
+	"backend/web/util"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
@@ -28,12 +30,51 @@ func (h Handler) GetSubjectByID(c echo.Context) error {
 		_ = c.JSON(http.StatusBadRequest, err)
 		return err
 	}
+	return util.Success(c, http.StatusOK, subject)
+}
+func (h Handler) AddCollection(c echo.Context) error {
+	uid := c.Get("uid").(uint32)
+	SubjectID := c.Param("id")
+	AddType := c.Param("type")
+	id, err := strconv.Atoi(SubjectID)
+	if err != nil {
+		logger.Error("add failed")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	subtype, err := strconv.Atoi(AddType)
+	if err != nil {
+		logger.Error("add failed")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	err = h.ctrl.AddCollection(uid, id, uint8(subtype))
+	if err != nil {
+		logger.Error("add failed")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	return c.NoContent(http.StatusOK)
+}
+func (h Handler) UpdateCollection(c echo.Context) error {
+	uid := c.Get("uid").(uint32)
+	id := c.Param("id")
+	var req collection.UpdateCollectionReq
+	if err := c.Bind(&req); err != nil {
+		logger.Error("Login bind failed")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	if err := c.Validate(&req); err != nil {
+		logger.Error("Login Validate failed")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	subid, _ := strconv.Atoi(id)
+	err := h.ctrl.UpdateCollection(uid, subid, req)
+	if err != nil {
+		return util.Error(c, http.StatusBadRequest, err.Error())
 
-	_ = c.JSON(http.StatusOK, subject)
-	return nil
+	}
+	return c.NoContent(http.StatusOK)
 }
 func (h Handler) CreateSubject(c echo.Context) error {
-	var req request.CreateSubjectReq
+	var req subject.CreateSubjectReq
 	if err := c.Bind(&req); err != nil {
 		logger.Error("Login bind failed")
 		_ = c.JSON(http.StatusBadRequest, err)
@@ -50,6 +91,5 @@ func (h Handler) CreateSubject(c echo.Context) error {
 		_ = c.JSON(http.StatusBadRequest, err)
 		return err
 	}
-	_ = c.JSON(http.StatusOK, "create success")
-	return nil
+	return c.NoContent(http.StatusOK)
 }

@@ -32,4 +32,5 @@ func (Members) Fields() []ent.Field {
 // Edges of the Members.
 func (Members) Edges() []ent.Edge {
 	return nil
+
 }

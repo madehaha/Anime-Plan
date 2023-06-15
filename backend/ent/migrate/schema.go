@@ -8,6 +8,22 @@ import (
 )
 
 var (
+	// CollectionsColumns holds the columns for the "collections" table.
+	CollectionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "uid", Type: field.TypeUint32},
+		{Name: "sub_id", Type: field.TypeInt},
+		{Name: "type", Type: field.TypeUint8},
+		{Name: "if_comment", Type: field.TypeBool, Default: false},
+		{Name: "comment", Type: field.TypeString, Size: 100, Default: ""},
+		{Name: "score", Type: field.TypeInt8, Default: 100},
+	}
+	// CollectionsTable holds the schema information for the "collections" table.
+	CollectionsTable = &schema.Table{
+		Name:       "collections",
+		Columns:    CollectionsColumns,
+		PrimaryKey: []*schema.Column{CollectionsColumns[0]},
+	}
 	// MembersColumns holds the columns for the "members" table.
 	MembersColumns = []*schema.Column{
 		{Name: "uid", Type: field.TypeUint32, Increment: true},
@@ -38,6 +54,8 @@ var (
 		{Name: "doing", Type: field.TypeUint32, Default: 0},
 		{Name: "subject_type", Type: field.TypeUint8, Default: 0},
 		{Name: "collect", Type: field.TypeUint32, Default: 0},
+		{Name: "drop", Type: field.TypeUint32, Default: 0},
+		{Name: "watched", Type: field.TypeUint32, Default: 0},
 	}
 	// SubjectsTable holds the schema information for the "subjects" table.
 	SubjectsTable = &schema.Table{
@@ -47,6 +65,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		CollectionsTable,
 		MembersTable,
 		SubjectsTable,
 	}

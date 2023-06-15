@@ -170,6 +170,48 @@ func (su *SubjectUpdate) AddCollect(u int32) *SubjectUpdate {
 	return su
 }
 
+// SetDrop sets the "drop" field.
+func (su *SubjectUpdate) SetDrop(u uint32) *SubjectUpdate {
+	su.mutation.ResetDrop()
+	su.mutation.SetDrop(u)
+	return su
+}
+
+// SetNillableDrop sets the "drop" field if the given value is not nil.
+func (su *SubjectUpdate) SetNillableDrop(u *uint32) *SubjectUpdate {
+	if u != nil {
+		su.SetDrop(*u)
+	}
+	return su
+}
+
+// AddDrop adds u to the "drop" field.
+func (su *SubjectUpdate) AddDrop(u int32) *SubjectUpdate {
+	su.mutation.AddDrop(u)
+	return su
+}
+
+// SetWatched sets the "watched" field.
+func (su *SubjectUpdate) SetWatched(u uint32) *SubjectUpdate {
+	su.mutation.ResetWatched()
+	su.mutation.SetWatched(u)
+	return su
+}
+
+// SetNillableWatched sets the "watched" field if the given value is not nil.
+func (su *SubjectUpdate) SetNillableWatched(u *uint32) *SubjectUpdate {
+	if u != nil {
+		su.SetWatched(*u)
+	}
+	return su
+}
+
+// AddWatched adds u to the "watched" field.
+func (su *SubjectUpdate) AddWatched(u int32) *SubjectUpdate {
+	su.mutation.AddWatched(u)
+	return su
+}
+
 // Mutation returns the SubjectMutation object of the builder.
 func (su *SubjectUpdate) Mutation() *SubjectMutation {
 	return su.mutation
@@ -273,6 +315,18 @@ func (su *SubjectUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := su.mutation.AddedCollect(); ok {
 		_spec.AddField(subject.FieldCollect, field.TypeUint32, value)
+	}
+	if value, ok := su.mutation.Drop(); ok {
+		_spec.SetField(subject.FieldDrop, field.TypeUint32, value)
+	}
+	if value, ok := su.mutation.AddedDrop(); ok {
+		_spec.AddField(subject.FieldDrop, field.TypeUint32, value)
+	}
+	if value, ok := su.mutation.Watched(); ok {
+		_spec.SetField(subject.FieldWatched, field.TypeUint32, value)
+	}
+	if value, ok := su.mutation.AddedWatched(); ok {
+		_spec.AddField(subject.FieldWatched, field.TypeUint32, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, su.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -437,6 +491,48 @@ func (suo *SubjectUpdateOne) AddCollect(u int32) *SubjectUpdateOne {
 	return suo
 }
 
+// SetDrop sets the "drop" field.
+func (suo *SubjectUpdateOne) SetDrop(u uint32) *SubjectUpdateOne {
+	suo.mutation.ResetDrop()
+	suo.mutation.SetDrop(u)
+	return suo
+}
+
+// SetNillableDrop sets the "drop" field if the given value is not nil.
+func (suo *SubjectUpdateOne) SetNillableDrop(u *uint32) *SubjectUpdateOne {
+	if u != nil {
+		suo.SetDrop(*u)
+	}
+	return suo
+}
+
+// AddDrop adds u to the "drop" field.
+func (suo *SubjectUpdateOne) AddDrop(u int32) *SubjectUpdateOne {
+	suo.mutation.AddDrop(u)
+	return suo
+}
+
+// SetWatched sets the "watched" field.
+func (suo *SubjectUpdateOne) SetWatched(u uint32) *SubjectUpdateOne {
+	suo.mutation.ResetWatched()
+	suo.mutation.SetWatched(u)
+	return suo
+}
+
+// SetNillableWatched sets the "watched" field if the given value is not nil.
+func (suo *SubjectUpdateOne) SetNillableWatched(u *uint32) *SubjectUpdateOne {
+	if u != nil {
+		suo.SetWatched(*u)
+	}
+	return suo
+}
+
+// AddWatched adds u to the "watched" field.
+func (suo *SubjectUpdateOne) AddWatched(u int32) *SubjectUpdateOne {
+	suo.mutation.AddWatched(u)
+	return suo
+}
+
 // Mutation returns the SubjectMutation object of the builder.
 func (suo *SubjectUpdateOne) Mutation() *SubjectMutation {
 	return suo.mutation
@@ -570,6 +666,18 @@ func (suo *SubjectUpdateOne) sqlSave(ctx context.Context) (_node *Subject, err e
 	}
 	if value, ok := suo.mutation.AddedCollect(); ok {
 		_spec.AddField(subject.FieldCollect, field.TypeUint32, value)
+	}
+	if value, ok := suo.mutation.Drop(); ok {
+		_spec.SetField(subject.FieldDrop, field.TypeUint32, value)
+	}
+	if value, ok := suo.mutation.AddedDrop(); ok {
+		_spec.AddField(subject.FieldDrop, field.TypeUint32, value)
+	}
+	if value, ok := suo.mutation.Watched(); ok {
+		_spec.SetField(subject.FieldWatched, field.TypeUint32, value)
+	}
+	if value, ok := suo.mutation.AddedWatched(); ok {
+		_spec.AddField(subject.FieldWatched, field.TypeUint32, value)
 	}
 	_node = &Subject{config: suo.config}
 	_spec.Assign = _node.assignValues

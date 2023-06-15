@@ -51,6 +51,8 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultIfComment holds the default value on creation for the "if_comment" field.
 	DefaultIfComment bool
+	// DefaultComment holds the default value on creation for the "comment" field.
+	DefaultComment string
 	// CommentValidator is a validator for the "comment" field. It is called by the builders before save.
 	CommentValidator func(string) error
 	// DefaultScore holds the default value on creation for the "score" field.

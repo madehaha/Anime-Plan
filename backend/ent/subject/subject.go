@@ -31,6 +31,10 @@ const (
 	FieldSubjectType = "subject_type"
 	// FieldCollect holds the string denoting the collect field in the database.
 	FieldCollect = "collect"
+	// FieldDrop holds the string denoting the drop field in the database.
+	FieldDrop = "drop"
+	// FieldWatched holds the string denoting the watched field in the database.
+	FieldWatched = "watched"
 	// Table holds the table name of the subject in the database.
 	Table = "subjects"
 )
@@ -48,6 +52,8 @@ var Columns = []string{
 	FieldDoing,
 	FieldSubjectType,
 	FieldCollect,
+	FieldDrop,
+	FieldWatched,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -77,6 +83,10 @@ var (
 	DefaultSubjectType uint8
 	// DefaultCollect holds the default value on creation for the "collect" field.
 	DefaultCollect uint32
+	// DefaultDrop holds the default value on creation for the "drop" field.
+	DefaultDrop uint32
+	// DefaultWatched holds the default value on creation for the "watched" field.
+	DefaultWatched uint32
 )
 
 // OrderOption defines the ordering options for the Subject queries.
@@ -135,4 +145,14 @@ func BySubjectType(opts ...sql.OrderTermOption) OrderOption {
 // ByCollect orders the results by the collect field.
 func ByCollect(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCollect, opts...).ToFunc()
+}
+
+// ByDrop orders the results by the drop field.
+func ByDrop(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDrop, opts...).ToFunc()
+}
+
+// ByWatched orders the results by the watched field.
+func ByWatched(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldWatched, opts...).ToFunc()
 }

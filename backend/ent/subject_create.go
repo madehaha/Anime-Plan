@@ -127,6 +127,34 @@ func (sc *SubjectCreate) SetNillableCollect(u *uint32) *SubjectCreate {
 	return sc
 }
 
+// SetDrop sets the "drop" field.
+func (sc *SubjectCreate) SetDrop(u uint32) *SubjectCreate {
+	sc.mutation.SetDrop(u)
+	return sc
+}
+
+// SetNillableDrop sets the "drop" field if the given value is not nil.
+func (sc *SubjectCreate) SetNillableDrop(u *uint32) *SubjectCreate {
+	if u != nil {
+		sc.SetDrop(*u)
+	}
+	return sc
+}
+
+// SetWatched sets the "watched" field.
+func (sc *SubjectCreate) SetWatched(u uint32) *SubjectCreate {
+	sc.mutation.SetWatched(u)
+	return sc
+}
+
+// SetNillableWatched sets the "watched" field if the given value is not nil.
+func (sc *SubjectCreate) SetNillableWatched(u *uint32) *SubjectCreate {
+	if u != nil {
+		sc.SetWatched(*u)
+	}
+	return sc
+}
+
 // Mutation returns the SubjectMutation object of the builder.
 func (sc *SubjectCreate) Mutation() *SubjectMutation {
 	return sc.mutation
@@ -186,6 +214,14 @@ func (sc *SubjectCreate) defaults() {
 		v := subject.DefaultCollect
 		sc.mutation.SetCollect(v)
 	}
+	if _, ok := sc.mutation.Drop(); !ok {
+		v := subject.DefaultDrop
+		sc.mutation.SetDrop(v)
+	}
+	if _, ok := sc.mutation.Watched(); !ok {
+		v := subject.DefaultWatched
+		sc.mutation.SetWatched(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -229,6 +265,12 @@ func (sc *SubjectCreate) check() error {
 	}
 	if _, ok := sc.mutation.Collect(); !ok {
 		return &ValidationError{Name: "collect", err: errors.New(`ent: missing required field "Subject.collect"`)}
+	}
+	if _, ok := sc.mutation.Drop(); !ok {
+		return &ValidationError{Name: "drop", err: errors.New(`ent: missing required field "Subject.drop"`)}
+	}
+	if _, ok := sc.mutation.Watched(); !ok {
+		return &ValidationError{Name: "watched", err: errors.New(`ent: missing required field "Subject.watched"`)}
 	}
 	return nil
 }
@@ -295,6 +337,14 @@ func (sc *SubjectCreate) createSpec() (*Subject, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.Collect(); ok {
 		_spec.SetField(subject.FieldCollect, field.TypeUint32, value)
 		_node.Collect = value
+	}
+	if value, ok := sc.mutation.Drop(); ok {
+		_spec.SetField(subject.FieldDrop, field.TypeUint32, value)
+		_node.Drop = value
+	}
+	if value, ok := sc.mutation.Watched(); ok {
+		_spec.SetField(subject.FieldWatched, field.TypeUint32, value)
+		_node.Watched = value
 	}
 	return _node, _spec
 }

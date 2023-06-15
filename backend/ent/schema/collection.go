@@ -14,10 +14,10 @@ type Collection struct {
 func (Collection) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint32("uid"),
-		field.Int64("sub_id"),
+		field.Int("sub_id"),
 		field.Uint8("type"),
 		field.Bool("if_comment").Default(false),
-		field.String("comment").MaxLen(100).MinLen(5),
+		field.String("comment").Default("").MaxLen(100),
 		field.Int8("score").Default(100),
 	}
 }

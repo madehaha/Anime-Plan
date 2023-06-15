@@ -41,14 +41,14 @@ func (cu *CollectionUpdate) AddUID(u int32) *CollectionUpdate {
 }
 
 // SetSubID sets the "sub_id" field.
-func (cu *CollectionUpdate) SetSubID(i int64) *CollectionUpdate {
+func (cu *CollectionUpdate) SetSubID(i int) *CollectionUpdate {
 	cu.mutation.ResetSubID()
 	cu.mutation.SetSubID(i)
 	return cu
 }
 
 // AddSubID adds i to the "sub_id" field.
-func (cu *CollectionUpdate) AddSubID(i int64) *CollectionUpdate {
+func (cu *CollectionUpdate) AddSubID(i int) *CollectionUpdate {
 	cu.mutation.AddSubID(i)
 	return cu
 }
@@ -83,6 +83,14 @@ func (cu *CollectionUpdate) SetNillableIfComment(b *bool) *CollectionUpdate {
 // SetComment sets the "comment" field.
 func (cu *CollectionUpdate) SetComment(s string) *CollectionUpdate {
 	cu.mutation.SetComment(s)
+	return cu
+}
+
+// SetNillableComment sets the "comment" field if the given value is not nil.
+func (cu *CollectionUpdate) SetNillableComment(s *string) *CollectionUpdate {
+	if s != nil {
+		cu.SetComment(*s)
+	}
 	return cu
 }
 
@@ -168,10 +176,10 @@ func (cu *CollectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.AddField(collection.FieldUID, field.TypeUint32, value)
 	}
 	if value, ok := cu.mutation.SubID(); ok {
-		_spec.SetField(collection.FieldSubID, field.TypeInt64, value)
+		_spec.SetField(collection.FieldSubID, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.AddedSubID(); ok {
-		_spec.AddField(collection.FieldSubID, field.TypeInt64, value)
+		_spec.AddField(collection.FieldSubID, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.GetType(); ok {
 		_spec.SetField(collection.FieldType, field.TypeUint8, value)
@@ -225,14 +233,14 @@ func (cuo *CollectionUpdateOne) AddUID(u int32) *CollectionUpdateOne {
 }
 
 // SetSubID sets the "sub_id" field.
-func (cuo *CollectionUpdateOne) SetSubID(i int64) *CollectionUpdateOne {
+func (cuo *CollectionUpdateOne) SetSubID(i int) *CollectionUpdateOne {
 	cuo.mutation.ResetSubID()
 	cuo.mutation.SetSubID(i)
 	return cuo
 }
 
 // AddSubID adds i to the "sub_id" field.
-func (cuo *CollectionUpdateOne) AddSubID(i int64) *CollectionUpdateOne {
+func (cuo *CollectionUpdateOne) AddSubID(i int) *CollectionUpdateOne {
 	cuo.mutation.AddSubID(i)
 	return cuo
 }
@@ -267,6 +275,14 @@ func (cuo *CollectionUpdateOne) SetNillableIfComment(b *bool) *CollectionUpdateO
 // SetComment sets the "comment" field.
 func (cuo *CollectionUpdateOne) SetComment(s string) *CollectionUpdateOne {
 	cuo.mutation.SetComment(s)
+	return cuo
+}
+
+// SetNillableComment sets the "comment" field if the given value is not nil.
+func (cuo *CollectionUpdateOne) SetNillableComment(s *string) *CollectionUpdateOne {
+	if s != nil {
+		cuo.SetComment(*s)
+	}
 	return cuo
 }
 
@@ -382,10 +398,10 @@ func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection,
 		_spec.AddField(collection.FieldUID, field.TypeUint32, value)
 	}
 	if value, ok := cuo.mutation.SubID(); ok {
-		_spec.SetField(collection.FieldSubID, field.TypeInt64, value)
+		_spec.SetField(collection.FieldSubID, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.AddedSubID(); ok {
-		_spec.AddField(collection.FieldSubID, field.TypeInt64, value)
+		_spec.AddField(collection.FieldSubID, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.GetType(); ok {
 		_spec.SetField(collection.FieldType, field.TypeUint8, value)

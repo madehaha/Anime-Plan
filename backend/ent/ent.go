@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"backend/ent/collection"
 	"backend/ent/members"
 	"backend/ent/subject"
 	"context"
@@ -74,8 +75,9 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			members.Table: members.ValidColumn,
-			subject.Table: subject.ValidColumn,
+			collection.Table: collection.ValidColumn,
+			members.Table:    members.ValidColumn,
+			subject.Table:    subject.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

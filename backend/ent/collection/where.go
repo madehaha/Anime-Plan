@@ -59,7 +59,7 @@ func UID(v uint32) predicate.Collection {
 }
 
 // SubID applies equality check predicate on the "sub_id" field. It's identical to SubIDEQ.
-func SubID(v int64) predicate.Collection {
+func SubID(v int) predicate.Collection {
 	return predicate.Collection(sql.FieldEQ(FieldSubID, v))
 }
 
@@ -124,42 +124,42 @@ func UIDLTE(v uint32) predicate.Collection {
 }
 
 // SubIDEQ applies the EQ predicate on the "sub_id" field.
-func SubIDEQ(v int64) predicate.Collection {
+func SubIDEQ(v int) predicate.Collection {
 	return predicate.Collection(sql.FieldEQ(FieldSubID, v))
 }
 
 // SubIDNEQ applies the NEQ predicate on the "sub_id" field.
-func SubIDNEQ(v int64) predicate.Collection {
+func SubIDNEQ(v int) predicate.Collection {
 	return predicate.Collection(sql.FieldNEQ(FieldSubID, v))
 }
 
 // SubIDIn applies the In predicate on the "sub_id" field.
-func SubIDIn(vs ...int64) predicate.Collection {
+func SubIDIn(vs ...int) predicate.Collection {
 	return predicate.Collection(sql.FieldIn(FieldSubID, vs...))
 }
 
 // SubIDNotIn applies the NotIn predicate on the "sub_id" field.
-func SubIDNotIn(vs ...int64) predicate.Collection {
+func SubIDNotIn(vs ...int) predicate.Collection {
 	return predicate.Collection(sql.FieldNotIn(FieldSubID, vs...))
 }
 
 // SubIDGT applies the GT predicate on the "sub_id" field.
-func SubIDGT(v int64) predicate.Collection {
+func SubIDGT(v int) predicate.Collection {
 	return predicate.Collection(sql.FieldGT(FieldSubID, v))
 }
 
 // SubIDGTE applies the GTE predicate on the "sub_id" field.
-func SubIDGTE(v int64) predicate.Collection {
+func SubIDGTE(v int) predicate.Collection {
 	return predicate.Collection(sql.FieldGTE(FieldSubID, v))
 }
 
 // SubIDLT applies the LT predicate on the "sub_id" field.
-func SubIDLT(v int64) predicate.Collection {
+func SubIDLT(v int) predicate.Collection {
 	return predicate.Collection(sql.FieldLT(FieldSubID, v))
 }
 
 // SubIDLTE applies the LTE predicate on the "sub_id" field.
-func SubIDLTE(v int64) predicate.Collection {
+func SubIDLTE(v int) predicate.Collection {
 	return predicate.Collection(sql.FieldLTE(FieldSubID, v))
 }
 

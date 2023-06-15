@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"backend/ent/collection"
 	"backend/ent/members"
 	"backend/ent/predicate"
 	"backend/ent/subject"
@@ -24,9 +25,741 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeMembers = "Members"
-	TypeSubject = "Subject"
+	TypeCollection = "Collection"
+	TypeMembers    = "Members"
+	TypeSubject    = "Subject"
 )
+
+// CollectionMutation represents an operation that mutates the Collection nodes in the graph.
+type CollectionMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	uid           *uint32
+	adduid        *int32
+	sub_id        *int
+	addsub_id     *int
+	_type         *uint8
+	add_type      *int8
+	if_comment    *bool
+	comment       *string
+	score         *int8
+	addscore      *int8
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*Collection, error)
+	predicates    []predicate.Collection
+}
+
+var _ ent.Mutation = (*CollectionMutation)(nil)
+
+// collectionOption allows management of the mutation configuration using functional options.
+type collectionOption func(*CollectionMutation)
+
+// newCollectionMutation creates new mutation for the Collection entity.
+func newCollectionMutation(c config, op Op, opts ...collectionOption) *CollectionMutation {
+	m := &CollectionMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeCollection,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withCollectionID sets the ID field of the mutation.
+func withCollectionID(id int) collectionOption {
+	return func(m *CollectionMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Collection
+		)
+		m.oldValue = func(ctx context.Context) (*Collection, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Collection.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withCollection sets the old Collection of the mutation.
+func withCollection(node *Collection) collectionOption {
+	return func(m *CollectionMutation) {
+		m.oldValue = func(context.Context) (*Collection, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m CollectionMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m CollectionMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *CollectionMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *CollectionMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Collection.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetUID sets the "uid" field.
+func (m *CollectionMutation) SetUID(u uint32) {
+	m.uid = &u
+	m.adduid = nil
+}
+
+// UID returns the value of the "uid" field in the mutation.
+func (m *CollectionMutation) UID() (r uint32, exists bool) {
+	v := m.uid
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUID returns the old "uid" field's value of the Collection entity.
+// If the Collection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CollectionMutation) OldUID(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUID: %w", err)
+	}
+	return oldValue.UID, nil
+}
+
+// AddUID adds u to the "uid" field.
+func (m *CollectionMutation) AddUID(u int32) {
+	if m.adduid != nil {
+		*m.adduid += u
+	} else {
+		m.adduid = &u
+	}
+}
+
+// AddedUID returns the value that was added to the "uid" field in this mutation.
+func (m *CollectionMutation) AddedUID() (r int32, exists bool) {
+	v := m.adduid
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetUID resets all changes to the "uid" field.
+func (m *CollectionMutation) ResetUID() {
+	m.uid = nil
+	m.adduid = nil
+}
+
+// SetSubID sets the "sub_id" field.
+func (m *CollectionMutation) SetSubID(i int) {
+	m.sub_id = &i
+	m.addsub_id = nil
+}
+
+// SubID returns the value of the "sub_id" field in the mutation.
+func (m *CollectionMutation) SubID() (r int, exists bool) {
+	v := m.sub_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSubID returns the old "sub_id" field's value of the Collection entity.
+// If the Collection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CollectionMutation) OldSubID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSubID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSubID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSubID: %w", err)
+	}
+	return oldValue.SubID, nil
+}
+
+// AddSubID adds i to the "sub_id" field.
+func (m *CollectionMutation) AddSubID(i int) {
+	if m.addsub_id != nil {
+		*m.addsub_id += i
+	} else {
+		m.addsub_id = &i
+	}
+}
+
+// AddedSubID returns the value that was added to the "sub_id" field in this mutation.
+func (m *CollectionMutation) AddedSubID() (r int, exists bool) {
+	v := m.addsub_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSubID resets all changes to the "sub_id" field.
+func (m *CollectionMutation) ResetSubID() {
+	m.sub_id = nil
+	m.addsub_id = nil
+}
+
+// SetType sets the "type" field.
+func (m *CollectionMutation) SetType(u uint8) {
+	m._type = &u
+	m.add_type = nil
+}
+
+// GetType returns the value of the "type" field in the mutation.
+func (m *CollectionMutation) GetType() (r uint8, exists bool) {
+	v := m._type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldType returns the old "type" field's value of the Collection entity.
+// If the Collection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CollectionMutation) OldType(ctx context.Context) (v uint8, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldType: %w", err)
+	}
+	return oldValue.Type, nil
+}
+
+// AddType adds u to the "type" field.
+func (m *CollectionMutation) AddType(u int8) {
+	if m.add_type != nil {
+		*m.add_type += u
+	} else {
+		m.add_type = &u
+	}
+}
+
+// AddedType returns the value that was added to the "type" field in this mutation.
+func (m *CollectionMutation) AddedType() (r int8, exists bool) {
+	v := m.add_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetType resets all changes to the "type" field.
+func (m *CollectionMutation) ResetType() {
+	m._type = nil
+	m.add_type = nil
+}
+
+// SetIfComment sets the "if_comment" field.
+func (m *CollectionMutation) SetIfComment(b bool) {
+	m.if_comment = &b
+}
+
+// IfComment returns the value of the "if_comment" field in the mutation.
+func (m *CollectionMutation) IfComment() (r bool, exists bool) {
+	v := m.if_comment
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIfComment returns the old "if_comment" field's value of the Collection entity.
+// If the Collection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CollectionMutation) OldIfComment(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIfComment is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIfComment requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIfComment: %w", err)
+	}
+	return oldValue.IfComment, nil
+}
+
+// ResetIfComment resets all changes to the "if_comment" field.
+func (m *CollectionMutation) ResetIfComment() {
+	m.if_comment = nil
+}
+
+// SetComment sets the "comment" field.
+func (m *CollectionMutation) SetComment(s string) {
+	m.comment = &s
+}
+
+// Comment returns the value of the "comment" field in the mutation.
+func (m *CollectionMutation) Comment() (r string, exists bool) {
+	v := m.comment
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldComment returns the old "comment" field's value of the Collection entity.
+// If the Collection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CollectionMutation) OldComment(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldComment is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldComment requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldComment: %w", err)
+	}
+	return oldValue.Comment, nil
+}
+
+// ResetComment resets all changes to the "comment" field.
+func (m *CollectionMutation) ResetComment() {
+	m.comment = nil
+}
+
+// SetScore sets the "score" field.
+func (m *CollectionMutation) SetScore(i int8) {
+	m.score = &i
+	m.addscore = nil
+}
+
+// Score returns the value of the "score" field in the mutation.
+func (m *CollectionMutation) Score() (r int8, exists bool) {
+	v := m.score
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldScore returns the old "score" field's value of the Collection entity.
+// If the Collection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CollectionMutation) OldScore(ctx context.Context) (v int8, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldScore is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldScore requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldScore: %w", err)
+	}
+	return oldValue.Score, nil
+}
+
+// AddScore adds i to the "score" field.
+func (m *CollectionMutation) AddScore(i int8) {
+	if m.addscore != nil {
+		*m.addscore += i
+	} else {
+		m.addscore = &i
+	}
+}
+
+// AddedScore returns the value that was added to the "score" field in this mutation.
+func (m *CollectionMutation) AddedScore() (r int8, exists bool) {
+	v := m.addscore
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetScore resets all changes to the "score" field.
+func (m *CollectionMutation) ResetScore() {
+	m.score = nil
+	m.addscore = nil
+}
+
+// Where appends a list predicates to the CollectionMutation builder.
+func (m *CollectionMutation) Where(ps ...predicate.Collection) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the CollectionMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *CollectionMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Collection, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *CollectionMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *CollectionMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Collection).
+func (m *CollectionMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *CollectionMutation) Fields() []string {
+	fields := make([]string, 0, 6)
+	if m.uid != nil {
+		fields = append(fields, collection.FieldUID)
+	}
+	if m.sub_id != nil {
+		fields = append(fields, collection.FieldSubID)
+	}
+	if m._type != nil {
+		fields = append(fields, collection.FieldType)
+	}
+	if m.if_comment != nil {
+		fields = append(fields, collection.FieldIfComment)
+	}
+	if m.comment != nil {
+		fields = append(fields, collection.FieldComment)
+	}
+	if m.score != nil {
+		fields = append(fields, collection.FieldScore)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *CollectionMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case collection.FieldUID:
+		return m.UID()
+	case collection.FieldSubID:
+		return m.SubID()
+	case collection.FieldType:
+		return m.GetType()
+	case collection.FieldIfComment:
+		return m.IfComment()
+	case collection.FieldComment:
+		return m.Comment()
+	case collection.FieldScore:
+		return m.Score()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *CollectionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case collection.FieldUID:
+		return m.OldUID(ctx)
+	case collection.FieldSubID:
+		return m.OldSubID(ctx)
+	case collection.FieldType:
+		return m.OldType(ctx)
+	case collection.FieldIfComment:
+		return m.OldIfComment(ctx)
+	case collection.FieldComment:
+		return m.OldComment(ctx)
+	case collection.FieldScore:
+		return m.OldScore(ctx)
+	}
+	return nil, fmt.Errorf("unknown Collection field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CollectionMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case collection.FieldUID:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUID(v)
+		return nil
+	case collection.FieldSubID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSubID(v)
+		return nil
+	case collection.FieldType:
+		v, ok := value.(uint8)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetType(v)
+		return nil
+	case collection.FieldIfComment:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIfComment(v)
+		return nil
+	case collection.FieldComment:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetComment(v)
+		return nil
+	case collection.FieldScore:
+		v, ok := value.(int8)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetScore(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Collection field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *CollectionMutation) AddedFields() []string {
+	var fields []string
+	if m.adduid != nil {
+		fields = append(fields, collection.FieldUID)
+	}
+	if m.addsub_id != nil {
+		fields = append(fields, collection.FieldSubID)
+	}
+	if m.add_type != nil {
+		fields = append(fields, collection.FieldType)
+	}
+	if m.addscore != nil {
+		fields = append(fields, collection.FieldScore)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *CollectionMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case collection.FieldUID:
+		return m.AddedUID()
+	case collection.FieldSubID:
+		return m.AddedSubID()
+	case collection.FieldType:
+		return m.AddedType()
+	case collection.FieldScore:
+		return m.AddedScore()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CollectionMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case collection.FieldUID:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUID(v)
+		return nil
+	case collection.FieldSubID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSubID(v)
+		return nil
+	case collection.FieldType:
+		v, ok := value.(int8)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddType(v)
+		return nil
+	case collection.FieldScore:
+		v, ok := value.(int8)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddScore(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Collection numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *CollectionMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *CollectionMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *CollectionMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Collection nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *CollectionMutation) ResetField(name string) error {
+	switch name {
+	case collection.FieldUID:
+		m.ResetUID()
+		return nil
+	case collection.FieldSubID:
+		m.ResetSubID()
+		return nil
+	case collection.FieldType:
+		m.ResetType()
+		return nil
+	case collection.FieldIfComment:
+		m.ResetIfComment()
+		return nil
+	case collection.FieldComment:
+		m.ResetComment()
+		return nil
+	case collection.FieldScore:
+		m.ResetScore()
+		return nil
+	}
+	return fmt.Errorf("unknown Collection field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *CollectionMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *CollectionMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *CollectionMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *CollectionMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *CollectionMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *CollectionMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *CollectionMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown Collection unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *CollectionMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown Collection edge %s", name)
+}
 
 // MembersMutation represents an operation that mutates the Members nodes in the graph.
 type MembersMutation struct {
@@ -741,6 +1474,10 @@ type SubjectMutation struct {
 	addsubject_type *int8
 	collect         *uint32
 	addcollect      *int32
+	drop            *uint32
+	adddrop         *int32
+	watched         *uint32
+	addwatched      *int32
 	clearedFields   map[string]struct{}
 	done            bool
 	oldValue        func(context.Context) (*Subject, error)
@@ -1305,6 +2042,118 @@ func (m *SubjectMutation) ResetCollect() {
 	m.addcollect = nil
 }
 
+// SetDrop sets the "drop" field.
+func (m *SubjectMutation) SetDrop(u uint32) {
+	m.drop = &u
+	m.adddrop = nil
+}
+
+// Drop returns the value of the "drop" field in the mutation.
+func (m *SubjectMutation) Drop() (r uint32, exists bool) {
+	v := m.drop
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDrop returns the old "drop" field's value of the Subject entity.
+// If the Subject object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubjectMutation) OldDrop(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDrop is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDrop requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDrop: %w", err)
+	}
+	return oldValue.Drop, nil
+}
+
+// AddDrop adds u to the "drop" field.
+func (m *SubjectMutation) AddDrop(u int32) {
+	if m.adddrop != nil {
+		*m.adddrop += u
+	} else {
+		m.adddrop = &u
+	}
+}
+
+// AddedDrop returns the value that was added to the "drop" field in this mutation.
+func (m *SubjectMutation) AddedDrop() (r int32, exists bool) {
+	v := m.adddrop
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDrop resets all changes to the "drop" field.
+func (m *SubjectMutation) ResetDrop() {
+	m.drop = nil
+	m.adddrop = nil
+}
+
+// SetWatched sets the "watched" field.
+func (m *SubjectMutation) SetWatched(u uint32) {
+	m.watched = &u
+	m.addwatched = nil
+}
+
+// Watched returns the value of the "watched" field in the mutation.
+func (m *SubjectMutation) Watched() (r uint32, exists bool) {
+	v := m.watched
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldWatched returns the old "watched" field's value of the Subject entity.
+// If the Subject object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubjectMutation) OldWatched(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldWatched is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldWatched requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldWatched: %w", err)
+	}
+	return oldValue.Watched, nil
+}
+
+// AddWatched adds u to the "watched" field.
+func (m *SubjectMutation) AddWatched(u int32) {
+	if m.addwatched != nil {
+		*m.addwatched += u
+	} else {
+		m.addwatched = &u
+	}
+}
+
+// AddedWatched returns the value that was added to the "watched" field in this mutation.
+func (m *SubjectMutation) AddedWatched() (r int32, exists bool) {
+	v := m.addwatched
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetWatched resets all changes to the "watched" field.
+func (m *SubjectMutation) ResetWatched() {
+	m.watched = nil
+	m.addwatched = nil
+}
+
 // Where appends a list predicates to the SubjectMutation builder.
 func (m *SubjectMutation) Where(ps ...predicate.Subject) {
 	m.predicates = append(m.predicates, ps...)
@@ -1339,7 +2188,7 @@ func (m *SubjectMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *SubjectMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 12)
 	if m.image != nil {
 		fields = append(fields, subject.FieldImage)
 	}
@@ -1370,6 +2219,12 @@ func (m *SubjectMutation) Fields() []string {
 	if m.collect != nil {
 		fields = append(fields, subject.FieldCollect)
 	}
+	if m.drop != nil {
+		fields = append(fields, subject.FieldDrop)
+	}
+	if m.watched != nil {
+		fields = append(fields, subject.FieldWatched)
+	}
 	return fields
 }
 
@@ -1398,6 +2253,10 @@ func (m *SubjectMutation) Field(name string) (ent.Value, bool) {
 		return m.SubjectType()
 	case subject.FieldCollect:
 		return m.Collect()
+	case subject.FieldDrop:
+		return m.Drop()
+	case subject.FieldWatched:
+		return m.Watched()
 	}
 	return nil, false
 }
@@ -1427,6 +2286,10 @@ func (m *SubjectMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldSubjectType(ctx)
 	case subject.FieldCollect:
 		return m.OldCollect(ctx)
+	case subject.FieldDrop:
+		return m.OldDrop(ctx)
+	case subject.FieldWatched:
+		return m.OldWatched(ctx)
 	}
 	return nil, fmt.Errorf("unknown Subject field %s", name)
 }
@@ -1506,6 +2369,20 @@ func (m *SubjectMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetCollect(v)
 		return nil
+	case subject.FieldDrop:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDrop(v)
+		return nil
+	case subject.FieldWatched:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetWatched(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Subject field %s", name)
 }
@@ -1529,6 +2406,12 @@ func (m *SubjectMutation) AddedFields() []string {
 	if m.addcollect != nil {
 		fields = append(fields, subject.FieldCollect)
 	}
+	if m.adddrop != nil {
+		fields = append(fields, subject.FieldDrop)
+	}
+	if m.addwatched != nil {
+		fields = append(fields, subject.FieldWatched)
+	}
 	return fields
 }
 
@@ -1547,6 +2430,10 @@ func (m *SubjectMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedSubjectType()
 	case subject.FieldCollect:
 		return m.AddedCollect()
+	case subject.FieldDrop:
+		return m.AddedDrop()
+	case subject.FieldWatched:
+		return m.AddedWatched()
 	}
 	return nil, false
 }
@@ -1590,6 +2477,20 @@ func (m *SubjectMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddCollect(v)
+		return nil
+	case subject.FieldDrop:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDrop(v)
+		return nil
+	case subject.FieldWatched:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddWatched(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Subject numeric field %s", name)
@@ -1647,6 +2548,12 @@ func (m *SubjectMutation) ResetField(name string) error {
 		return nil
 	case subject.FieldCollect:
 		m.ResetCollect()
+		return nil
+	case subject.FieldDrop:
+		m.ResetDrop()
+		return nil
+	case subject.FieldWatched:
+		m.ResetWatched()
 		return nil
 	}
 	return fmt.Errorf("unknown Subject field %s", name)

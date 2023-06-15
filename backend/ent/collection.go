@@ -19,7 +19,7 @@ type Collection struct {
 	// UID holds the value of the "uid" field.
 	UID uint32 `json:"uid,omitempty"`
 	// SubID holds the value of the "sub_id" field.
-	SubID int64 `json:"sub_id,omitempty"`
+	SubID int `json:"sub_id,omitempty"`
 	// Type holds the value of the "type" field.
 	Type uint8 `json:"type,omitempty"`
 	// IfComment holds the value of the "if_comment" field.
@@ -73,7 +73,7 @@ func (c *Collection) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field sub_id", values[i])
 			} else if value.Valid {
-				c.SubID = value.Int64
+				c.SubID = int(value.Int64)
 			}
 		case collection.FieldType:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
