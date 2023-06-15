@@ -12,3 +12,4 @@ mysql:
   db: AP
 
 jwt: "2d7af79ab14a28f368ae68cd7ba393ed7f4d31ed2f094cebc004360dc9132916"
+static_directory: "./public"

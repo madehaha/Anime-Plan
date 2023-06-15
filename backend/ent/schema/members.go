@@ -15,7 +15,7 @@ type Members struct {
 // Fields of the Members.
 func (Members) Fields() []ent.Field {
 	return []ent.Field{
-		field.Uint32("id").StorageKey("uid").Unique(),
+		field.Uint32("id").StorageKey("uid").Unique().Immutable(),
 		field.String("username").MaxLen(30).Nillable().Unique().Match(
 			regexp.
 				MustCompile("^[a-zA-Z_]{1,}[a-zA-Z0-9_]*$"),
@@ -25,7 +25,7 @@ func (Members) Fields() []ent.Field {
 		field.String("nickname").MaxLen(30),
 		field.String("avatar").MaxLen(255).Default("https://lain.bgm.tv/pic/user/l/icon.jpg"),
 		field.Uint8("gid").Default(0), // group id
-		field.String("register_time"),
+		field.String("register_time").Immutable(),
 	}
 }
 

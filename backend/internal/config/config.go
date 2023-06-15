@@ -1,10 +1,12 @@
 package config
 
 import (
-	"backend/internal/logger"
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"os"
+
+	"gopkg.in/yaml.v3"
+
+	"backend/internal/logger"
 )
 
 type AppConfig struct {
@@ -21,7 +23,8 @@ type AppConfig struct {
 		DB       string `yaml:"db"`
 	}
 
-	JwtSecret string `yaml:"jwt"`
+	JwtSecret       string `yaml:"jwt"`
+	StaticDirectory string `yaml:"static_directory"`
 }
 
 func AppConfigReader() AppConfig {

@@ -1,12 +1,14 @@
 package web
 
 import (
-	"backend/internal/config"
-	"backend/internal/logger"
 	"fmt"
+	"net/http"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
-	"net/http"
+
+	"backend/internal/config"
+	"backend/internal/logger"
 )
 
 func New() *echo.Echo {
@@ -29,5 +31,6 @@ func Start(app *echo.Echo, cfg *config.AppConfig) error {
 	addr := cfg.ListenAddr()
 	logger.Info(fmt.Sprintf("Server is listening at %s", addr))
 	app.Validator = &CustomValidator{validator: validator.New()}
+	app.Static("public", cfg.StaticDirectory)
 	return app.Start(addr)
 }
