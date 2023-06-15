@@ -1,9 +1,12 @@
 package middleware
 
 import (
+	"net/http"
+
+	"github.com/labstack/echo/v4"
+
 	"backend/internal/logger"
 	"backend/web/util"
-	"github.com/labstack/echo/v4"
 )
 
 const PREFIX = "Bearer "
@@ -18,7 +21,9 @@ func NewJwtMiddleware(jwtUtil util.JwtUtil) JwtMiddleware {
 	}
 }
 
-func (jm JwtMiddleware) extractAndCheckToken(ctx echo.Context) (token string, claims *util.JwtUserClaims, err error) {
+func (jm JwtMiddleware) extractAndCheckToken(ctx echo.Context) (
+	token string, claims *util.JwtUserClaims, err error,
+) {
 	token = ctx.Request().Header.Get("Authorization")
 	bearerLength := len(PREFIX)
 	if len(token) < bearerLength {
@@ -39,7 +44,7 @@ func (jm JwtMiddleware) UserJWTAuth(next echo.HandlerFunc) echo.HandlerFunc {
 		_, claims, err := jm.extractAndCheckToken(c)
 		if err != nil {
 			logger.Error("extract token or check token error")
-			return err
+			return util.Error(c, http.StatusUnauthorized, err.Error())
 		}
 		c.Set("uid", claims.Uid)
 		c.Set("gid", claims.Gid)
