@@ -39,8 +39,29 @@ type Subject struct {
 	// Drop holds the value of the "drop" field.
 	Drop uint32 `json:"drop,omitempty"`
 	// Watched holds the value of the "watched" field.
-	Watched      uint32 `json:"watched,omitempty"`
+	Watched uint32 `json:"watched,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the SubjectQuery when eager-loading is set.
+	Edges        SubjectEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// SubjectEdges holds the relations/edges for other nodes in the graph.
+type SubjectEdges struct {
+	// Collections holds the value of the collections edge.
+	Collections []*Collection `json:"collections,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// CollectionsOrErr returns the Collections value or an error if the edge
+// was not loaded in eager-loading.
+func (e SubjectEdges) CollectionsOrErr() ([]*Collection, error) {
+	if e.loadedTypes[0] {
+		return e.Collections, nil
+	}
+	return nil, &NotLoadedError{edge: "collections"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -156,6 +177,11 @@ func (s *Subject) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (s *Subject) Value(name string) (ent.Value, error) {
 	return s.selectValues.Get(name)
+}
+
+// QueryCollections queries the "collections" edge of the Subject entity.
+func (s *Subject) QueryCollections() *CollectionQuery {
+	return NewSubjectClient(s.config).QueryCollections(s)
 }
 
 // Update returns a builder for updating this Subject.

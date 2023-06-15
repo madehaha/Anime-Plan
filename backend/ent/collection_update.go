@@ -4,7 +4,9 @@ package ent
 
 import (
 	"backend/ent/collection"
+	"backend/ent/members"
 	"backend/ent/predicate"
+	"backend/ent/subject"
 	"context"
 	"errors"
 	"fmt"
@@ -24,32 +26,6 @@ type CollectionUpdate struct {
 // Where appends a list predicates to the CollectionUpdate builder.
 func (cu *CollectionUpdate) Where(ps ...predicate.Collection) *CollectionUpdate {
 	cu.mutation.Where(ps...)
-	return cu
-}
-
-// SetUID sets the "uid" field.
-func (cu *CollectionUpdate) SetUID(u uint32) *CollectionUpdate {
-	cu.mutation.ResetUID()
-	cu.mutation.SetUID(u)
-	return cu
-}
-
-// AddUID adds u to the "uid" field.
-func (cu *CollectionUpdate) AddUID(u int32) *CollectionUpdate {
-	cu.mutation.AddUID(u)
-	return cu
-}
-
-// SetSubID sets the "sub_id" field.
-func (cu *CollectionUpdate) SetSubID(i int) *CollectionUpdate {
-	cu.mutation.ResetSubID()
-	cu.mutation.SetSubID(i)
-	return cu
-}
-
-// AddSubID adds i to the "sub_id" field.
-func (cu *CollectionUpdate) AddSubID(i int) *CollectionUpdate {
-	cu.mutation.AddSubID(i)
 	return cu
 }
 
@@ -115,9 +91,73 @@ func (cu *CollectionUpdate) AddScore(i int8) *CollectionUpdate {
 	return cu
 }
 
+// SetTime sets the "time" field.
+func (cu *CollectionUpdate) SetTime(s string) *CollectionUpdate {
+	cu.mutation.SetTime(s)
+	return cu
+}
+
+// SetNillableTime sets the "time" field if the given value is not nil.
+func (cu *CollectionUpdate) SetNillableTime(s *string) *CollectionUpdate {
+	if s != nil {
+		cu.SetTime(*s)
+	}
+	return cu
+}
+
+// SetMemberID sets the "member" edge to the Members entity by ID.
+func (cu *CollectionUpdate) SetMemberID(id uint32) *CollectionUpdate {
+	cu.mutation.SetMemberID(id)
+	return cu
+}
+
+// SetNillableMemberID sets the "member" edge to the Members entity by ID if the given value is not nil.
+func (cu *CollectionUpdate) SetNillableMemberID(id *uint32) *CollectionUpdate {
+	if id != nil {
+		cu = cu.SetMemberID(*id)
+	}
+	return cu
+}
+
+// SetMember sets the "member" edge to the Members entity.
+func (cu *CollectionUpdate) SetMember(m *Members) *CollectionUpdate {
+	return cu.SetMemberID(m.ID)
+}
+
+// SetSubjectID sets the "subject" edge to the Subject entity by ID.
+func (cu *CollectionUpdate) SetSubjectID(id int) *CollectionUpdate {
+	cu.mutation.SetSubjectID(id)
+	return cu
+}
+
+// SetNillableSubjectID sets the "subject" edge to the Subject entity by ID if the given value is not nil.
+func (cu *CollectionUpdate) SetNillableSubjectID(id *int) *CollectionUpdate {
+	if id != nil {
+		cu = cu.SetSubjectID(*id)
+	}
+	return cu
+}
+
+// SetSubject sets the "subject" edge to the Subject entity.
+func (cu *CollectionUpdate) SetSubject(s *Subject) *CollectionUpdate {
+	return cu.SetSubjectID(s.ID)
+}
+
 // Mutation returns the CollectionMutation object of the builder.
 func (cu *CollectionUpdate) Mutation() *CollectionMutation {
 	return cu.mutation
+}
+
+// ClearMember clears the "member" edge to the Members entity.
+func (cu *CollectionUpdate) ClearMember() *CollectionUpdate {
+	cu.mutation.ClearMember()
+	return cu
+}
+
+// ClearSubject clears the "subject" edge to the Subject entity.
+func (cu *CollectionUpdate) ClearSubject() *CollectionUpdate {
+	cu.mutation.ClearSubject()
+	return cu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -169,18 +209,6 @@ func (cu *CollectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := cu.mutation.UID(); ok {
-		_spec.SetField(collection.FieldUID, field.TypeUint32, value)
-	}
-	if value, ok := cu.mutation.AddedUID(); ok {
-		_spec.AddField(collection.FieldUID, field.TypeUint32, value)
-	}
-	if value, ok := cu.mutation.SubID(); ok {
-		_spec.SetField(collection.FieldSubID, field.TypeInt, value)
-	}
-	if value, ok := cu.mutation.AddedSubID(); ok {
-		_spec.AddField(collection.FieldSubID, field.TypeInt, value)
-	}
 	if value, ok := cu.mutation.GetType(); ok {
 		_spec.SetField(collection.FieldType, field.TypeUint8, value)
 	}
@@ -198,6 +226,67 @@ func (cu *CollectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := cu.mutation.AddedScore(); ok {
 		_spec.AddField(collection.FieldScore, field.TypeInt8, value)
+	}
+	if value, ok := cu.mutation.Time(); ok {
+		_spec.SetField(collection.FieldTime, field.TypeString, value)
+	}
+	if cu.mutation.MemberCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   collection.MemberTable,
+			Columns: []string{collection.MemberColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(members.FieldID, field.TypeUint32),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.MemberIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   collection.MemberTable,
+			Columns: []string{collection.MemberColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(members.FieldID, field.TypeUint32),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cu.mutation.SubjectCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   collection.SubjectTable,
+			Columns: []string{collection.SubjectColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subject.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.SubjectIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   collection.SubjectTable,
+			Columns: []string{collection.SubjectColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subject.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -217,32 +306,6 @@ type CollectionUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *CollectionMutation
-}
-
-// SetUID sets the "uid" field.
-func (cuo *CollectionUpdateOne) SetUID(u uint32) *CollectionUpdateOne {
-	cuo.mutation.ResetUID()
-	cuo.mutation.SetUID(u)
-	return cuo
-}
-
-// AddUID adds u to the "uid" field.
-func (cuo *CollectionUpdateOne) AddUID(u int32) *CollectionUpdateOne {
-	cuo.mutation.AddUID(u)
-	return cuo
-}
-
-// SetSubID sets the "sub_id" field.
-func (cuo *CollectionUpdateOne) SetSubID(i int) *CollectionUpdateOne {
-	cuo.mutation.ResetSubID()
-	cuo.mutation.SetSubID(i)
-	return cuo
-}
-
-// AddSubID adds i to the "sub_id" field.
-func (cuo *CollectionUpdateOne) AddSubID(i int) *CollectionUpdateOne {
-	cuo.mutation.AddSubID(i)
-	return cuo
 }
 
 // SetType sets the "type" field.
@@ -307,9 +370,73 @@ func (cuo *CollectionUpdateOne) AddScore(i int8) *CollectionUpdateOne {
 	return cuo
 }
 
+// SetTime sets the "time" field.
+func (cuo *CollectionUpdateOne) SetTime(s string) *CollectionUpdateOne {
+	cuo.mutation.SetTime(s)
+	return cuo
+}
+
+// SetNillableTime sets the "time" field if the given value is not nil.
+func (cuo *CollectionUpdateOne) SetNillableTime(s *string) *CollectionUpdateOne {
+	if s != nil {
+		cuo.SetTime(*s)
+	}
+	return cuo
+}
+
+// SetMemberID sets the "member" edge to the Members entity by ID.
+func (cuo *CollectionUpdateOne) SetMemberID(id uint32) *CollectionUpdateOne {
+	cuo.mutation.SetMemberID(id)
+	return cuo
+}
+
+// SetNillableMemberID sets the "member" edge to the Members entity by ID if the given value is not nil.
+func (cuo *CollectionUpdateOne) SetNillableMemberID(id *uint32) *CollectionUpdateOne {
+	if id != nil {
+		cuo = cuo.SetMemberID(*id)
+	}
+	return cuo
+}
+
+// SetMember sets the "member" edge to the Members entity.
+func (cuo *CollectionUpdateOne) SetMember(m *Members) *CollectionUpdateOne {
+	return cuo.SetMemberID(m.ID)
+}
+
+// SetSubjectID sets the "subject" edge to the Subject entity by ID.
+func (cuo *CollectionUpdateOne) SetSubjectID(id int) *CollectionUpdateOne {
+	cuo.mutation.SetSubjectID(id)
+	return cuo
+}
+
+// SetNillableSubjectID sets the "subject" edge to the Subject entity by ID if the given value is not nil.
+func (cuo *CollectionUpdateOne) SetNillableSubjectID(id *int) *CollectionUpdateOne {
+	if id != nil {
+		cuo = cuo.SetSubjectID(*id)
+	}
+	return cuo
+}
+
+// SetSubject sets the "subject" edge to the Subject entity.
+func (cuo *CollectionUpdateOne) SetSubject(s *Subject) *CollectionUpdateOne {
+	return cuo.SetSubjectID(s.ID)
+}
+
 // Mutation returns the CollectionMutation object of the builder.
 func (cuo *CollectionUpdateOne) Mutation() *CollectionMutation {
 	return cuo.mutation
+}
+
+// ClearMember clears the "member" edge to the Members entity.
+func (cuo *CollectionUpdateOne) ClearMember() *CollectionUpdateOne {
+	cuo.mutation.ClearMember()
+	return cuo
+}
+
+// ClearSubject clears the "subject" edge to the Subject entity.
+func (cuo *CollectionUpdateOne) ClearSubject() *CollectionUpdateOne {
+	cuo.mutation.ClearSubject()
+	return cuo
 }
 
 // Where appends a list predicates to the CollectionUpdate builder.
@@ -391,18 +518,6 @@ func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection,
 			}
 		}
 	}
-	if value, ok := cuo.mutation.UID(); ok {
-		_spec.SetField(collection.FieldUID, field.TypeUint32, value)
-	}
-	if value, ok := cuo.mutation.AddedUID(); ok {
-		_spec.AddField(collection.FieldUID, field.TypeUint32, value)
-	}
-	if value, ok := cuo.mutation.SubID(); ok {
-		_spec.SetField(collection.FieldSubID, field.TypeInt, value)
-	}
-	if value, ok := cuo.mutation.AddedSubID(); ok {
-		_spec.AddField(collection.FieldSubID, field.TypeInt, value)
-	}
 	if value, ok := cuo.mutation.GetType(); ok {
 		_spec.SetField(collection.FieldType, field.TypeUint8, value)
 	}
@@ -420,6 +535,67 @@ func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection,
 	}
 	if value, ok := cuo.mutation.AddedScore(); ok {
 		_spec.AddField(collection.FieldScore, field.TypeInt8, value)
+	}
+	if value, ok := cuo.mutation.Time(); ok {
+		_spec.SetField(collection.FieldTime, field.TypeString, value)
+	}
+	if cuo.mutation.MemberCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   collection.MemberTable,
+			Columns: []string{collection.MemberColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(members.FieldID, field.TypeUint32),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.MemberIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   collection.MemberTable,
+			Columns: []string{collection.MemberColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(members.FieldID, field.TypeUint32),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.SubjectCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   collection.SubjectTable,
+			Columns: []string{collection.SubjectColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subject.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.SubjectIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   collection.SubjectTable,
+			Columns: []string{collection.SubjectColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subject.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Collection{config: cuo.config}
 	_spec.Assign = _node.assignValues

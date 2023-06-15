@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"backend/ent/collection"
 	"backend/ent/members"
 	"context"
 	"errors"
@@ -81,6 +82,21 @@ func (mc *MembersCreate) SetRegisterTime(s string) *MembersCreate {
 func (mc *MembersCreate) SetID(u uint32) *MembersCreate {
 	mc.mutation.SetID(u)
 	return mc
+}
+
+// AddCollectionIDs adds the "collections" edge to the Collection entity by IDs.
+func (mc *MembersCreate) AddCollectionIDs(ids ...int) *MembersCreate {
+	mc.mutation.AddCollectionIDs(ids...)
+	return mc
+}
+
+// AddCollections adds the "collections" edges to the Collection entity.
+func (mc *MembersCreate) AddCollections(c ...*Collection) *MembersCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return mc.AddCollectionIDs(ids...)
 }
 
 // Mutation returns the MembersMutation object of the builder.
@@ -230,6 +246,22 @@ func (mc *MembersCreate) createSpec() (*Members, *sqlgraph.CreateSpec) {
 	if value, ok := mc.mutation.RegisterTime(); ok {
 		_spec.SetField(members.FieldRegisterTime, field.TypeString, value)
 		_node.RegisterTime = value
+	}
+	if nodes := mc.mutation.CollectionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   members.CollectionsTable,
+			Columns: []string{members.CollectionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

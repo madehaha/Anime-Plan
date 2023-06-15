@@ -6,6 +6,7 @@ import (
 	"backend/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // ID filters vertices based on their ID field.
@@ -516,6 +517,29 @@ func RegisterTimeEqualFold(v string) predicate.Members {
 // RegisterTimeContainsFold applies the ContainsFold predicate on the "register_time" field.
 func RegisterTimeContainsFold(v string) predicate.Members {
 	return predicate.Members(sql.FieldContainsFold(FieldRegisterTime, v))
+}
+
+// HasCollections applies the HasEdge predicate on the "collections" edge.
+func HasCollections() predicate.Members {
+	return predicate.Members(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, CollectionsTable, CollectionsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCollectionsWith applies the HasEdge predicate on the "collections" edge with a given conditions (other predicates).
+func HasCollectionsWith(preds ...predicate.Collection) predicate.Members {
+	return predicate.Members(func(s *sql.Selector) {
+		step := newCollectionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

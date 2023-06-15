@@ -4,6 +4,8 @@ package ent
 
 import (
 	"backend/ent/collection"
+	"backend/ent/members"
+	"backend/ent/subject"
 	"context"
 	"errors"
 	"fmt"
@@ -17,18 +19,6 @@ type CollectionCreate struct {
 	config
 	mutation *CollectionMutation
 	hooks    []Hook
-}
-
-// SetUID sets the "uid" field.
-func (cc *CollectionCreate) SetUID(u uint32) *CollectionCreate {
-	cc.mutation.SetUID(u)
-	return cc
-}
-
-// SetSubID sets the "sub_id" field.
-func (cc *CollectionCreate) SetSubID(i int) *CollectionCreate {
-	cc.mutation.SetSubID(i)
-	return cc
 }
 
 // SetType sets the "type" field.
@@ -79,6 +69,58 @@ func (cc *CollectionCreate) SetNillableScore(i *int8) *CollectionCreate {
 	return cc
 }
 
+// SetTime sets the "time" field.
+func (cc *CollectionCreate) SetTime(s string) *CollectionCreate {
+	cc.mutation.SetTime(s)
+	return cc
+}
+
+// SetNillableTime sets the "time" field if the given value is not nil.
+func (cc *CollectionCreate) SetNillableTime(s *string) *CollectionCreate {
+	if s != nil {
+		cc.SetTime(*s)
+	}
+	return cc
+}
+
+// SetMemberID sets the "member" edge to the Members entity by ID.
+func (cc *CollectionCreate) SetMemberID(id uint32) *CollectionCreate {
+	cc.mutation.SetMemberID(id)
+	return cc
+}
+
+// SetNillableMemberID sets the "member" edge to the Members entity by ID if the given value is not nil.
+func (cc *CollectionCreate) SetNillableMemberID(id *uint32) *CollectionCreate {
+	if id != nil {
+		cc = cc.SetMemberID(*id)
+	}
+	return cc
+}
+
+// SetMember sets the "member" edge to the Members entity.
+func (cc *CollectionCreate) SetMember(m *Members) *CollectionCreate {
+	return cc.SetMemberID(m.ID)
+}
+
+// SetSubjectID sets the "subject" edge to the Subject entity by ID.
+func (cc *CollectionCreate) SetSubjectID(id int) *CollectionCreate {
+	cc.mutation.SetSubjectID(id)
+	return cc
+}
+
+// SetNillableSubjectID sets the "subject" edge to the Subject entity by ID if the given value is not nil.
+func (cc *CollectionCreate) SetNillableSubjectID(id *int) *CollectionCreate {
+	if id != nil {
+		cc = cc.SetSubjectID(*id)
+	}
+	return cc
+}
+
+// SetSubject sets the "subject" edge to the Subject entity.
+func (cc *CollectionCreate) SetSubject(s *Subject) *CollectionCreate {
+	return cc.SetSubjectID(s.ID)
+}
+
 // Mutation returns the CollectionMutation object of the builder.
 func (cc *CollectionCreate) Mutation() *CollectionMutation {
 	return cc.mutation
@@ -126,16 +168,14 @@ func (cc *CollectionCreate) defaults() {
 		v := collection.DefaultScore
 		cc.mutation.SetScore(v)
 	}
+	if _, ok := cc.mutation.Time(); !ok {
+		v := collection.DefaultTime
+		cc.mutation.SetTime(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (cc *CollectionCreate) check() error {
-	if _, ok := cc.mutation.UID(); !ok {
-		return &ValidationError{Name: "uid", err: errors.New(`ent: missing required field "Collection.uid"`)}
-	}
-	if _, ok := cc.mutation.SubID(); !ok {
-		return &ValidationError{Name: "sub_id", err: errors.New(`ent: missing required field "Collection.sub_id"`)}
-	}
 	if _, ok := cc.mutation.GetType(); !ok {
 		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "Collection.type"`)}
 	}
@@ -152,6 +192,9 @@ func (cc *CollectionCreate) check() error {
 	}
 	if _, ok := cc.mutation.Score(); !ok {
 		return &ValidationError{Name: "score", err: errors.New(`ent: missing required field "Collection.score"`)}
+	}
+	if _, ok := cc.mutation.Time(); !ok {
+		return &ValidationError{Name: "time", err: errors.New(`ent: missing required field "Collection.time"`)}
 	}
 	return nil
 }
@@ -179,14 +222,6 @@ func (cc *CollectionCreate) createSpec() (*Collection, *sqlgraph.CreateSpec) {
 		_node = &Collection{config: cc.config}
 		_spec = sqlgraph.NewCreateSpec(collection.Table, sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt))
 	)
-	if value, ok := cc.mutation.UID(); ok {
-		_spec.SetField(collection.FieldUID, field.TypeUint32, value)
-		_node.UID = value
-	}
-	if value, ok := cc.mutation.SubID(); ok {
-		_spec.SetField(collection.FieldSubID, field.TypeInt, value)
-		_node.SubID = value
-	}
 	if value, ok := cc.mutation.GetType(); ok {
 		_spec.SetField(collection.FieldType, field.TypeUint8, value)
 		_node.Type = value
@@ -202,6 +237,44 @@ func (cc *CollectionCreate) createSpec() (*Collection, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.Score(); ok {
 		_spec.SetField(collection.FieldScore, field.TypeInt8, value)
 		_node.Score = value
+	}
+	if value, ok := cc.mutation.Time(); ok {
+		_spec.SetField(collection.FieldTime, field.TypeString, value)
+		_node.Time = value
+	}
+	if nodes := cc.mutation.MemberIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   collection.MemberTable,
+			Columns: []string{collection.MemberColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(members.FieldID, field.TypeUint32),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.members_collections = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.SubjectIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   collection.SubjectTable,
+			Columns: []string{collection.SubjectColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subject.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.subject_collections = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

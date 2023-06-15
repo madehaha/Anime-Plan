@@ -32,7 +32,7 @@ func (h Handler) GetSubjectByID(c echo.Context) error {
 	}
 	return util.Success(c, http.StatusOK, subject)
 }
-func (h Handler) AddCollection(c echo.Context) error {
+func (h Handler) AddOrUpdateCollection(c echo.Context) error {
 	uid := c.Get("uid").(uint32)
 	SubjectID := c.Param("id")
 	AddType := c.Param("type")
@@ -52,6 +52,9 @@ func (h Handler) AddCollection(c echo.Context) error {
 		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
 	return c.NoContent(http.StatusOK)
+}
+func (h Handler) GetComment(c echo.Context) error {
+	return nil
 }
 func (h Handler) UpdateCollection(c echo.Context) error {
 	uid := c.Get("uid").(uint32)

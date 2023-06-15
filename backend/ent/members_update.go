@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"backend/ent/collection"
 	"backend/ent/members"
 	"backend/ent/predicate"
 	"context"
@@ -86,9 +87,45 @@ func (mu *MembersUpdate) AddGid(u int8) *MembersUpdate {
 	return mu
 }
 
+// AddCollectionIDs adds the "collections" edge to the Collection entity by IDs.
+func (mu *MembersUpdate) AddCollectionIDs(ids ...int) *MembersUpdate {
+	mu.mutation.AddCollectionIDs(ids...)
+	return mu
+}
+
+// AddCollections adds the "collections" edges to the Collection entity.
+func (mu *MembersUpdate) AddCollections(c ...*Collection) *MembersUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return mu.AddCollectionIDs(ids...)
+}
+
 // Mutation returns the MembersMutation object of the builder.
 func (mu *MembersUpdate) Mutation() *MembersMutation {
 	return mu.mutation
+}
+
+// ClearCollections clears all "collections" edges to the Collection entity.
+func (mu *MembersUpdate) ClearCollections() *MembersUpdate {
+	mu.mutation.ClearCollections()
+	return mu
+}
+
+// RemoveCollectionIDs removes the "collections" edge to Collection entities by IDs.
+func (mu *MembersUpdate) RemoveCollectionIDs(ids ...int) *MembersUpdate {
+	mu.mutation.RemoveCollectionIDs(ids...)
+	return mu
+}
+
+// RemoveCollections removes "collections" edges to Collection entities.
+func (mu *MembersUpdate) RemoveCollections(c ...*Collection) *MembersUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return mu.RemoveCollectionIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -176,6 +213,51 @@ func (mu *MembersUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := mu.mutation.AddedGid(); ok {
 		_spec.AddField(members.FieldGid, field.TypeUint8, value)
 	}
+	if mu.mutation.CollectionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   members.CollectionsTable,
+			Columns: []string{members.CollectionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mu.mutation.RemovedCollectionsIDs(); len(nodes) > 0 && !mu.mutation.CollectionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   members.CollectionsTable,
+			Columns: []string{members.CollectionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mu.mutation.CollectionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   members.CollectionsTable,
+			Columns: []string{members.CollectionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, mu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{members.Label}
@@ -255,9 +337,45 @@ func (muo *MembersUpdateOne) AddGid(u int8) *MembersUpdateOne {
 	return muo
 }
 
+// AddCollectionIDs adds the "collections" edge to the Collection entity by IDs.
+func (muo *MembersUpdateOne) AddCollectionIDs(ids ...int) *MembersUpdateOne {
+	muo.mutation.AddCollectionIDs(ids...)
+	return muo
+}
+
+// AddCollections adds the "collections" edges to the Collection entity.
+func (muo *MembersUpdateOne) AddCollections(c ...*Collection) *MembersUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return muo.AddCollectionIDs(ids...)
+}
+
 // Mutation returns the MembersMutation object of the builder.
 func (muo *MembersUpdateOne) Mutation() *MembersMutation {
 	return muo.mutation
+}
+
+// ClearCollections clears all "collections" edges to the Collection entity.
+func (muo *MembersUpdateOne) ClearCollections() *MembersUpdateOne {
+	muo.mutation.ClearCollections()
+	return muo
+}
+
+// RemoveCollectionIDs removes the "collections" edge to Collection entities by IDs.
+func (muo *MembersUpdateOne) RemoveCollectionIDs(ids ...int) *MembersUpdateOne {
+	muo.mutation.RemoveCollectionIDs(ids...)
+	return muo
+}
+
+// RemoveCollections removes "collections" edges to Collection entities.
+func (muo *MembersUpdateOne) RemoveCollections(c ...*Collection) *MembersUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return muo.RemoveCollectionIDs(ids...)
 }
 
 // Where appends a list predicates to the MembersUpdate builder.
@@ -374,6 +492,51 @@ func (muo *MembersUpdateOne) sqlSave(ctx context.Context) (_node *Members, err e
 	}
 	if value, ok := muo.mutation.AddedGid(); ok {
 		_spec.AddField(members.FieldGid, field.TypeUint8, value)
+	}
+	if muo.mutation.CollectionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   members.CollectionsTable,
+			Columns: []string{members.CollectionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := muo.mutation.RemovedCollectionsIDs(); len(nodes) > 0 && !muo.mutation.CollectionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   members.CollectionsTable,
+			Columns: []string{members.CollectionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := muo.mutation.CollectionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   members.CollectionsTable,
+			Columns: []string{members.CollectionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Members{config: muo.config}
 	_spec.Assign = _node.assignValues

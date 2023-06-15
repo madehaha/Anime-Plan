@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"entgo.io/ent/schema/edge"
 	"regexp"
 
 	"entgo.io/ent"
@@ -31,6 +32,7 @@ func (Members) Fields() []ent.Field {
 
 // Edges of the Members.
 func (Members) Edges() []ent.Edge {
-	return nil
-
+	return []ent.Edge{
+		edge.To("collections", Collection.Type),
+	}
 }

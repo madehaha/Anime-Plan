@@ -6,6 +6,7 @@ import (
 	"backend/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // ID filters vertices based on their ID field.
@@ -716,6 +717,29 @@ func WatchedLT(v uint32) predicate.Subject {
 // WatchedLTE applies the LTE predicate on the "watched" field.
 func WatchedLTE(v uint32) predicate.Subject {
 	return predicate.Subject(sql.FieldLTE(FieldWatched, v))
+}
+
+// HasCollections applies the HasEdge predicate on the "collections" edge.
+func HasCollections() predicate.Subject {
+	return predicate.Subject(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, CollectionsTable, CollectionsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCollectionsWith applies the HasEdge predicate on the "collections" edge with a given conditions (other predicates).
+func HasCollectionsWith(preds ...predicate.Collection) predicate.Subject {
+	return predicate.Subject(func(s *sql.Selector) {
+		step := newCollectionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

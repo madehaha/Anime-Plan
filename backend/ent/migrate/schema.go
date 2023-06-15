@@ -11,18 +11,33 @@ var (
 	// CollectionsColumns holds the columns for the "collections" table.
 	CollectionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "uid", Type: field.TypeUint32},
-		{Name: "sub_id", Type: field.TypeInt},
 		{Name: "type", Type: field.TypeUint8},
 		{Name: "if_comment", Type: field.TypeBool, Default: false},
 		{Name: "comment", Type: field.TypeString, Size: 100, Default: ""},
-		{Name: "score", Type: field.TypeInt8, Default: 100},
+		{Name: "score", Type: field.TypeInt8, Default: 10},
+		{Name: "time", Type: field.TypeString, Default: "2023-06-15"},
+		{Name: "members_collections", Type: field.TypeUint32, Nullable: true},
+		{Name: "subject_collections", Type: field.TypeInt, Nullable: true},
 	}
 	// CollectionsTable holds the schema information for the "collections" table.
 	CollectionsTable = &schema.Table{
 		Name:       "collections",
 		Columns:    CollectionsColumns,
 		PrimaryKey: []*schema.Column{CollectionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "collections_members_collections",
+				Columns:    []*schema.Column{CollectionsColumns[6]},
+				RefColumns: []*schema.Column{MembersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "collections_subjects_collections",
+				Columns:    []*schema.Column{CollectionsColumns[7]},
+				RefColumns: []*schema.Column{SubjectsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// MembersColumns holds the columns for the "members" table.
 	MembersColumns = []*schema.Column{
@@ -72,4 +87,6 @@ var (
 )
 
 func init() {
+	CollectionsTable.ForeignKeys[0].RefTable = MembersTable
+	CollectionsTable.ForeignKeys[1].RefTable = SubjectsTable
 }

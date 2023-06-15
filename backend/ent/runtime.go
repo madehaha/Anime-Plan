@@ -16,19 +16,23 @@ func init() {
 	collectionFields := schema.Collection{}.Fields()
 	_ = collectionFields
 	// collectionDescIfComment is the schema descriptor for if_comment field.
-	collectionDescIfComment := collectionFields[3].Descriptor()
+	collectionDescIfComment := collectionFields[1].Descriptor()
 	// collection.DefaultIfComment holds the default value on creation for the if_comment field.
 	collection.DefaultIfComment = collectionDescIfComment.Default.(bool)
 	// collectionDescComment is the schema descriptor for comment field.
-	collectionDescComment := collectionFields[4].Descriptor()
+	collectionDescComment := collectionFields[2].Descriptor()
 	// collection.DefaultComment holds the default value on creation for the comment field.
 	collection.DefaultComment = collectionDescComment.Default.(string)
 	// collection.CommentValidator is a validator for the "comment" field. It is called by the builders before save.
 	collection.CommentValidator = collectionDescComment.Validators[0].(func(string) error)
 	// collectionDescScore is the schema descriptor for score field.
-	collectionDescScore := collectionFields[5].Descriptor()
+	collectionDescScore := collectionFields[3].Descriptor()
 	// collection.DefaultScore holds the default value on creation for the score field.
 	collection.DefaultScore = collectionDescScore.Default.(int8)
+	// collectionDescTime is the schema descriptor for time field.
+	collectionDescTime := collectionFields[4].Descriptor()
+	// collection.DefaultTime holds the default value on creation for the time field.
+	collection.DefaultTime = collectionDescTime.Default.(string)
 	membersFields := schema.Members{}.Fields()
 	_ = membersFields
 	// membersDescUsername is the schema descriptor for username field.

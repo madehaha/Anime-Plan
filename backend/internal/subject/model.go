@@ -2,13 +2,14 @@ package subject
 
 import (
 	"backend/ent"
-	collection2 "backend/ent/collection"
+	"backend/ent/members"
 	"backend/ent/subject"
 	"backend/internal/logger"
 	"backend/internal/model"
 	"backend/web/request/collection"
 	"context"
 	"errors"
+	"time"
 )
 
 type MysqlRepo struct {
@@ -34,22 +35,26 @@ func (m MysqlRepo) GetSubjectByID(ctx context.Context, id int64) (ent.Subject, e
 	return *subject, nil
 }
 func (m MysqlRepo) UpdateCollection(ctx context.Context, MemberId uint32, SubjectId int, req collection.UpdateCollectionReq) error {
-	col, err := m.client.Collection.Query().Where(collection2.UID(MemberId)).Where(collection2.SubID(SubjectId)).First(ctx)
+	//mem, err := m.client.Members.Query().Where(members.ID(MemberId)).First(ctx)
+	//col, _ := m.client.Members.QueryCollections(mem).All(ctx)
+	//m.client.Collection.Query
+	//col, _ := mem.QueryCollections().QuerySubject()
 	if err != nil {
 		return err
 	}
 	if req.Comment != "" {
-		col.Update().SetType(req.CollectionType).SetIfComment(true).SetComment(req.Comment).SetScore(req.Score).Save(ctx)
+		col.Update().SetType(req.CollectionType).SetIfComment(true).SetComment(req.Comment).
+			SetTime(time.Now().String()).SetScore(req.Score).Save(ctx)
 	}
 
-	col.Update().AddType(int8(req.CollectionType)).SetScore(req.Score).Save(ctx)
+	col.Update().AddType(int8(req.CollectionType)).SetScore(req.Score).SetTime(time.Now().String()).Save(ctx)
 	return nil
 }
-func (m MysqlRepo) AddCollection(ctx context.Context, MemberId uint32, SubjectId int, AddType model.CollectionType) error {
-	//member, _ := m.client.Members.Query().Where(members.ID(MemberId)).First(ctx)
+func (m MysqlRepo) AddOrUpdateCollection(ctx context.Context, MemberId uint32, SubjectId int, AddType model.CollectionType) error {
+	member, _ := m.client.Members.Query().Where(members.ID(MemberId)).First(ctx)
 	sub, _ := m.client.Subject.Query().Where(subject.ID(SubjectId)).First(ctx)
-	_, err := m.client.Collection.Create().
-		SetUID(MemberId).SetType(AddType).SetSubID(SubjectId).Save(ctx)
+	_, err := m.client.Collection.Create().SetMember(member).SetSubject(sub).SetType(AddType).SetTime(time.Now().String()).Save(ctx)
+
 	if err != nil {
 		return err
 	}

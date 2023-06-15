@@ -4,7 +4,9 @@ package ent
 
 import (
 	"backend/ent/collection"
+	"backend/ent/members"
 	"backend/ent/predicate"
+	"backend/ent/subject"
 	"context"
 	"fmt"
 	"math"
@@ -17,10 +19,13 @@ import (
 // CollectionQuery is the builder for querying Collection entities.
 type CollectionQuery struct {
 	config
-	ctx        *QueryContext
-	order      []collection.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Collection
+	ctx         *QueryContext
+	order       []collection.OrderOption
+	inters      []Interceptor
+	predicates  []predicate.Collection
+	withMember  *MembersQuery
+	withSubject *SubjectQuery
+	withFKs     bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -55,6 +60,50 @@ func (cq *CollectionQuery) Unique(unique bool) *CollectionQuery {
 func (cq *CollectionQuery) Order(o ...collection.OrderOption) *CollectionQuery {
 	cq.order = append(cq.order, o...)
 	return cq
+}
+
+// QueryMember chains the current query on the "member" edge.
+func (cq *CollectionQuery) QueryMember() *MembersQuery {
+	query := (&MembersClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(collection.Table, collection.FieldID, selector),
+			sqlgraph.To(members.Table, members.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, collection.MemberTable, collection.MemberColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QuerySubject chains the current query on the "subject" edge.
+func (cq *CollectionQuery) QuerySubject() *SubjectQuery {
+	query := (&SubjectClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(collection.Table, collection.FieldID, selector),
+			sqlgraph.To(subject.Table, subject.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, collection.SubjectTable, collection.SubjectColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Collection entity from the query.
@@ -244,15 +293,39 @@ func (cq *CollectionQuery) Clone() *CollectionQuery {
 		return nil
 	}
 	return &CollectionQuery{
-		config:     cq.config,
-		ctx:        cq.ctx.Clone(),
-		order:      append([]collection.OrderOption{}, cq.order...),
-		inters:     append([]Interceptor{}, cq.inters...),
-		predicates: append([]predicate.Collection{}, cq.predicates...),
+		config:      cq.config,
+		ctx:         cq.ctx.Clone(),
+		order:       append([]collection.OrderOption{}, cq.order...),
+		inters:      append([]Interceptor{}, cq.inters...),
+		predicates:  append([]predicate.Collection{}, cq.predicates...),
+		withMember:  cq.withMember.Clone(),
+		withSubject: cq.withSubject.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
 	}
+}
+
+// WithMember tells the query-builder to eager-load the nodes that are connected to
+// the "member" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CollectionQuery) WithMember(opts ...func(*MembersQuery)) *CollectionQuery {
+	query := (&MembersClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withMember = query
+	return cq
+}
+
+// WithSubject tells the query-builder to eager-load the nodes that are connected to
+// the "subject" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CollectionQuery) WithSubject(opts ...func(*SubjectQuery)) *CollectionQuery {
+	query := (&SubjectClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withSubject = query
+	return cq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -261,12 +334,12 @@ func (cq *CollectionQuery) Clone() *CollectionQuery {
 // Example:
 //
 //	var v []struct {
-//		UID uint32 `json:"uid,omitempty"`
+//		Type uint8 `json:"type,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Collection.Query().
-//		GroupBy(collection.FieldUID).
+//		GroupBy(collection.FieldType).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (cq *CollectionQuery) GroupBy(field string, fields ...string) *CollectionGroupBy {
@@ -284,11 +357,11 @@ func (cq *CollectionQuery) GroupBy(field string, fields ...string) *CollectionGr
 // Example:
 //
 //	var v []struct {
-//		UID uint32 `json:"uid,omitempty"`
+//		Type uint8 `json:"type,omitempty"`
 //	}
 //
 //	client.Collection.Query().
-//		Select(collection.FieldUID).
+//		Select(collection.FieldType).
 //		Scan(ctx, &v)
 func (cq *CollectionQuery) Select(fields ...string) *CollectionSelect {
 	cq.ctx.Fields = append(cq.ctx.Fields, fields...)
@@ -331,15 +404,27 @@ func (cq *CollectionQuery) prepareQuery(ctx context.Context) error {
 
 func (cq *CollectionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Collection, error) {
 	var (
-		nodes = []*Collection{}
-		_spec = cq.querySpec()
+		nodes       = []*Collection{}
+		withFKs     = cq.withFKs
+		_spec       = cq.querySpec()
+		loadedTypes = [2]bool{
+			cq.withMember != nil,
+			cq.withSubject != nil,
+		}
 	)
+	if cq.withMember != nil || cq.withSubject != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, collection.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Collection).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Collection{config: cq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -351,7 +436,84 @@ func (cq *CollectionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*C
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := cq.withMember; query != nil {
+		if err := cq.loadMember(ctx, query, nodes, nil,
+			func(n *Collection, e *Members) { n.Edges.Member = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := cq.withSubject; query != nil {
+		if err := cq.loadSubject(ctx, query, nodes, nil,
+			func(n *Collection, e *Subject) { n.Edges.Subject = e }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (cq *CollectionQuery) loadMember(ctx context.Context, query *MembersQuery, nodes []*Collection, init func(*Collection), assign func(*Collection, *Members)) error {
+	ids := make([]uint32, 0, len(nodes))
+	nodeids := make(map[uint32][]*Collection)
+	for i := range nodes {
+		if nodes[i].members_collections == nil {
+			continue
+		}
+		fk := *nodes[i].members_collections
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(members.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "members_collections" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (cq *CollectionQuery) loadSubject(ctx context.Context, query *SubjectQuery, nodes []*Collection, init func(*Collection), assign func(*Collection, *Subject)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Collection)
+	for i := range nodes {
+		if nodes[i].subject_collections == nil {
+			continue
+		}
+		fk := *nodes[i].subject_collections
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(subject.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "subject_collections" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
 }
 
 func (cq *CollectionQuery) sqlCount(ctx context.Context) (int, error) {

@@ -3,9 +3,11 @@
 package ent
 
 import (
+	"backend/ent/collection"
 	"backend/ent/members"
 	"backend/ent/predicate"
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -17,10 +19,11 @@ import (
 // MembersQuery is the builder for querying Members entities.
 type MembersQuery struct {
 	config
-	ctx        *QueryContext
-	order      []members.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Members
+	ctx             *QueryContext
+	order           []members.OrderOption
+	inters          []Interceptor
+	predicates      []predicate.Members
+	withCollections *CollectionQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -55,6 +58,28 @@ func (mq *MembersQuery) Unique(unique bool) *MembersQuery {
 func (mq *MembersQuery) Order(o ...members.OrderOption) *MembersQuery {
 	mq.order = append(mq.order, o...)
 	return mq
+}
+
+// QueryCollections chains the current query on the "collections" edge.
+func (mq *MembersQuery) QueryCollections() *CollectionQuery {
+	query := (&CollectionClient{config: mq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := mq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := mq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(members.Table, members.FieldID, selector),
+			sqlgraph.To(collection.Table, collection.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, members.CollectionsTable, members.CollectionsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Members entity from the query.
@@ -244,15 +269,27 @@ func (mq *MembersQuery) Clone() *MembersQuery {
 		return nil
 	}
 	return &MembersQuery{
-		config:     mq.config,
-		ctx:        mq.ctx.Clone(),
-		order:      append([]members.OrderOption{}, mq.order...),
-		inters:     append([]Interceptor{}, mq.inters...),
-		predicates: append([]predicate.Members{}, mq.predicates...),
+		config:          mq.config,
+		ctx:             mq.ctx.Clone(),
+		order:           append([]members.OrderOption{}, mq.order...),
+		inters:          append([]Interceptor{}, mq.inters...),
+		predicates:      append([]predicate.Members{}, mq.predicates...),
+		withCollections: mq.withCollections.Clone(),
 		// clone intermediate query.
 		sql:  mq.sql.Clone(),
 		path: mq.path,
 	}
+}
+
+// WithCollections tells the query-builder to eager-load the nodes that are connected to
+// the "collections" edge. The optional arguments are used to configure the query builder of the edge.
+func (mq *MembersQuery) WithCollections(opts ...func(*CollectionQuery)) *MembersQuery {
+	query := (&CollectionClient{config: mq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	mq.withCollections = query
+	return mq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -331,8 +368,11 @@ func (mq *MembersQuery) prepareQuery(ctx context.Context) error {
 
 func (mq *MembersQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Members, error) {
 	var (
-		nodes = []*Members{}
-		_spec = mq.querySpec()
+		nodes       = []*Members{}
+		_spec       = mq.querySpec()
+		loadedTypes = [1]bool{
+			mq.withCollections != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Members).scanValues(nil, columns)
@@ -340,6 +380,7 @@ func (mq *MembersQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Memb
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Members{config: mq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -351,7 +392,46 @@ func (mq *MembersQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Memb
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := mq.withCollections; query != nil {
+		if err := mq.loadCollections(ctx, query, nodes,
+			func(n *Members) { n.Edges.Collections = []*Collection{} },
+			func(n *Members, e *Collection) { n.Edges.Collections = append(n.Edges.Collections, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (mq *MembersQuery) loadCollections(ctx context.Context, query *CollectionQuery, nodes []*Members, init func(*Members), assign func(*Members, *Collection)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uint32]*Members)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Collection(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(members.CollectionsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.members_collections
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "members_collections" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "members_collections" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
 }
 
 func (mq *MembersQuery) sqlCount(ctx context.Context) (int, error) {

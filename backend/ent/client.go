@@ -17,6 +17,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // Client is the client that holds all ent builders.
@@ -301,6 +302,38 @@ func (c *CollectionClient) GetX(ctx context.Context, id int) *Collection {
 	return obj
 }
 
+// QueryMember queries the member edge of a Collection.
+func (c *CollectionClient) QueryMember(co *Collection) *MembersQuery {
+	query := (&MembersClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := co.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(collection.Table, collection.FieldID, id),
+			sqlgraph.To(members.Table, members.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, collection.MemberTable, collection.MemberColumn),
+		)
+		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySubject queries the subject edge of a Collection.
+func (c *CollectionClient) QuerySubject(co *Collection) *SubjectQuery {
+	query := (&SubjectClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := co.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(collection.Table, collection.FieldID, id),
+			sqlgraph.To(subject.Table, subject.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, collection.SubjectTable, collection.SubjectColumn),
+		)
+		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *CollectionClient) Hooks() []Hook {
 	return c.hooks.Collection
@@ -419,6 +452,22 @@ func (c *MembersClient) GetX(ctx context.Context, id uint32) *Members {
 	return obj
 }
 
+// QueryCollections queries the collections edge of a Members.
+func (c *MembersClient) QueryCollections(m *Members) *CollectionQuery {
+	query := (&CollectionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(members.Table, members.FieldID, id),
+			sqlgraph.To(collection.Table, collection.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, members.CollectionsTable, members.CollectionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *MembersClient) Hooks() []Hook {
 	return c.hooks.Members
@@ -535,6 +584,22 @@ func (c *SubjectClient) GetX(ctx context.Context, id int) *Subject {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryCollections queries the collections edge of a Subject.
+func (c *SubjectClient) QueryCollections(s *Subject) *CollectionQuery {
+	query := (&CollectionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(subject.Table, subject.FieldID, id),
+			sqlgraph.To(collection.Table, collection.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, subject.CollectionsTable, subject.CollectionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.

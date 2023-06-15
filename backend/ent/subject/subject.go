@@ -4,6 +4,7 @@ package subject
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -35,8 +36,17 @@ const (
 	FieldDrop = "drop"
 	// FieldWatched holds the string denoting the watched field in the database.
 	FieldWatched = "watched"
+	// EdgeCollections holds the string denoting the collections edge name in mutations.
+	EdgeCollections = "collections"
 	// Table holds the table name of the subject in the database.
 	Table = "subjects"
+	// CollectionsTable is the table that holds the collections relation/edge.
+	CollectionsTable = "collections"
+	// CollectionsInverseTable is the table name for the Collection entity.
+	// It exists in this package in order to avoid circular dependency with the "collection" package.
+	CollectionsInverseTable = "collections"
+	// CollectionsColumn is the table column denoting the collections relation/edge.
+	CollectionsColumn = "subject_collections"
 )
 
 // Columns holds all SQL columns for subject fields.
@@ -155,4 +165,25 @@ func ByDrop(opts ...sql.OrderTermOption) OrderOption {
 // ByWatched orders the results by the watched field.
 func ByWatched(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldWatched, opts...).ToFunc()
+}
+
+// ByCollectionsCount orders the results by collections count.
+func ByCollectionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCollectionsStep(), opts...)
+	}
+}
+
+// ByCollections orders the results by collections terms.
+func ByCollections(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCollectionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newCollectionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CollectionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, CollectionsTable, CollectionsColumn),
+	)
 }

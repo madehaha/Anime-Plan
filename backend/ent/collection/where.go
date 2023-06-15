@@ -6,6 +6,7 @@ import (
 	"backend/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // ID filters vertices based on their ID field.
@@ -53,16 +54,6 @@ func IDLTE(id int) predicate.Collection {
 	return predicate.Collection(sql.FieldLTE(FieldID, id))
 }
 
-// UID applies equality check predicate on the "uid" field. It's identical to UIDEQ.
-func UID(v uint32) predicate.Collection {
-	return predicate.Collection(sql.FieldEQ(FieldUID, v))
-}
-
-// SubID applies equality check predicate on the "sub_id" field. It's identical to SubIDEQ.
-func SubID(v int) predicate.Collection {
-	return predicate.Collection(sql.FieldEQ(FieldSubID, v))
-}
-
 // Type applies equality check predicate on the "type" field. It's identical to TypeEQ.
 func Type(v uint8) predicate.Collection {
 	return predicate.Collection(sql.FieldEQ(FieldType, v))
@@ -83,84 +74,9 @@ func Score(v int8) predicate.Collection {
 	return predicate.Collection(sql.FieldEQ(FieldScore, v))
 }
 
-// UIDEQ applies the EQ predicate on the "uid" field.
-func UIDEQ(v uint32) predicate.Collection {
-	return predicate.Collection(sql.FieldEQ(FieldUID, v))
-}
-
-// UIDNEQ applies the NEQ predicate on the "uid" field.
-func UIDNEQ(v uint32) predicate.Collection {
-	return predicate.Collection(sql.FieldNEQ(FieldUID, v))
-}
-
-// UIDIn applies the In predicate on the "uid" field.
-func UIDIn(vs ...uint32) predicate.Collection {
-	return predicate.Collection(sql.FieldIn(FieldUID, vs...))
-}
-
-// UIDNotIn applies the NotIn predicate on the "uid" field.
-func UIDNotIn(vs ...uint32) predicate.Collection {
-	return predicate.Collection(sql.FieldNotIn(FieldUID, vs...))
-}
-
-// UIDGT applies the GT predicate on the "uid" field.
-func UIDGT(v uint32) predicate.Collection {
-	return predicate.Collection(sql.FieldGT(FieldUID, v))
-}
-
-// UIDGTE applies the GTE predicate on the "uid" field.
-func UIDGTE(v uint32) predicate.Collection {
-	return predicate.Collection(sql.FieldGTE(FieldUID, v))
-}
-
-// UIDLT applies the LT predicate on the "uid" field.
-func UIDLT(v uint32) predicate.Collection {
-	return predicate.Collection(sql.FieldLT(FieldUID, v))
-}
-
-// UIDLTE applies the LTE predicate on the "uid" field.
-func UIDLTE(v uint32) predicate.Collection {
-	return predicate.Collection(sql.FieldLTE(FieldUID, v))
-}
-
-// SubIDEQ applies the EQ predicate on the "sub_id" field.
-func SubIDEQ(v int) predicate.Collection {
-	return predicate.Collection(sql.FieldEQ(FieldSubID, v))
-}
-
-// SubIDNEQ applies the NEQ predicate on the "sub_id" field.
-func SubIDNEQ(v int) predicate.Collection {
-	return predicate.Collection(sql.FieldNEQ(FieldSubID, v))
-}
-
-// SubIDIn applies the In predicate on the "sub_id" field.
-func SubIDIn(vs ...int) predicate.Collection {
-	return predicate.Collection(sql.FieldIn(FieldSubID, vs...))
-}
-
-// SubIDNotIn applies the NotIn predicate on the "sub_id" field.
-func SubIDNotIn(vs ...int) predicate.Collection {
-	return predicate.Collection(sql.FieldNotIn(FieldSubID, vs...))
-}
-
-// SubIDGT applies the GT predicate on the "sub_id" field.
-func SubIDGT(v int) predicate.Collection {
-	return predicate.Collection(sql.FieldGT(FieldSubID, v))
-}
-
-// SubIDGTE applies the GTE predicate on the "sub_id" field.
-func SubIDGTE(v int) predicate.Collection {
-	return predicate.Collection(sql.FieldGTE(FieldSubID, v))
-}
-
-// SubIDLT applies the LT predicate on the "sub_id" field.
-func SubIDLT(v int) predicate.Collection {
-	return predicate.Collection(sql.FieldLT(FieldSubID, v))
-}
-
-// SubIDLTE applies the LTE predicate on the "sub_id" field.
-func SubIDLTE(v int) predicate.Collection {
-	return predicate.Collection(sql.FieldLTE(FieldSubID, v))
+// Time applies equality check predicate on the "time" field. It's identical to TimeEQ.
+func Time(v string) predicate.Collection {
+	return predicate.Collection(sql.FieldEQ(FieldTime, v))
 }
 
 // TypeEQ applies the EQ predicate on the "type" field.
@@ -316,6 +232,117 @@ func ScoreLT(v int8) predicate.Collection {
 // ScoreLTE applies the LTE predicate on the "score" field.
 func ScoreLTE(v int8) predicate.Collection {
 	return predicate.Collection(sql.FieldLTE(FieldScore, v))
+}
+
+// TimeEQ applies the EQ predicate on the "time" field.
+func TimeEQ(v string) predicate.Collection {
+	return predicate.Collection(sql.FieldEQ(FieldTime, v))
+}
+
+// TimeNEQ applies the NEQ predicate on the "time" field.
+func TimeNEQ(v string) predicate.Collection {
+	return predicate.Collection(sql.FieldNEQ(FieldTime, v))
+}
+
+// TimeIn applies the In predicate on the "time" field.
+func TimeIn(vs ...string) predicate.Collection {
+	return predicate.Collection(sql.FieldIn(FieldTime, vs...))
+}
+
+// TimeNotIn applies the NotIn predicate on the "time" field.
+func TimeNotIn(vs ...string) predicate.Collection {
+	return predicate.Collection(sql.FieldNotIn(FieldTime, vs...))
+}
+
+// TimeGT applies the GT predicate on the "time" field.
+func TimeGT(v string) predicate.Collection {
+	return predicate.Collection(sql.FieldGT(FieldTime, v))
+}
+
+// TimeGTE applies the GTE predicate on the "time" field.
+func TimeGTE(v string) predicate.Collection {
+	return predicate.Collection(sql.FieldGTE(FieldTime, v))
+}
+
+// TimeLT applies the LT predicate on the "time" field.
+func TimeLT(v string) predicate.Collection {
+	return predicate.Collection(sql.FieldLT(FieldTime, v))
+}
+
+// TimeLTE applies the LTE predicate on the "time" field.
+func TimeLTE(v string) predicate.Collection {
+	return predicate.Collection(sql.FieldLTE(FieldTime, v))
+}
+
+// TimeContains applies the Contains predicate on the "time" field.
+func TimeContains(v string) predicate.Collection {
+	return predicate.Collection(sql.FieldContains(FieldTime, v))
+}
+
+// TimeHasPrefix applies the HasPrefix predicate on the "time" field.
+func TimeHasPrefix(v string) predicate.Collection {
+	return predicate.Collection(sql.FieldHasPrefix(FieldTime, v))
+}
+
+// TimeHasSuffix applies the HasSuffix predicate on the "time" field.
+func TimeHasSuffix(v string) predicate.Collection {
+	return predicate.Collection(sql.FieldHasSuffix(FieldTime, v))
+}
+
+// TimeEqualFold applies the EqualFold predicate on the "time" field.
+func TimeEqualFold(v string) predicate.Collection {
+	return predicate.Collection(sql.FieldEqualFold(FieldTime, v))
+}
+
+// TimeContainsFold applies the ContainsFold predicate on the "time" field.
+func TimeContainsFold(v string) predicate.Collection {
+	return predicate.Collection(sql.FieldContainsFold(FieldTime, v))
+}
+
+// HasMember applies the HasEdge predicate on the "member" edge.
+func HasMember() predicate.Collection {
+	return predicate.Collection(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, MemberTable, MemberColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasMemberWith applies the HasEdge predicate on the "member" edge with a given conditions (other predicates).
+func HasMemberWith(preds ...predicate.Members) predicate.Collection {
+	return predicate.Collection(func(s *sql.Selector) {
+		step := newMemberStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasSubject applies the HasEdge predicate on the "subject" edge.
+func HasSubject() predicate.Collection {
+	return predicate.Collection(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, SubjectTable, SubjectColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSubjectWith applies the HasEdge predicate on the "subject" edge with a given conditions (other predicates).
+func HasSubjectWith(preds ...predicate.Subject) predicate.Collection {
+	return predicate.Collection(func(s *sql.Selector) {
+		step := newSubjectStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

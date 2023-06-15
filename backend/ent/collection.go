@@ -4,6 +4,8 @@ package ent
 
 import (
 	"backend/ent/collection"
+	"backend/ent/members"
+	"backend/ent/subject"
 	"fmt"
 	"strings"
 
@@ -16,10 +18,6 @@ type Collection struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// UID holds the value of the "uid" field.
-	UID uint32 `json:"uid,omitempty"`
-	// SubID holds the value of the "sub_id" field.
-	SubID int `json:"sub_id,omitempty"`
 	// Type holds the value of the "type" field.
 	Type uint8 `json:"type,omitempty"`
 	// IfComment holds the value of the "if_comment" field.
@@ -27,8 +25,52 @@ type Collection struct {
 	// Comment holds the value of the "comment" field.
 	Comment string `json:"comment,omitempty"`
 	// Score holds the value of the "score" field.
-	Score        int8 `json:"score,omitempty"`
-	selectValues sql.SelectValues
+	Score int8 `json:"score,omitempty"`
+	// Time holds the value of the "time" field.
+	Time string `json:"time,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the CollectionQuery when eager-loading is set.
+	Edges               CollectionEdges `json:"edges"`
+	members_collections *uint32
+	subject_collections *int
+	selectValues        sql.SelectValues
+}
+
+// CollectionEdges holds the relations/edges for other nodes in the graph.
+type CollectionEdges struct {
+	// Member holds the value of the member edge.
+	Member *Members `json:"member,omitempty"`
+	// Subject holds the value of the subject edge.
+	Subject *Subject `json:"subject,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [2]bool
+}
+
+// MemberOrErr returns the Member value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e CollectionEdges) MemberOrErr() (*Members, error) {
+	if e.loadedTypes[0] {
+		if e.Member == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: members.Label}
+		}
+		return e.Member, nil
+	}
+	return nil, &NotLoadedError{edge: "member"}
+}
+
+// SubjectOrErr returns the Subject value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e CollectionEdges) SubjectOrErr() (*Subject, error) {
+	if e.loadedTypes[1] {
+		if e.Subject == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: subject.Label}
+		}
+		return e.Subject, nil
+	}
+	return nil, &NotLoadedError{edge: "subject"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -38,10 +80,14 @@ func (*Collection) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case collection.FieldIfComment:
 			values[i] = new(sql.NullBool)
-		case collection.FieldID, collection.FieldUID, collection.FieldSubID, collection.FieldType, collection.FieldScore:
+		case collection.FieldID, collection.FieldType, collection.FieldScore:
 			values[i] = new(sql.NullInt64)
-		case collection.FieldComment:
+		case collection.FieldComment, collection.FieldTime:
 			values[i] = new(sql.NullString)
+		case collection.ForeignKeys[0]: // members_collections
+			values[i] = new(sql.NullInt64)
+		case collection.ForeignKeys[1]: // subject_collections
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -63,18 +109,6 @@ func (c *Collection) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			c.ID = int(value.Int64)
-		case collection.FieldUID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field uid", values[i])
-			} else if value.Valid {
-				c.UID = uint32(value.Int64)
-			}
-		case collection.FieldSubID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field sub_id", values[i])
-			} else if value.Valid {
-				c.SubID = int(value.Int64)
-			}
 		case collection.FieldType:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field type", values[i])
@@ -99,6 +133,26 @@ func (c *Collection) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.Score = int8(value.Int64)
 			}
+		case collection.FieldTime:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field time", values[i])
+			} else if value.Valid {
+				c.Time = value.String
+			}
+		case collection.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field members_collections", value)
+			} else if value.Valid {
+				c.members_collections = new(uint32)
+				*c.members_collections = uint32(value.Int64)
+			}
+		case collection.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field subject_collections", value)
+			} else if value.Valid {
+				c.subject_collections = new(int)
+				*c.subject_collections = int(value.Int64)
+			}
 		default:
 			c.selectValues.Set(columns[i], values[i])
 		}
@@ -110,6 +164,16 @@ func (c *Collection) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (c *Collection) Value(name string) (ent.Value, error) {
 	return c.selectValues.Get(name)
+}
+
+// QueryMember queries the "member" edge of the Collection entity.
+func (c *Collection) QueryMember() *MembersQuery {
+	return NewCollectionClient(c.config).QueryMember(c)
+}
+
+// QuerySubject queries the "subject" edge of the Collection entity.
+func (c *Collection) QuerySubject() *SubjectQuery {
+	return NewCollectionClient(c.config).QuerySubject(c)
 }
 
 // Update returns a builder for updating this Collection.
@@ -135,12 +199,6 @@ func (c *Collection) String() string {
 	var builder strings.Builder
 	builder.WriteString("Collection(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", c.ID))
-	builder.WriteString("uid=")
-	builder.WriteString(fmt.Sprintf("%v", c.UID))
-	builder.WriteString(", ")
-	builder.WriteString("sub_id=")
-	builder.WriteString(fmt.Sprintf("%v", c.SubID))
-	builder.WriteString(", ")
 	builder.WriteString("type=")
 	builder.WriteString(fmt.Sprintf("%v", c.Type))
 	builder.WriteString(", ")
@@ -152,6 +210,9 @@ func (c *Collection) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("score=")
 	builder.WriteString(fmt.Sprintf("%v", c.Score))
+	builder.WriteString(", ")
+	builder.WriteString("time=")
+	builder.WriteString(c.Time)
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -30,7 +30,28 @@ type Members struct {
 	Gid uint8 `json:"gid,omitempty"`
 	// RegisterTime holds the value of the "register_time" field.
 	RegisterTime string `json:"register_time,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the MembersQuery when eager-loading is set.
+	Edges        MembersEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// MembersEdges holds the relations/edges for other nodes in the graph.
+type MembersEdges struct {
+	// Collections holds the value of the collections edge.
+	Collections []*Collection `json:"collections,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// CollectionsOrErr returns the Collections value or an error if the edge
+// was not loaded in eager-loading.
+func (e MembersEdges) CollectionsOrErr() ([]*Collection, error) {
+	if e.loadedTypes[0] {
+		return e.Collections, nil
+	}
+	return nil, &NotLoadedError{edge: "collections"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -117,6 +138,11 @@ func (m *Members) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (m *Members) Value(name string) (ent.Value, error) {
 	return m.selectValues.Get(name)
+}
+
+// QueryCollections queries the "collections" edge of the Members entity.
+func (m *Members) QueryCollections() *CollectionQuery {
+	return NewMembersClient(m.config).QueryCollections(m)
 }
 
 // Update returns a builder for updating this Members.

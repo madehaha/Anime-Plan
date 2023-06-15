@@ -43,6 +43,7 @@ func (sc SubjectCtrl) AddCollection(MemberId uint32, SubjectId int, AddType mode
 	}
 	return nil
 }
+
 func (sc SubjectCtrl) UpdateCollection(MemberId uint32, SubjectId int, req collection2.UpdateCollectionReq) error {
 	err := sc.Repo.UpdateCollection(context.Background(), MemberId, SubjectId, req)
 	if err != nil {
@@ -50,6 +51,7 @@ func (sc SubjectCtrl) UpdateCollection(MemberId uint32, SubjectId int, req colle
 	}
 	return nil
 }
+
 func (sc SubjectCtrl) CreateSubject(req subject2.CreateSubjectReq, gid uint8) error {
 	if gid == 0 {
 		logger.Error("Failed to create subjects")

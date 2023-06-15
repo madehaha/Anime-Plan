@@ -4,6 +4,7 @@ package members
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -25,8 +26,19 @@ const (
 	FieldGid = "gid"
 	// FieldRegisterTime holds the string denoting the register_time field in the database.
 	FieldRegisterTime = "register_time"
+	// EdgeCollections holds the string denoting the collections edge name in mutations.
+	EdgeCollections = "collections"
+	// CollectionFieldID holds the string denoting the ID field of the Collection.
+	CollectionFieldID = "id"
 	// Table holds the table name of the members in the database.
 	Table = "members"
+	// CollectionsTable is the table that holds the collections relation/edge.
+	CollectionsTable = "collections"
+	// CollectionsInverseTable is the table name for the Collection entity.
+	// It exists in this package in order to avoid circular dependency with the "collection" package.
+	CollectionsInverseTable = "collections"
+	// CollectionsColumn is the table column denoting the collections relation/edge.
+	CollectionsColumn = "members_collections"
 )
 
 // Columns holds all SQL columns for members fields.
@@ -107,4 +119,25 @@ func ByGid(opts ...sql.OrderTermOption) OrderOption {
 // ByRegisterTime orders the results by the register_time field.
 func ByRegisterTime(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRegisterTime, opts...).ToFunc()
+}
+
+// ByCollectionsCount orders the results by collections count.
+func ByCollectionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCollectionsStep(), opts...)
+	}
+}
+
+// ByCollections orders the results by collections terms.
+func ByCollections(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCollectionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newCollectionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CollectionsInverseTable, CollectionFieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, CollectionsTable, CollectionsColumn),
+	)
 }

@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"backend/ent/collection"
 	"backend/ent/subject"
 	"context"
 	"errors"
@@ -153,6 +154,21 @@ func (sc *SubjectCreate) SetNillableWatched(u *uint32) *SubjectCreate {
 		sc.SetWatched(*u)
 	}
 	return sc
+}
+
+// AddCollectionIDs adds the "collections" edge to the Collection entity by IDs.
+func (sc *SubjectCreate) AddCollectionIDs(ids ...int) *SubjectCreate {
+	sc.mutation.AddCollectionIDs(ids...)
+	return sc
+}
+
+// AddCollections adds the "collections" edges to the Collection entity.
+func (sc *SubjectCreate) AddCollections(c ...*Collection) *SubjectCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return sc.AddCollectionIDs(ids...)
 }
 
 // Mutation returns the SubjectMutation object of the builder.
@@ -345,6 +361,22 @@ func (sc *SubjectCreate) createSpec() (*Subject, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.Watched(); ok {
 		_spec.SetField(subject.FieldWatched, field.TypeUint32, value)
 		_node.Watched = value
+	}
+	if nodes := sc.mutation.CollectionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   subject.CollectionsTable,
+			Columns: []string{subject.CollectionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

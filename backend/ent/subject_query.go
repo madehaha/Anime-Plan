@@ -3,9 +3,11 @@
 package ent
 
 import (
+	"backend/ent/collection"
 	"backend/ent/predicate"
 	"backend/ent/subject"
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -17,10 +19,11 @@ import (
 // SubjectQuery is the builder for querying Subject entities.
 type SubjectQuery struct {
 	config
-	ctx        *QueryContext
-	order      []subject.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Subject
+	ctx             *QueryContext
+	order           []subject.OrderOption
+	inters          []Interceptor
+	predicates      []predicate.Subject
+	withCollections *CollectionQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -55,6 +58,28 @@ func (sq *SubjectQuery) Unique(unique bool) *SubjectQuery {
 func (sq *SubjectQuery) Order(o ...subject.OrderOption) *SubjectQuery {
 	sq.order = append(sq.order, o...)
 	return sq
+}
+
+// QueryCollections chains the current query on the "collections" edge.
+func (sq *SubjectQuery) QueryCollections() *CollectionQuery {
+	query := (&CollectionClient{config: sq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := sq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := sq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(subject.Table, subject.FieldID, selector),
+			sqlgraph.To(collection.Table, collection.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, subject.CollectionsTable, subject.CollectionsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Subject entity from the query.
@@ -244,15 +269,27 @@ func (sq *SubjectQuery) Clone() *SubjectQuery {
 		return nil
 	}
 	return &SubjectQuery{
-		config:     sq.config,
-		ctx:        sq.ctx.Clone(),
-		order:      append([]subject.OrderOption{}, sq.order...),
-		inters:     append([]Interceptor{}, sq.inters...),
-		predicates: append([]predicate.Subject{}, sq.predicates...),
+		config:          sq.config,
+		ctx:             sq.ctx.Clone(),
+		order:           append([]subject.OrderOption{}, sq.order...),
+		inters:          append([]Interceptor{}, sq.inters...),
+		predicates:      append([]predicate.Subject{}, sq.predicates...),
+		withCollections: sq.withCollections.Clone(),
 		// clone intermediate query.
 		sql:  sq.sql.Clone(),
 		path: sq.path,
 	}
+}
+
+// WithCollections tells the query-builder to eager-load the nodes that are connected to
+// the "collections" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *SubjectQuery) WithCollections(opts ...func(*CollectionQuery)) *SubjectQuery {
+	query := (&CollectionClient{config: sq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	sq.withCollections = query
+	return sq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -331,8 +368,11 @@ func (sq *SubjectQuery) prepareQuery(ctx context.Context) error {
 
 func (sq *SubjectQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Subject, error) {
 	var (
-		nodes = []*Subject{}
-		_spec = sq.querySpec()
+		nodes       = []*Subject{}
+		_spec       = sq.querySpec()
+		loadedTypes = [1]bool{
+			sq.withCollections != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Subject).scanValues(nil, columns)
@@ -340,6 +380,7 @@ func (sq *SubjectQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Subj
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Subject{config: sq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -351,7 +392,46 @@ func (sq *SubjectQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Subj
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := sq.withCollections; query != nil {
+		if err := sq.loadCollections(ctx, query, nodes,
+			func(n *Subject) { n.Edges.Collections = []*Collection{} },
+			func(n *Subject, e *Collection) { n.Edges.Collections = append(n.Edges.Collections, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (sq *SubjectQuery) loadCollections(ctx context.Context, query *CollectionQuery, nodes []*Subject, init func(*Subject), assign func(*Subject, *Collection)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Subject)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Collection(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(subject.CollectionsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.subject_collections
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "subject_collections" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "subject_collections" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
 }
 
 func (sq *SubjectQuery) sqlCount(ctx context.Context) (int, error) {

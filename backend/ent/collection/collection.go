@@ -4,6 +4,7 @@ package collection
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -11,10 +12,6 @@ const (
 	Label = "collection"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldUID holds the string denoting the uid field in the database.
-	FieldUID = "uid"
-	// FieldSubID holds the string denoting the sub_id field in the database.
-	FieldSubID = "sub_id"
 	// FieldType holds the string denoting the type field in the database.
 	FieldType = "type"
 	// FieldIfComment holds the string denoting the if_comment field in the database.
@@ -23,25 +20,58 @@ const (
 	FieldComment = "comment"
 	// FieldScore holds the string denoting the score field in the database.
 	FieldScore = "score"
+	// FieldTime holds the string denoting the time field in the database.
+	FieldTime = "time"
+	// EdgeMember holds the string denoting the member edge name in mutations.
+	EdgeMember = "member"
+	// EdgeSubject holds the string denoting the subject edge name in mutations.
+	EdgeSubject = "subject"
+	// MembersFieldID holds the string denoting the ID field of the Members.
+	MembersFieldID = "uid"
 	// Table holds the table name of the collection in the database.
 	Table = "collections"
+	// MemberTable is the table that holds the member relation/edge.
+	MemberTable = "collections"
+	// MemberInverseTable is the table name for the Members entity.
+	// It exists in this package in order to avoid circular dependency with the "members" package.
+	MemberInverseTable = "members"
+	// MemberColumn is the table column denoting the member relation/edge.
+	MemberColumn = "members_collections"
+	// SubjectTable is the table that holds the subject relation/edge.
+	SubjectTable = "collections"
+	// SubjectInverseTable is the table name for the Subject entity.
+	// It exists in this package in order to avoid circular dependency with the "subject" package.
+	SubjectInverseTable = "subjects"
+	// SubjectColumn is the table column denoting the subject relation/edge.
+	SubjectColumn = "subject_collections"
 )
 
 // Columns holds all SQL columns for collection fields.
 var Columns = []string{
 	FieldID,
-	FieldUID,
-	FieldSubID,
 	FieldType,
 	FieldIfComment,
 	FieldComment,
 	FieldScore,
+	FieldTime,
+}
+
+// ForeignKeys holds the SQL foreign-keys that are owned by the "collections"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"members_collections",
+	"subject_collections",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -57,6 +87,8 @@ var (
 	CommentValidator func(string) error
 	// DefaultScore holds the default value on creation for the "score" field.
 	DefaultScore int8
+	// DefaultTime holds the default value on creation for the "time" field.
+	DefaultTime string
 )
 
 // OrderOption defines the ordering options for the Collection queries.
@@ -65,16 +97,6 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
-}
-
-// ByUID orders the results by the uid field.
-func ByUID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUID, opts...).ToFunc()
-}
-
-// BySubID orders the results by the sub_id field.
-func BySubID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldSubID, opts...).ToFunc()
 }
 
 // ByType orders the results by the type field.
@@ -95,4 +117,37 @@ func ByComment(opts ...sql.OrderTermOption) OrderOption {
 // ByScore orders the results by the score field.
 func ByScore(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldScore, opts...).ToFunc()
+}
+
+// ByTime orders the results by the time field.
+func ByTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTime, opts...).ToFunc()
+}
+
+// ByMemberField orders the results by member field.
+func ByMemberField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newMemberStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// BySubjectField orders the results by subject field.
+func BySubjectField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSubjectStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newMemberStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(MemberInverseTable, MembersFieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, MemberTable, MemberColumn),
+	)
+}
+func newSubjectStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SubjectInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, SubjectTable, SubjectColumn),
+	)
 }
