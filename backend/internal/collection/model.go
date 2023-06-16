@@ -62,7 +62,7 @@ func (m MysqlRepo) AddCollection(
 	var score uint8
 	var epStatus uint8
 	date := time.Now().Format("2006-01-02")
-	hasComment := req.Comment == ""
+	hasComment := req.Comment != ""
 	hasEpStatusOrScore := req.Type == model.Wish
 	if hasEpStatusOrScore {
 		score = req.Score
@@ -73,7 +73,7 @@ func (m MysqlRepo) AddCollection(
 	}
 	// not exist
 	_, err := m.Client.Collection.Create().SetType(req.Type).SetHasComment(hasComment).SetComment(req.Comment).
-		SetScore(score).SetAddTime(date).SetEpStatus(epStatus).Save(ctx)
+		SetScore(score).SetAddTime(date).SetEpStatus(epStatus).SetMemberID(uid).SetSubjectID(subjectId).Save(ctx)
 	if err != nil {
 		return err
 	}

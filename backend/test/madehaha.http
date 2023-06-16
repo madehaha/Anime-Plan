@@ -42,7 +42,7 @@ GET http://localhost:2333/subject/get
 Content-Type: application/json
 
 ### GET subject by ID
-GET http://localhost:2333/subject/2
+GET http://localhost:2333/subject/2/sdfasdf
 Content-Type: application/json
 
 ### collection
