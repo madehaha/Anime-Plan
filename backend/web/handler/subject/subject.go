@@ -48,8 +48,7 @@ func (h Handler) CreateSubject(c echo.Context) error {
 	err := h.ctrl.CreateSubject(req, gid)
 	if err != nil {
 		logger.Error("create subject failed")
-		_ = c.JSON(http.StatusBadRequest, err)
-		return err
+		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
 	return c.NoContent(http.StatusOK)
 }

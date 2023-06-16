@@ -41,7 +41,7 @@ func (cc CollectionCtrl) UpdateCollection(
 		return err
 	}
 	// update
-	hasComment := req.Comment == ""
+	hasComment := req.Comment != ""
 	collectionEntity.HasComment = hasComment
 	hasEpStatusOrScore := req.Type != model.Wish
 	if hasEpStatusOrScore {

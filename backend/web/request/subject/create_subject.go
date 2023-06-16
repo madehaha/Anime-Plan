@@ -2,7 +2,7 @@ package subject
 
 type CreateSubjectReq struct {
 	Image    string `json:"image"`
-	Summary  string `json:"summary"`
+	Summary  string `json:"summary" validate:"required"`
 	Name     string `json:"name" validate:"required"`
 	NameCN   string `json:"name_cn" validate:"required"`
 	Date     string `json:"date" validate:"required"` // release date
