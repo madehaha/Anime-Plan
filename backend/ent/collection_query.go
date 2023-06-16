@@ -130,8 +130,8 @@ func (cq *CollectionQuery) FirstX(ctx context.Context) *Collection {
 
 // FirstID returns the first Collection ID from the query.
 // Returns a *NotFoundError when no Collection ID was found.
-func (cq *CollectionQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (cq *CollectionQuery) FirstID(ctx context.Context) (id uint32, err error) {
+	var ids []uint32
 	if ids, err = cq.Limit(1).IDs(setContextOp(ctx, cq.ctx, "FirstID")); err != nil {
 		return
 	}
@@ -143,7 +143,7 @@ func (cq *CollectionQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (cq *CollectionQuery) FirstIDX(ctx context.Context) int {
+func (cq *CollectionQuery) FirstIDX(ctx context.Context) uint32 {
 	id, err := cq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -181,8 +181,8 @@ func (cq *CollectionQuery) OnlyX(ctx context.Context) *Collection {
 // OnlyID is like Only, but returns the only Collection ID in the query.
 // Returns a *NotSingularError when more than one Collection ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (cq *CollectionQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (cq *CollectionQuery) OnlyID(ctx context.Context) (id uint32, err error) {
+	var ids []uint32
 	if ids, err = cq.Limit(2).IDs(setContextOp(ctx, cq.ctx, "OnlyID")); err != nil {
 		return
 	}
@@ -198,7 +198,7 @@ func (cq *CollectionQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (cq *CollectionQuery) OnlyIDX(ctx context.Context) int {
+func (cq *CollectionQuery) OnlyIDX(ctx context.Context) uint32 {
 	id, err := cq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -226,7 +226,7 @@ func (cq *CollectionQuery) AllX(ctx context.Context) []*Collection {
 }
 
 // IDs executes the query and returns a list of Collection IDs.
-func (cq *CollectionQuery) IDs(ctx context.Context) (ids []int, err error) {
+func (cq *CollectionQuery) IDs(ctx context.Context) (ids []uint32, err error) {
 	if cq.ctx.Unique == nil && cq.path != nil {
 		cq.Unique(true)
 	}
@@ -238,7 +238,7 @@ func (cq *CollectionQuery) IDs(ctx context.Context) (ids []int, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (cq *CollectionQuery) IDsX(ctx context.Context) []int {
+func (cq *CollectionQuery) IDsX(ctx context.Context) []uint32 {
 	ids, err := cq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -484,8 +484,8 @@ func (cq *CollectionQuery) loadMember(ctx context.Context, query *MembersQuery, 
 	return nil
 }
 func (cq *CollectionQuery) loadSubject(ctx context.Context, query *SubjectQuery, nodes []*Collection, init func(*Collection), assign func(*Collection, *Subject)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Collection)
+	ids := make([]uint32, 0, len(nodes))
+	nodeids := make(map[uint32][]*Collection)
 	for i := range nodes {
 		if nodes[i].subject_collections == nil {
 			continue
@@ -526,7 +526,7 @@ func (cq *CollectionQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (cq *CollectionQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(collection.Table, collection.Columns, sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewQuerySpec(collection.Table, collection.Columns, sqlgraph.NewFieldSpec(collection.FieldID, field.TypeUint32))
 	_spec.From = cq.sql
 	if unique := cq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

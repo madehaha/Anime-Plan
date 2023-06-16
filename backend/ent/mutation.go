@@ -35,18 +35,20 @@ type CollectionMutation struct {
 	config
 	op             Op
 	typ            string
-	id             *int
+	id             *uint32
 	_type          *uint8
 	add_type       *int8
-	if_comment     *bool
+	has_comment    *bool
 	comment        *string
-	score          *int8
+	score          *uint8
 	addscore       *int8
-	time           *string
+	add_time       *string
+	ep_status      *uint8
+	addep_status   *int8
 	clearedFields  map[string]struct{}
 	member         *uint32
 	clearedmember  bool
-	subject        *int
+	subject        *uint32
 	clearedsubject bool
 	done           bool
 	oldValue       func(context.Context) (*Collection, error)
@@ -73,7 +75,7 @@ func newCollectionMutation(c config, op Op, opts ...collectionOption) *Collectio
 }
 
 // withCollectionID sets the ID field of the mutation.
-func withCollectionID(id int) collectionOption {
+func withCollectionID(id uint32) collectionOption {
 	return func(m *CollectionMutation) {
 		var (
 			err   error
@@ -123,9 +125,15 @@ func (m CollectionMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Collection entities.
+func (m *CollectionMutation) SetID(id uint32) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *CollectionMutation) ID() (id int, exists bool) {
+func (m *CollectionMutation) ID() (id uint32, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -136,12 +144,12 @@ func (m *CollectionMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *CollectionMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *CollectionMutation) IDs(ctx context.Context) ([]uint32, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []int{id}, nil
+			return []uint32{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -207,40 +215,40 @@ func (m *CollectionMutation) ResetType() {
 	m.add_type = nil
 }
 
-// SetIfComment sets the "if_comment" field.
-func (m *CollectionMutation) SetIfComment(b bool) {
-	m.if_comment = &b
+// SetHasComment sets the "has_comment" field.
+func (m *CollectionMutation) SetHasComment(b bool) {
+	m.has_comment = &b
 }
 
-// IfComment returns the value of the "if_comment" field in the mutation.
-func (m *CollectionMutation) IfComment() (r bool, exists bool) {
-	v := m.if_comment
+// HasComment returns the value of the "has_comment" field in the mutation.
+func (m *CollectionMutation) HasComment() (r bool, exists bool) {
+	v := m.has_comment
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldIfComment returns the old "if_comment" field's value of the Collection entity.
+// OldHasComment returns the old "has_comment" field's value of the Collection entity.
 // If the Collection object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CollectionMutation) OldIfComment(ctx context.Context) (v bool, err error) {
+func (m *CollectionMutation) OldHasComment(ctx context.Context) (v bool, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldIfComment is only allowed on UpdateOne operations")
+		return v, errors.New("OldHasComment is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldIfComment requires an ID field in the mutation")
+		return v, errors.New("OldHasComment requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldIfComment: %w", err)
+		return v, fmt.Errorf("querying old value for OldHasComment: %w", err)
 	}
-	return oldValue.IfComment, nil
+	return oldValue.HasComment, nil
 }
 
-// ResetIfComment resets all changes to the "if_comment" field.
-func (m *CollectionMutation) ResetIfComment() {
-	m.if_comment = nil
+// ResetHasComment resets all changes to the "has_comment" field.
+func (m *CollectionMutation) ResetHasComment() {
+	m.has_comment = nil
 }
 
 // SetComment sets the "comment" field.
@@ -280,13 +288,13 @@ func (m *CollectionMutation) ResetComment() {
 }
 
 // SetScore sets the "score" field.
-func (m *CollectionMutation) SetScore(i int8) {
-	m.score = &i
+func (m *CollectionMutation) SetScore(u uint8) {
+	m.score = &u
 	m.addscore = nil
 }
 
 // Score returns the value of the "score" field in the mutation.
-func (m *CollectionMutation) Score() (r int8, exists bool) {
+func (m *CollectionMutation) Score() (r uint8, exists bool) {
 	v := m.score
 	if v == nil {
 		return
@@ -297,7 +305,7 @@ func (m *CollectionMutation) Score() (r int8, exists bool) {
 // OldScore returns the old "score" field's value of the Collection entity.
 // If the Collection object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CollectionMutation) OldScore(ctx context.Context) (v int8, err error) {
+func (m *CollectionMutation) OldScore(ctx context.Context) (v uint8, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldScore is only allowed on UpdateOne operations")
 	}
@@ -311,12 +319,12 @@ func (m *CollectionMutation) OldScore(ctx context.Context) (v int8, err error) {
 	return oldValue.Score, nil
 }
 
-// AddScore adds i to the "score" field.
-func (m *CollectionMutation) AddScore(i int8) {
+// AddScore adds u to the "score" field.
+func (m *CollectionMutation) AddScore(u int8) {
 	if m.addscore != nil {
-		*m.addscore += i
+		*m.addscore += u
 	} else {
-		m.addscore = &i
+		m.addscore = &u
 	}
 }
 
@@ -335,40 +343,96 @@ func (m *CollectionMutation) ResetScore() {
 	m.addscore = nil
 }
 
-// SetTime sets the "time" field.
-func (m *CollectionMutation) SetTime(s string) {
-	m.time = &s
+// SetAddTime sets the "add_time" field.
+func (m *CollectionMutation) SetAddTime(s string) {
+	m.add_time = &s
 }
 
-// Time returns the value of the "time" field in the mutation.
-func (m *CollectionMutation) Time() (r string, exists bool) {
-	v := m.time
+// AddTime returns the value of the "add_time" field in the mutation.
+func (m *CollectionMutation) AddTime() (r string, exists bool) {
+	v := m.add_time
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldTime returns the old "time" field's value of the Collection entity.
+// OldAddTime returns the old "add_time" field's value of the Collection entity.
 // If the Collection object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CollectionMutation) OldTime(ctx context.Context) (v string, err error) {
+func (m *CollectionMutation) OldAddTime(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTime is only allowed on UpdateOne operations")
+		return v, errors.New("OldAddTime is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTime requires an ID field in the mutation")
+		return v, errors.New("OldAddTime requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTime: %w", err)
+		return v, fmt.Errorf("querying old value for OldAddTime: %w", err)
 	}
-	return oldValue.Time, nil
+	return oldValue.AddTime, nil
 }
 
-// ResetTime resets all changes to the "time" field.
-func (m *CollectionMutation) ResetTime() {
-	m.time = nil
+// ResetAddTime resets all changes to the "add_time" field.
+func (m *CollectionMutation) ResetAddTime() {
+	m.add_time = nil
+}
+
+// SetEpStatus sets the "ep_status" field.
+func (m *CollectionMutation) SetEpStatus(u uint8) {
+	m.ep_status = &u
+	m.addep_status = nil
+}
+
+// EpStatus returns the value of the "ep_status" field in the mutation.
+func (m *CollectionMutation) EpStatus() (r uint8, exists bool) {
+	v := m.ep_status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEpStatus returns the old "ep_status" field's value of the Collection entity.
+// If the Collection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CollectionMutation) OldEpStatus(ctx context.Context) (v uint8, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEpStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEpStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEpStatus: %w", err)
+	}
+	return oldValue.EpStatus, nil
+}
+
+// AddEpStatus adds u to the "ep_status" field.
+func (m *CollectionMutation) AddEpStatus(u int8) {
+	if m.addep_status != nil {
+		*m.addep_status += u
+	} else {
+		m.addep_status = &u
+	}
+}
+
+// AddedEpStatus returns the value that was added to the "ep_status" field in this mutation.
+func (m *CollectionMutation) AddedEpStatus() (r int8, exists bool) {
+	v := m.addep_status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetEpStatus resets all changes to the "ep_status" field.
+func (m *CollectionMutation) ResetEpStatus() {
+	m.ep_status = nil
+	m.addep_status = nil
 }
 
 // SetMemberID sets the "member" edge to the Members entity by id.
@@ -411,7 +475,7 @@ func (m *CollectionMutation) ResetMember() {
 }
 
 // SetSubjectID sets the "subject" edge to the Subject entity by id.
-func (m *CollectionMutation) SetSubjectID(id int) {
+func (m *CollectionMutation) SetSubjectID(id uint32) {
 	m.subject = &id
 }
 
@@ -426,7 +490,7 @@ func (m *CollectionMutation) SubjectCleared() bool {
 }
 
 // SubjectID returns the "subject" edge ID in the mutation.
-func (m *CollectionMutation) SubjectID() (id int, exists bool) {
+func (m *CollectionMutation) SubjectID() (id uint32, exists bool) {
 	if m.subject != nil {
 		return *m.subject, true
 	}
@@ -436,7 +500,7 @@ func (m *CollectionMutation) SubjectID() (id int, exists bool) {
 // SubjectIDs returns the "subject" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // SubjectID instead. It exists only for internal usage by the builders.
-func (m *CollectionMutation) SubjectIDs() (ids []int) {
+func (m *CollectionMutation) SubjectIDs() (ids []uint32) {
 	if id := m.subject; id != nil {
 		ids = append(ids, *id)
 	}
@@ -483,12 +547,12 @@ func (m *CollectionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CollectionMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m._type != nil {
 		fields = append(fields, collection.FieldType)
 	}
-	if m.if_comment != nil {
-		fields = append(fields, collection.FieldIfComment)
+	if m.has_comment != nil {
+		fields = append(fields, collection.FieldHasComment)
 	}
 	if m.comment != nil {
 		fields = append(fields, collection.FieldComment)
@@ -496,8 +560,11 @@ func (m *CollectionMutation) Fields() []string {
 	if m.score != nil {
 		fields = append(fields, collection.FieldScore)
 	}
-	if m.time != nil {
-		fields = append(fields, collection.FieldTime)
+	if m.add_time != nil {
+		fields = append(fields, collection.FieldAddTime)
+	}
+	if m.ep_status != nil {
+		fields = append(fields, collection.FieldEpStatus)
 	}
 	return fields
 }
@@ -509,14 +576,16 @@ func (m *CollectionMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case collection.FieldType:
 		return m.GetType()
-	case collection.FieldIfComment:
-		return m.IfComment()
+	case collection.FieldHasComment:
+		return m.HasComment()
 	case collection.FieldComment:
 		return m.Comment()
 	case collection.FieldScore:
 		return m.Score()
-	case collection.FieldTime:
-		return m.Time()
+	case collection.FieldAddTime:
+		return m.AddTime()
+	case collection.FieldEpStatus:
+		return m.EpStatus()
 	}
 	return nil, false
 }
@@ -528,14 +597,16 @@ func (m *CollectionMutation) OldField(ctx context.Context, name string) (ent.Val
 	switch name {
 	case collection.FieldType:
 		return m.OldType(ctx)
-	case collection.FieldIfComment:
-		return m.OldIfComment(ctx)
+	case collection.FieldHasComment:
+		return m.OldHasComment(ctx)
 	case collection.FieldComment:
 		return m.OldComment(ctx)
 	case collection.FieldScore:
 		return m.OldScore(ctx)
-	case collection.FieldTime:
-		return m.OldTime(ctx)
+	case collection.FieldAddTime:
+		return m.OldAddTime(ctx)
+	case collection.FieldEpStatus:
+		return m.OldEpStatus(ctx)
 	}
 	return nil, fmt.Errorf("unknown Collection field %s", name)
 }
@@ -552,12 +623,12 @@ func (m *CollectionMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetType(v)
 		return nil
-	case collection.FieldIfComment:
+	case collection.FieldHasComment:
 		v, ok := value.(bool)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetIfComment(v)
+		m.SetHasComment(v)
 		return nil
 	case collection.FieldComment:
 		v, ok := value.(string)
@@ -567,18 +638,25 @@ func (m *CollectionMutation) SetField(name string, value ent.Value) error {
 		m.SetComment(v)
 		return nil
 	case collection.FieldScore:
-		v, ok := value.(int8)
+		v, ok := value.(uint8)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetScore(v)
 		return nil
-	case collection.FieldTime:
+	case collection.FieldAddTime:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetTime(v)
+		m.SetAddTime(v)
+		return nil
+	case collection.FieldEpStatus:
+		v, ok := value.(uint8)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEpStatus(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Collection field %s", name)
@@ -594,6 +672,9 @@ func (m *CollectionMutation) AddedFields() []string {
 	if m.addscore != nil {
 		fields = append(fields, collection.FieldScore)
 	}
+	if m.addep_status != nil {
+		fields = append(fields, collection.FieldEpStatus)
+	}
 	return fields
 }
 
@@ -606,6 +687,8 @@ func (m *CollectionMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedType()
 	case collection.FieldScore:
 		return m.AddedScore()
+	case collection.FieldEpStatus:
+		return m.AddedEpStatus()
 	}
 	return nil, false
 }
@@ -628,6 +711,13 @@ func (m *CollectionMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddScore(v)
+		return nil
+	case collection.FieldEpStatus:
+		v, ok := value.(int8)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddEpStatus(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Collection numeric field %s", name)
@@ -659,8 +749,8 @@ func (m *CollectionMutation) ResetField(name string) error {
 	case collection.FieldType:
 		m.ResetType()
 		return nil
-	case collection.FieldIfComment:
-		m.ResetIfComment()
+	case collection.FieldHasComment:
+		m.ResetHasComment()
 		return nil
 	case collection.FieldComment:
 		m.ResetComment()
@@ -668,8 +758,11 @@ func (m *CollectionMutation) ResetField(name string) error {
 	case collection.FieldScore:
 		m.ResetScore()
 		return nil
-	case collection.FieldTime:
-		m.ResetTime()
+	case collection.FieldAddTime:
+		m.ResetAddTime()
+		return nil
+	case collection.FieldEpStatus:
+		m.ResetEpStatus()
 		return nil
 	}
 	return fmt.Errorf("unknown Collection field %s", name)
@@ -782,8 +875,8 @@ type MembersMutation struct {
 	addgid             *int8
 	register_time      *string
 	clearedFields      map[string]struct{}
-	collections        map[int]struct{}
-	removedcollections map[int]struct{}
+	collections        map[uint32]struct{}
+	removedcollections map[uint32]struct{}
 	clearedcollections bool
 	done               bool
 	oldValue           func(context.Context) (*Members, error)
@@ -1167,9 +1260,9 @@ func (m *MembersMutation) ResetRegisterTime() {
 }
 
 // AddCollectionIDs adds the "collections" edge to the Collection entity by ids.
-func (m *MembersMutation) AddCollectionIDs(ids ...int) {
+func (m *MembersMutation) AddCollectionIDs(ids ...uint32) {
 	if m.collections == nil {
-		m.collections = make(map[int]struct{})
+		m.collections = make(map[uint32]struct{})
 	}
 	for i := range ids {
 		m.collections[ids[i]] = struct{}{}
@@ -1187,9 +1280,9 @@ func (m *MembersMutation) CollectionsCleared() bool {
 }
 
 // RemoveCollectionIDs removes the "collections" edge to the Collection entity by IDs.
-func (m *MembersMutation) RemoveCollectionIDs(ids ...int) {
+func (m *MembersMutation) RemoveCollectionIDs(ids ...uint32) {
 	if m.removedcollections == nil {
-		m.removedcollections = make(map[int]struct{})
+		m.removedcollections = make(map[uint32]struct{})
 	}
 	for i := range ids {
 		delete(m.collections, ids[i])
@@ -1198,7 +1291,7 @@ func (m *MembersMutation) RemoveCollectionIDs(ids ...int) {
 }
 
 // RemovedCollections returns the removed IDs of the "collections" edge to the Collection entity.
-func (m *MembersMutation) RemovedCollectionsIDs() (ids []int) {
+func (m *MembersMutation) RemovedCollectionsIDs() (ids []uint32) {
 	for id := range m.removedcollections {
 		ids = append(ids, id)
 	}
@@ -1206,7 +1299,7 @@ func (m *MembersMutation) RemovedCollectionsIDs() (ids []int) {
 }
 
 // CollectionsIDs returns the "collections" edge IDs in the mutation.
-func (m *MembersMutation) CollectionsIDs() (ids []int) {
+func (m *MembersMutation) CollectionsIDs() (ids []uint32) {
 	for id := range m.collections {
 		ids = append(ids, id)
 	}
@@ -1557,29 +1650,27 @@ type SubjectMutation struct {
 	config
 	op                 Op
 	typ                string
-	id                 *int
+	id                 *uint32
 	image              *string
 	summary            *string
 	name               *string
-	date               *string
 	name_cn            *string
-	on_hold            *uint32
-	addon_hold         *int32
+	date               *string
+	episodes           *uint8
+	addepisodes        *int8
 	wish               *uint32
 	addwish            *int32
 	doing              *uint32
 	adddoing           *int32
-	subject_type       *uint8
-	addsubject_type    *int8
-	collect            *uint32
-	addcollect         *int32
-	drop               *uint32
-	adddrop            *int32
 	watched            *uint32
 	addwatched         *int32
+	on_hold            *uint32
+	addon_hold         *int32
+	dropped            *uint32
+	adddropped         *int32
 	clearedFields      map[string]struct{}
-	collections        map[int]struct{}
-	removedcollections map[int]struct{}
+	collections        map[uint32]struct{}
+	removedcollections map[uint32]struct{}
 	clearedcollections bool
 	done               bool
 	oldValue           func(context.Context) (*Subject, error)
@@ -1606,7 +1697,7 @@ func newSubjectMutation(c config, op Op, opts ...subjectOption) *SubjectMutation
 }
 
 // withSubjectID sets the ID field of the mutation.
-func withSubjectID(id int) subjectOption {
+func withSubjectID(id uint32) subjectOption {
 	return func(m *SubjectMutation) {
 		var (
 			err   error
@@ -1656,9 +1747,15 @@ func (m SubjectMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Subject entities.
+func (m *SubjectMutation) SetID(id uint32) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *SubjectMutation) ID() (id int, exists bool) {
+func (m *SubjectMutation) ID() (id uint32, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -1669,12 +1766,12 @@ func (m *SubjectMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *SubjectMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *SubjectMutation) IDs(ctx context.Context) ([]uint32, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []int{id}, nil
+			return []uint32{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -1792,42 +1889,6 @@ func (m *SubjectMutation) ResetName() {
 	m.name = nil
 }
 
-// SetDate sets the "date" field.
-func (m *SubjectMutation) SetDate(s string) {
-	m.date = &s
-}
-
-// Date returns the value of the "date" field in the mutation.
-func (m *SubjectMutation) Date() (r string, exists bool) {
-	v := m.date
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDate returns the old "date" field's value of the Subject entity.
-// If the Subject object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubjectMutation) OldDate(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDate is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDate requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDate: %w", err)
-	}
-	return oldValue.Date, nil
-}
-
-// ResetDate resets all changes to the "date" field.
-func (m *SubjectMutation) ResetDate() {
-	m.date = nil
-}
-
 // SetNameCn sets the "name_cn" field.
 func (m *SubjectMutation) SetNameCn(s string) {
 	m.name_cn = &s
@@ -1864,60 +1925,96 @@ func (m *SubjectMutation) ResetNameCn() {
 	m.name_cn = nil
 }
 
-// SetOnHold sets the "on_hold" field.
-func (m *SubjectMutation) SetOnHold(u uint32) {
-	m.on_hold = &u
-	m.addon_hold = nil
+// SetDate sets the "date" field.
+func (m *SubjectMutation) SetDate(s string) {
+	m.date = &s
 }
 
-// OnHold returns the value of the "on_hold" field in the mutation.
-func (m *SubjectMutation) OnHold() (r uint32, exists bool) {
-	v := m.on_hold
+// Date returns the value of the "date" field in the mutation.
+func (m *SubjectMutation) Date() (r string, exists bool) {
+	v := m.date
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldOnHold returns the old "on_hold" field's value of the Subject entity.
+// OldDate returns the old "date" field's value of the Subject entity.
 // If the Subject object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubjectMutation) OldOnHold(ctx context.Context) (v uint32, err error) {
+func (m *SubjectMutation) OldDate(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldOnHold is only allowed on UpdateOne operations")
+		return v, errors.New("OldDate is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldOnHold requires an ID field in the mutation")
+		return v, errors.New("OldDate requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldOnHold: %w", err)
+		return v, fmt.Errorf("querying old value for OldDate: %w", err)
 	}
-	return oldValue.OnHold, nil
+	return oldValue.Date, nil
 }
 
-// AddOnHold adds u to the "on_hold" field.
-func (m *SubjectMutation) AddOnHold(u int32) {
-	if m.addon_hold != nil {
-		*m.addon_hold += u
-	} else {
-		m.addon_hold = &u
-	}
+// ResetDate resets all changes to the "date" field.
+func (m *SubjectMutation) ResetDate() {
+	m.date = nil
 }
 
-// AddedOnHold returns the value that was added to the "on_hold" field in this mutation.
-func (m *SubjectMutation) AddedOnHold() (r int32, exists bool) {
-	v := m.addon_hold
+// SetEpisodes sets the "episodes" field.
+func (m *SubjectMutation) SetEpisodes(u uint8) {
+	m.episodes = &u
+	m.addepisodes = nil
+}
+
+// Episodes returns the value of the "episodes" field in the mutation.
+func (m *SubjectMutation) Episodes() (r uint8, exists bool) {
+	v := m.episodes
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetOnHold resets all changes to the "on_hold" field.
-func (m *SubjectMutation) ResetOnHold() {
-	m.on_hold = nil
-	m.addon_hold = nil
+// OldEpisodes returns the old "episodes" field's value of the Subject entity.
+// If the Subject object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubjectMutation) OldEpisodes(ctx context.Context) (v uint8, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEpisodes is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEpisodes requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEpisodes: %w", err)
+	}
+	return oldValue.Episodes, nil
+}
+
+// AddEpisodes adds u to the "episodes" field.
+func (m *SubjectMutation) AddEpisodes(u int8) {
+	if m.addepisodes != nil {
+		*m.addepisodes += u
+	} else {
+		m.addepisodes = &u
+	}
+}
+
+// AddedEpisodes returns the value that was added to the "episodes" field in this mutation.
+func (m *SubjectMutation) AddedEpisodes() (r int8, exists bool) {
+	v := m.addepisodes
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetEpisodes resets all changes to the "episodes" field.
+func (m *SubjectMutation) ResetEpisodes() {
+	m.episodes = nil
+	m.addepisodes = nil
 }
 
 // SetWish sets the "wish" field.
@@ -2032,174 +2129,6 @@ func (m *SubjectMutation) ResetDoing() {
 	m.adddoing = nil
 }
 
-// SetSubjectType sets the "subject_type" field.
-func (m *SubjectMutation) SetSubjectType(u uint8) {
-	m.subject_type = &u
-	m.addsubject_type = nil
-}
-
-// SubjectType returns the value of the "subject_type" field in the mutation.
-func (m *SubjectMutation) SubjectType() (r uint8, exists bool) {
-	v := m.subject_type
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldSubjectType returns the old "subject_type" field's value of the Subject entity.
-// If the Subject object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubjectMutation) OldSubjectType(ctx context.Context) (v uint8, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldSubjectType is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSubjectType requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSubjectType: %w", err)
-	}
-	return oldValue.SubjectType, nil
-}
-
-// AddSubjectType adds u to the "subject_type" field.
-func (m *SubjectMutation) AddSubjectType(u int8) {
-	if m.addsubject_type != nil {
-		*m.addsubject_type += u
-	} else {
-		m.addsubject_type = &u
-	}
-}
-
-// AddedSubjectType returns the value that was added to the "subject_type" field in this mutation.
-func (m *SubjectMutation) AddedSubjectType() (r int8, exists bool) {
-	v := m.addsubject_type
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetSubjectType resets all changes to the "subject_type" field.
-func (m *SubjectMutation) ResetSubjectType() {
-	m.subject_type = nil
-	m.addsubject_type = nil
-}
-
-// SetCollect sets the "collect" field.
-func (m *SubjectMutation) SetCollect(u uint32) {
-	m.collect = &u
-	m.addcollect = nil
-}
-
-// Collect returns the value of the "collect" field in the mutation.
-func (m *SubjectMutation) Collect() (r uint32, exists bool) {
-	v := m.collect
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCollect returns the old "collect" field's value of the Subject entity.
-// If the Subject object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubjectMutation) OldCollect(ctx context.Context) (v uint32, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCollect is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCollect requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCollect: %w", err)
-	}
-	return oldValue.Collect, nil
-}
-
-// AddCollect adds u to the "collect" field.
-func (m *SubjectMutation) AddCollect(u int32) {
-	if m.addcollect != nil {
-		*m.addcollect += u
-	} else {
-		m.addcollect = &u
-	}
-}
-
-// AddedCollect returns the value that was added to the "collect" field in this mutation.
-func (m *SubjectMutation) AddedCollect() (r int32, exists bool) {
-	v := m.addcollect
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetCollect resets all changes to the "collect" field.
-func (m *SubjectMutation) ResetCollect() {
-	m.collect = nil
-	m.addcollect = nil
-}
-
-// SetDrop sets the "drop" field.
-func (m *SubjectMutation) SetDrop(u uint32) {
-	m.drop = &u
-	m.adddrop = nil
-}
-
-// Drop returns the value of the "drop" field in the mutation.
-func (m *SubjectMutation) Drop() (r uint32, exists bool) {
-	v := m.drop
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDrop returns the old "drop" field's value of the Subject entity.
-// If the Subject object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SubjectMutation) OldDrop(ctx context.Context) (v uint32, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDrop is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDrop requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDrop: %w", err)
-	}
-	return oldValue.Drop, nil
-}
-
-// AddDrop adds u to the "drop" field.
-func (m *SubjectMutation) AddDrop(u int32) {
-	if m.adddrop != nil {
-		*m.adddrop += u
-	} else {
-		m.adddrop = &u
-	}
-}
-
-// AddedDrop returns the value that was added to the "drop" field in this mutation.
-func (m *SubjectMutation) AddedDrop() (r int32, exists bool) {
-	v := m.adddrop
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetDrop resets all changes to the "drop" field.
-func (m *SubjectMutation) ResetDrop() {
-	m.drop = nil
-	m.adddrop = nil
-}
-
 // SetWatched sets the "watched" field.
 func (m *SubjectMutation) SetWatched(u uint32) {
 	m.watched = &u
@@ -2256,10 +2185,122 @@ func (m *SubjectMutation) ResetWatched() {
 	m.addwatched = nil
 }
 
+// SetOnHold sets the "on_hold" field.
+func (m *SubjectMutation) SetOnHold(u uint32) {
+	m.on_hold = &u
+	m.addon_hold = nil
+}
+
+// OnHold returns the value of the "on_hold" field in the mutation.
+func (m *SubjectMutation) OnHold() (r uint32, exists bool) {
+	v := m.on_hold
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOnHold returns the old "on_hold" field's value of the Subject entity.
+// If the Subject object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubjectMutation) OldOnHold(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOnHold is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOnHold requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOnHold: %w", err)
+	}
+	return oldValue.OnHold, nil
+}
+
+// AddOnHold adds u to the "on_hold" field.
+func (m *SubjectMutation) AddOnHold(u int32) {
+	if m.addon_hold != nil {
+		*m.addon_hold += u
+	} else {
+		m.addon_hold = &u
+	}
+}
+
+// AddedOnHold returns the value that was added to the "on_hold" field in this mutation.
+func (m *SubjectMutation) AddedOnHold() (r int32, exists bool) {
+	v := m.addon_hold
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetOnHold resets all changes to the "on_hold" field.
+func (m *SubjectMutation) ResetOnHold() {
+	m.on_hold = nil
+	m.addon_hold = nil
+}
+
+// SetDropped sets the "dropped" field.
+func (m *SubjectMutation) SetDropped(u uint32) {
+	m.dropped = &u
+	m.adddropped = nil
+}
+
+// Dropped returns the value of the "dropped" field in the mutation.
+func (m *SubjectMutation) Dropped() (r uint32, exists bool) {
+	v := m.dropped
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDropped returns the old "dropped" field's value of the Subject entity.
+// If the Subject object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SubjectMutation) OldDropped(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDropped is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDropped requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDropped: %w", err)
+	}
+	return oldValue.Dropped, nil
+}
+
+// AddDropped adds u to the "dropped" field.
+func (m *SubjectMutation) AddDropped(u int32) {
+	if m.adddropped != nil {
+		*m.adddropped += u
+	} else {
+		m.adddropped = &u
+	}
+}
+
+// AddedDropped returns the value that was added to the "dropped" field in this mutation.
+func (m *SubjectMutation) AddedDropped() (r int32, exists bool) {
+	v := m.adddropped
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDropped resets all changes to the "dropped" field.
+func (m *SubjectMutation) ResetDropped() {
+	m.dropped = nil
+	m.adddropped = nil
+}
+
 // AddCollectionIDs adds the "collections" edge to the Collection entity by ids.
-func (m *SubjectMutation) AddCollectionIDs(ids ...int) {
+func (m *SubjectMutation) AddCollectionIDs(ids ...uint32) {
 	if m.collections == nil {
-		m.collections = make(map[int]struct{})
+		m.collections = make(map[uint32]struct{})
 	}
 	for i := range ids {
 		m.collections[ids[i]] = struct{}{}
@@ -2277,9 +2318,9 @@ func (m *SubjectMutation) CollectionsCleared() bool {
 }
 
 // RemoveCollectionIDs removes the "collections" edge to the Collection entity by IDs.
-func (m *SubjectMutation) RemoveCollectionIDs(ids ...int) {
+func (m *SubjectMutation) RemoveCollectionIDs(ids ...uint32) {
 	if m.removedcollections == nil {
-		m.removedcollections = make(map[int]struct{})
+		m.removedcollections = make(map[uint32]struct{})
 	}
 	for i := range ids {
 		delete(m.collections, ids[i])
@@ -2288,7 +2329,7 @@ func (m *SubjectMutation) RemoveCollectionIDs(ids ...int) {
 }
 
 // RemovedCollections returns the removed IDs of the "collections" edge to the Collection entity.
-func (m *SubjectMutation) RemovedCollectionsIDs() (ids []int) {
+func (m *SubjectMutation) RemovedCollectionsIDs() (ids []uint32) {
 	for id := range m.removedcollections {
 		ids = append(ids, id)
 	}
@@ -2296,7 +2337,7 @@ func (m *SubjectMutation) RemovedCollectionsIDs() (ids []int) {
 }
 
 // CollectionsIDs returns the "collections" edge IDs in the mutation.
-func (m *SubjectMutation) CollectionsIDs() (ids []int) {
+func (m *SubjectMutation) CollectionsIDs() (ids []uint32) {
 	for id := range m.collections {
 		ids = append(ids, id)
 	}
@@ -2344,7 +2385,7 @@ func (m *SubjectMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *SubjectMutation) Fields() []string {
-	fields := make([]string, 0, 12)
+	fields := make([]string, 0, 11)
 	if m.image != nil {
 		fields = append(fields, subject.FieldImage)
 	}
@@ -2354,14 +2395,14 @@ func (m *SubjectMutation) Fields() []string {
 	if m.name != nil {
 		fields = append(fields, subject.FieldName)
 	}
-	if m.date != nil {
-		fields = append(fields, subject.FieldDate)
-	}
 	if m.name_cn != nil {
 		fields = append(fields, subject.FieldNameCn)
 	}
-	if m.on_hold != nil {
-		fields = append(fields, subject.FieldOnHold)
+	if m.date != nil {
+		fields = append(fields, subject.FieldDate)
+	}
+	if m.episodes != nil {
+		fields = append(fields, subject.FieldEpisodes)
 	}
 	if m.wish != nil {
 		fields = append(fields, subject.FieldWish)
@@ -2369,17 +2410,14 @@ func (m *SubjectMutation) Fields() []string {
 	if m.doing != nil {
 		fields = append(fields, subject.FieldDoing)
 	}
-	if m.subject_type != nil {
-		fields = append(fields, subject.FieldSubjectType)
-	}
-	if m.collect != nil {
-		fields = append(fields, subject.FieldCollect)
-	}
-	if m.drop != nil {
-		fields = append(fields, subject.FieldDrop)
-	}
 	if m.watched != nil {
 		fields = append(fields, subject.FieldWatched)
+	}
+	if m.on_hold != nil {
+		fields = append(fields, subject.FieldOnHold)
+	}
+	if m.dropped != nil {
+		fields = append(fields, subject.FieldDropped)
 	}
 	return fields
 }
@@ -2395,24 +2433,22 @@ func (m *SubjectMutation) Field(name string) (ent.Value, bool) {
 		return m.Summary()
 	case subject.FieldName:
 		return m.Name()
-	case subject.FieldDate:
-		return m.Date()
 	case subject.FieldNameCn:
 		return m.NameCn()
-	case subject.FieldOnHold:
-		return m.OnHold()
+	case subject.FieldDate:
+		return m.Date()
+	case subject.FieldEpisodes:
+		return m.Episodes()
 	case subject.FieldWish:
 		return m.Wish()
 	case subject.FieldDoing:
 		return m.Doing()
-	case subject.FieldSubjectType:
-		return m.SubjectType()
-	case subject.FieldCollect:
-		return m.Collect()
-	case subject.FieldDrop:
-		return m.Drop()
 	case subject.FieldWatched:
 		return m.Watched()
+	case subject.FieldOnHold:
+		return m.OnHold()
+	case subject.FieldDropped:
+		return m.Dropped()
 	}
 	return nil, false
 }
@@ -2428,24 +2464,22 @@ func (m *SubjectMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldSummary(ctx)
 	case subject.FieldName:
 		return m.OldName(ctx)
-	case subject.FieldDate:
-		return m.OldDate(ctx)
 	case subject.FieldNameCn:
 		return m.OldNameCn(ctx)
-	case subject.FieldOnHold:
-		return m.OldOnHold(ctx)
+	case subject.FieldDate:
+		return m.OldDate(ctx)
+	case subject.FieldEpisodes:
+		return m.OldEpisodes(ctx)
 	case subject.FieldWish:
 		return m.OldWish(ctx)
 	case subject.FieldDoing:
 		return m.OldDoing(ctx)
-	case subject.FieldSubjectType:
-		return m.OldSubjectType(ctx)
-	case subject.FieldCollect:
-		return m.OldCollect(ctx)
-	case subject.FieldDrop:
-		return m.OldDrop(ctx)
 	case subject.FieldWatched:
 		return m.OldWatched(ctx)
+	case subject.FieldOnHold:
+		return m.OldOnHold(ctx)
+	case subject.FieldDropped:
+		return m.OldDropped(ctx)
 	}
 	return nil, fmt.Errorf("unknown Subject field %s", name)
 }
@@ -2476,13 +2510,6 @@ func (m *SubjectMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetName(v)
 		return nil
-	case subject.FieldDate:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDate(v)
-		return nil
 	case subject.FieldNameCn:
 		v, ok := value.(string)
 		if !ok {
@@ -2490,12 +2517,19 @@ func (m *SubjectMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetNameCn(v)
 		return nil
-	case subject.FieldOnHold:
-		v, ok := value.(uint32)
+	case subject.FieldDate:
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetOnHold(v)
+		m.SetDate(v)
+		return nil
+	case subject.FieldEpisodes:
+		v, ok := value.(uint8)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEpisodes(v)
 		return nil
 	case subject.FieldWish:
 		v, ok := value.(uint32)
@@ -2511,33 +2545,26 @@ func (m *SubjectMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDoing(v)
 		return nil
-	case subject.FieldSubjectType:
-		v, ok := value.(uint8)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetSubjectType(v)
-		return nil
-	case subject.FieldCollect:
-		v, ok := value.(uint32)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCollect(v)
-		return nil
-	case subject.FieldDrop:
-		v, ok := value.(uint32)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDrop(v)
-		return nil
 	case subject.FieldWatched:
 		v, ok := value.(uint32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetWatched(v)
+		return nil
+	case subject.FieldOnHold:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOnHold(v)
+		return nil
+	case subject.FieldDropped:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDropped(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Subject field %s", name)
@@ -2547,8 +2574,8 @@ func (m *SubjectMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *SubjectMutation) AddedFields() []string {
 	var fields []string
-	if m.addon_hold != nil {
-		fields = append(fields, subject.FieldOnHold)
+	if m.addepisodes != nil {
+		fields = append(fields, subject.FieldEpisodes)
 	}
 	if m.addwish != nil {
 		fields = append(fields, subject.FieldWish)
@@ -2556,17 +2583,14 @@ func (m *SubjectMutation) AddedFields() []string {
 	if m.adddoing != nil {
 		fields = append(fields, subject.FieldDoing)
 	}
-	if m.addsubject_type != nil {
-		fields = append(fields, subject.FieldSubjectType)
-	}
-	if m.addcollect != nil {
-		fields = append(fields, subject.FieldCollect)
-	}
-	if m.adddrop != nil {
-		fields = append(fields, subject.FieldDrop)
-	}
 	if m.addwatched != nil {
 		fields = append(fields, subject.FieldWatched)
+	}
+	if m.addon_hold != nil {
+		fields = append(fields, subject.FieldOnHold)
+	}
+	if m.adddropped != nil {
+		fields = append(fields, subject.FieldDropped)
 	}
 	return fields
 }
@@ -2576,20 +2600,18 @@ func (m *SubjectMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *SubjectMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case subject.FieldOnHold:
-		return m.AddedOnHold()
+	case subject.FieldEpisodes:
+		return m.AddedEpisodes()
 	case subject.FieldWish:
 		return m.AddedWish()
 	case subject.FieldDoing:
 		return m.AddedDoing()
-	case subject.FieldSubjectType:
-		return m.AddedSubjectType()
-	case subject.FieldCollect:
-		return m.AddedCollect()
-	case subject.FieldDrop:
-		return m.AddedDrop()
 	case subject.FieldWatched:
 		return m.AddedWatched()
+	case subject.FieldOnHold:
+		return m.AddedOnHold()
+	case subject.FieldDropped:
+		return m.AddedDropped()
 	}
 	return nil, false
 }
@@ -2599,12 +2621,12 @@ func (m *SubjectMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *SubjectMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case subject.FieldOnHold:
-		v, ok := value.(int32)
+	case subject.FieldEpisodes:
+		v, ok := value.(int8)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddOnHold(v)
+		m.AddEpisodes(v)
 		return nil
 	case subject.FieldWish:
 		v, ok := value.(int32)
@@ -2620,33 +2642,26 @@ func (m *SubjectMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddDoing(v)
 		return nil
-	case subject.FieldSubjectType:
-		v, ok := value.(int8)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddSubjectType(v)
-		return nil
-	case subject.FieldCollect:
-		v, ok := value.(int32)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddCollect(v)
-		return nil
-	case subject.FieldDrop:
-		v, ok := value.(int32)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddDrop(v)
-		return nil
 	case subject.FieldWatched:
 		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddWatched(v)
+		return nil
+	case subject.FieldOnHold:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddOnHold(v)
+		return nil
+	case subject.FieldDropped:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDropped(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Subject numeric field %s", name)
@@ -2684,14 +2699,14 @@ func (m *SubjectMutation) ResetField(name string) error {
 	case subject.FieldName:
 		m.ResetName()
 		return nil
-	case subject.FieldDate:
-		m.ResetDate()
-		return nil
 	case subject.FieldNameCn:
 		m.ResetNameCn()
 		return nil
-	case subject.FieldOnHold:
-		m.ResetOnHold()
+	case subject.FieldDate:
+		m.ResetDate()
+		return nil
+	case subject.FieldEpisodes:
+		m.ResetEpisodes()
 		return nil
 	case subject.FieldWish:
 		m.ResetWish()
@@ -2699,17 +2714,14 @@ func (m *SubjectMutation) ResetField(name string) error {
 	case subject.FieldDoing:
 		m.ResetDoing()
 		return nil
-	case subject.FieldSubjectType:
-		m.ResetSubjectType()
-		return nil
-	case subject.FieldCollect:
-		m.ResetCollect()
-		return nil
-	case subject.FieldDrop:
-		m.ResetDrop()
-		return nil
 	case subject.FieldWatched:
 		m.ResetWatched()
+		return nil
+	case subject.FieldOnHold:
+		m.ResetOnHold()
+		return nil
+	case subject.FieldDropped:
+		m.ResetDropped()
 		return nil
 	}
 	return fmt.Errorf("unknown Subject field %s", name)

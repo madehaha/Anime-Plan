@@ -14,20 +14,20 @@ type Subject struct {
 // Fields of the Subject.
 func (Subject) Fields() []ent.Field {
 	return []ent.Field{
-
+		field.Uint32("id").Unique().Immutable(),
 		field.String("image").MaxLen(255).Default("https://lain.bgm.tv/pic/user/l/icon.jpg"),
-		field.String("summary").MaxLen(300),
+		field.String("summary").MaxLen(300).Default("No summary."),
 		field.String("name"),
-		field.String("date"), //release date
 		field.String("name_cn"),
-		field.Uint32("on_hold").Default(0),
+		field.String("date"),    // release date
+		field.Uint8("episodes"), // number of episodes
+
 		field.Uint32("wish").Default(0),
 		field.Uint32("doing").Default(0),
-		field.Uint8("subject_type").Default(0),
-		field.Uint32("collect").Default(0),
-		field.Uint32("drop").Default(0),
 		field.Uint32("watched").Default(0),
-		field.Uint8("episode").Default(0),
+
+		field.Uint32("on_hold").Default(0),
+		field.Uint32("dropped").Default(0),
 	}
 }
 

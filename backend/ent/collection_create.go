@@ -27,16 +27,16 @@ func (cc *CollectionCreate) SetType(u uint8) *CollectionCreate {
 	return cc
 }
 
-// SetIfComment sets the "if_comment" field.
-func (cc *CollectionCreate) SetIfComment(b bool) *CollectionCreate {
-	cc.mutation.SetIfComment(b)
+// SetHasComment sets the "has_comment" field.
+func (cc *CollectionCreate) SetHasComment(b bool) *CollectionCreate {
+	cc.mutation.SetHasComment(b)
 	return cc
 }
 
-// SetNillableIfComment sets the "if_comment" field if the given value is not nil.
-func (cc *CollectionCreate) SetNillableIfComment(b *bool) *CollectionCreate {
+// SetNillableHasComment sets the "has_comment" field if the given value is not nil.
+func (cc *CollectionCreate) SetNillableHasComment(b *bool) *CollectionCreate {
 	if b != nil {
-		cc.SetIfComment(*b)
+		cc.SetHasComment(*b)
 	}
 	return cc
 }
@@ -56,30 +56,50 @@ func (cc *CollectionCreate) SetNillableComment(s *string) *CollectionCreate {
 }
 
 // SetScore sets the "score" field.
-func (cc *CollectionCreate) SetScore(i int8) *CollectionCreate {
-	cc.mutation.SetScore(i)
+func (cc *CollectionCreate) SetScore(u uint8) *CollectionCreate {
+	cc.mutation.SetScore(u)
 	return cc
 }
 
 // SetNillableScore sets the "score" field if the given value is not nil.
-func (cc *CollectionCreate) SetNillableScore(i *int8) *CollectionCreate {
-	if i != nil {
-		cc.SetScore(*i)
+func (cc *CollectionCreate) SetNillableScore(u *uint8) *CollectionCreate {
+	if u != nil {
+		cc.SetScore(*u)
 	}
 	return cc
 }
 
-// SetTime sets the "time" field.
-func (cc *CollectionCreate) SetTime(s string) *CollectionCreate {
-	cc.mutation.SetTime(s)
+// SetAddTime sets the "add_time" field.
+func (cc *CollectionCreate) SetAddTime(s string) *CollectionCreate {
+	cc.mutation.SetAddTime(s)
 	return cc
 }
 
-// SetNillableTime sets the "time" field if the given value is not nil.
-func (cc *CollectionCreate) SetNillableTime(s *string) *CollectionCreate {
+// SetNillableAddTime sets the "add_time" field if the given value is not nil.
+func (cc *CollectionCreate) SetNillableAddTime(s *string) *CollectionCreate {
 	if s != nil {
-		cc.SetTime(*s)
+		cc.SetAddTime(*s)
 	}
+	return cc
+}
+
+// SetEpStatus sets the "ep_status" field.
+func (cc *CollectionCreate) SetEpStatus(u uint8) *CollectionCreate {
+	cc.mutation.SetEpStatus(u)
+	return cc
+}
+
+// SetNillableEpStatus sets the "ep_status" field if the given value is not nil.
+func (cc *CollectionCreate) SetNillableEpStatus(u *uint8) *CollectionCreate {
+	if u != nil {
+		cc.SetEpStatus(*u)
+	}
+	return cc
+}
+
+// SetID sets the "id" field.
+func (cc *CollectionCreate) SetID(u uint32) *CollectionCreate {
+	cc.mutation.SetID(u)
 	return cc
 }
 
@@ -103,13 +123,13 @@ func (cc *CollectionCreate) SetMember(m *Members) *CollectionCreate {
 }
 
 // SetSubjectID sets the "subject" edge to the Subject entity by ID.
-func (cc *CollectionCreate) SetSubjectID(id int) *CollectionCreate {
+func (cc *CollectionCreate) SetSubjectID(id uint32) *CollectionCreate {
 	cc.mutation.SetSubjectID(id)
 	return cc
 }
 
 // SetNillableSubjectID sets the "subject" edge to the Subject entity by ID if the given value is not nil.
-func (cc *CollectionCreate) SetNillableSubjectID(id *int) *CollectionCreate {
+func (cc *CollectionCreate) SetNillableSubjectID(id *uint32) *CollectionCreate {
 	if id != nil {
 		cc = cc.SetSubjectID(*id)
 	}
@@ -156,9 +176,9 @@ func (cc *CollectionCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (cc *CollectionCreate) defaults() {
-	if _, ok := cc.mutation.IfComment(); !ok {
-		v := collection.DefaultIfComment
-		cc.mutation.SetIfComment(v)
+	if _, ok := cc.mutation.HasComment(); !ok {
+		v := collection.DefaultHasComment
+		cc.mutation.SetHasComment(v)
 	}
 	if _, ok := cc.mutation.Comment(); !ok {
 		v := collection.DefaultComment
@@ -168,9 +188,13 @@ func (cc *CollectionCreate) defaults() {
 		v := collection.DefaultScore
 		cc.mutation.SetScore(v)
 	}
-	if _, ok := cc.mutation.Time(); !ok {
-		v := collection.DefaultTime
-		cc.mutation.SetTime(v)
+	if _, ok := cc.mutation.AddTime(); !ok {
+		v := collection.DefaultAddTime
+		cc.mutation.SetAddTime(v)
+	}
+	if _, ok := cc.mutation.EpStatus(); !ok {
+		v := collection.DefaultEpStatus
+		cc.mutation.SetEpStatus(v)
 	}
 }
 
@@ -179,8 +203,13 @@ func (cc *CollectionCreate) check() error {
 	if _, ok := cc.mutation.GetType(); !ok {
 		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "Collection.type"`)}
 	}
-	if _, ok := cc.mutation.IfComment(); !ok {
-		return &ValidationError{Name: "if_comment", err: errors.New(`ent: missing required field "Collection.if_comment"`)}
+	if v, ok := cc.mutation.GetType(); ok {
+		if err := collection.TypeValidator(v); err != nil {
+			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Collection.type": %w`, err)}
+		}
+	}
+	if _, ok := cc.mutation.HasComment(); !ok {
+		return &ValidationError{Name: "has_comment", err: errors.New(`ent: missing required field "Collection.has_comment"`)}
 	}
 	if _, ok := cc.mutation.Comment(); !ok {
 		return &ValidationError{Name: "comment", err: errors.New(`ent: missing required field "Collection.comment"`)}
@@ -193,8 +222,11 @@ func (cc *CollectionCreate) check() error {
 	if _, ok := cc.mutation.Score(); !ok {
 		return &ValidationError{Name: "score", err: errors.New(`ent: missing required field "Collection.score"`)}
 	}
-	if _, ok := cc.mutation.Time(); !ok {
-		return &ValidationError{Name: "time", err: errors.New(`ent: missing required field "Collection.time"`)}
+	if _, ok := cc.mutation.AddTime(); !ok {
+		return &ValidationError{Name: "add_time", err: errors.New(`ent: missing required field "Collection.add_time"`)}
+	}
+	if _, ok := cc.mutation.EpStatus(); !ok {
+		return &ValidationError{Name: "ep_status", err: errors.New(`ent: missing required field "Collection.ep_status"`)}
 	}
 	return nil
 }
@@ -210,8 +242,10 @@ func (cc *CollectionCreate) sqlSave(ctx context.Context) (*Collection, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = uint32(id)
+	}
 	cc.mutation.id = &_node.ID
 	cc.mutation.done = true
 	return _node, nil
@@ -220,27 +254,35 @@ func (cc *CollectionCreate) sqlSave(ctx context.Context) (*Collection, error) {
 func (cc *CollectionCreate) createSpec() (*Collection, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Collection{config: cc.config}
-		_spec = sqlgraph.NewCreateSpec(collection.Table, sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(collection.Table, sqlgraph.NewFieldSpec(collection.FieldID, field.TypeUint32))
 	)
+	if id, ok := cc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := cc.mutation.GetType(); ok {
 		_spec.SetField(collection.FieldType, field.TypeUint8, value)
 		_node.Type = value
 	}
-	if value, ok := cc.mutation.IfComment(); ok {
-		_spec.SetField(collection.FieldIfComment, field.TypeBool, value)
-		_node.IfComment = value
+	if value, ok := cc.mutation.HasComment(); ok {
+		_spec.SetField(collection.FieldHasComment, field.TypeBool, value)
+		_node.HasComment = value
 	}
 	if value, ok := cc.mutation.Comment(); ok {
 		_spec.SetField(collection.FieldComment, field.TypeString, value)
 		_node.Comment = value
 	}
 	if value, ok := cc.mutation.Score(); ok {
-		_spec.SetField(collection.FieldScore, field.TypeInt8, value)
+		_spec.SetField(collection.FieldScore, field.TypeUint8, value)
 		_node.Score = value
 	}
-	if value, ok := cc.mutation.Time(); ok {
-		_spec.SetField(collection.FieldTime, field.TypeString, value)
-		_node.Time = value
+	if value, ok := cc.mutation.AddTime(); ok {
+		_spec.SetField(collection.FieldAddTime, field.TypeString, value)
+		_node.AddTime = value
+	}
+	if value, ok := cc.mutation.EpStatus(); ok {
+		_spec.SetField(collection.FieldEpStatus, field.TypeUint8, value)
+		_node.EpStatus = value
 	}
 	if nodes := cc.mutation.MemberIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -267,7 +309,7 @@ func (cc *CollectionCreate) createSpec() (*Collection, *sqlgraph.CreateSpec) {
 			Columns: []string{collection.SubjectColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subject.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(subject.FieldID, field.TypeUint32),
 			},
 		}
 		for _, k := range nodes {
@@ -320,9 +362,9 @@ func (ccb *CollectionCreateBulk) Save(ctx context.Context) ([]*Collection, error
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = uint32(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

@@ -3,19 +3,19 @@ package model
 type CollectionType = uint8
 
 const (
-	Wish    CollectionType = 1
-	OnHold  CollectionType = 2
-	Doing   CollectionType = 3
-	Drop    CollectionType = 4
-	Watched CollectionType = 5
+	Wish CollectionType = iota
+	Watched
+	Doing
+	OnHold
+	Dropped
 )
 
 const (
 	TextWish    = "想看"
-	TextOnHold  = "搁置"
-	TextDoing   = "在看"
-	TextDrop    = "抛弃"
 	TextWatched = "看过"
+	TextDoing   = "在看"
+	TextOnHold  = "搁置"
+	TextDropped = "抛弃"
 )
 
 func CollectionTypeString(s uint8) string {
@@ -26,8 +26,8 @@ func CollectionTypeString(s uint8) string {
 		return TextOnHold
 	case Doing:
 		return TextDoing
-	case Drop:
-		return TextDrop
+	case Dropped:
+		return TextDropped
 	case Watched:
 		return TextWatched
 	default:

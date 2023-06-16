@@ -1,107 +1,49 @@
 package subject
 
 import (
-	"backend/internal/logger"
-	"backend/web/request/collection"
-	"backend/web/request/subject"
-	"backend/web/response"
-	"backend/web/util"
-	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
+
+	"github.com/labstack/echo/v4"
+
+	"backend/internal/logger"
+	"backend/web/request/subject"
+	"backend/web/util"
 )
 
 func (h Handler) GetSubject(c echo.Context) error {
 	subjects, err := h.ctrl.GetSubject()
 	if err != nil {
 		logger.Error("Failed to get subject")
-		_ = c.JSON(http.StatusBadRequest, err)
-		return err
+		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
 
 	_ = c.JSON(http.StatusOK, subjects)
 	return nil
 }
+
 func (h Handler) GetSubjectByID(c echo.Context) error {
-	id := c.Param("id")
-	Id, err := strconv.ParseInt(id, 10, 64)
-	subject, err := h.ctrl.GetSubjectByID(Id)
+	id := c.Param("subject_id")
+	Id, err := strconv.ParseUint(id, 10, 64)
+	subjectEntity, err := h.ctrl.GetSubjectByID(uint32(Id))
 	if err != nil {
 		logger.Error("Failed to find subject")
-		_ = c.JSON(http.StatusBadRequest, err)
-		return err
-	}
-	return util.Success(c, http.StatusOK, subject)
-}
-func (h Handler) AddOrUpdateCollection(c echo.Context) error {
-	uid := c.Get("uid").(uint32)
-	SubjectID := c.Param("id")
-	AddType := c.Param("type")
-	id, err := strconv.Atoi(SubjectID)
-	if err != nil {
-		logger.Error("add failed")
 		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
-	subtype, err := strconv.Atoi(AddType)
-	if err != nil {
-		logger.Error("add failed")
-		return util.Error(c, http.StatusBadRequest, err.Error())
-	}
-	err = h.ctrl.AddCollection(uid, id, uint8(subtype))
-	if err != nil {
-		logger.Error("add failed")
-		return util.Error(c, http.StatusBadRequest, err.Error())
-	}
-	return c.NoContent(http.StatusOK)
-}
-func (h Handler) GetComment(c echo.Context) error {
-	return nil
-}
-func (h Handler) UpdateCollection(c echo.Context) error {
-	uid := c.Get("uid").(uint32)
-	id := c.Param("id")
-	var req collection.UpdateCollectionReq
-	if err := c.Bind(&req); err != nil {
-		logger.Error("Login bind failed")
-		return util.Error(c, http.StatusBadRequest, err.Error())
-	}
-	if err := c.Validate(&req); err != nil {
-		logger.Error("Login Validate failed")
-		return util.Error(c, http.StatusBadRequest, err.Error())
-	}
-	subid, _ := strconv.Atoi(id)
-	err := h.ctrl.UpdateCollection(uid, subid, req)
-	if err != nil {
-		return util.Error(c, http.StatusBadRequest, err.Error())
-
-	}
-	return c.NoContent(http.StatusOK)
+	return util.Success(c, http.StatusOK, subjectEntity)
 }
 
-func (h Handler) SearchSubject(c echo.Context) error {
-	searchTerm := c.QueryParam("term")
-	if searchTerm == "" {
-		logger.Error("fail to get term")
-		return util.Error(c, http.StatusBadRequest, "term is nil")
-	}
-	Subject, err := h.ctrl.SearchSubject(searchTerm)
-	if err != nil {
-		logger.Error("fail to search")
-		return util.Error(c, http.StatusBadRequest, err.Error())
-	}
-	return util.Success(c, http.StatusOK, response.NewSubjectResp(Subject))
-}
+// TODO Use WikiJWTAuth
 
 func (h Handler) CreateSubject(c echo.Context) error {
 	var req subject.CreateSubjectReq
 	if err := c.Bind(&req); err != nil {
-		logger.Error("Login bind failed")
-		_ = c.JSON(http.StatusBadRequest, err)
-		return err
+		logger.Error("Create Subject request bind failed")
+		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
 	if err := c.Validate(&req); err != nil {
-		logger.Error("Login Validate failed")
-		return err
+		logger.Error("Create Subject request validate failed")
+		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
 	gid := c.Get("gid").(uint8)
 	err := h.ctrl.CreateSubject(req, gid)

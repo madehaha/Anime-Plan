@@ -40,15 +40,17 @@ func (sc *SubjectCreate) SetSummary(s string) *SubjectCreate {
 	return sc
 }
 
-// SetName sets the "name" field.
-func (sc *SubjectCreate) SetName(s string) *SubjectCreate {
-	sc.mutation.SetName(s)
+// SetNillableSummary sets the "summary" field if the given value is not nil.
+func (sc *SubjectCreate) SetNillableSummary(s *string) *SubjectCreate {
+	if s != nil {
+		sc.SetSummary(*s)
+	}
 	return sc
 }
 
-// SetDate sets the "date" field.
-func (sc *SubjectCreate) SetDate(s string) *SubjectCreate {
-	sc.mutation.SetDate(s)
+// SetName sets the "name" field.
+func (sc *SubjectCreate) SetName(s string) *SubjectCreate {
+	sc.mutation.SetName(s)
 	return sc
 }
 
@@ -58,17 +60,15 @@ func (sc *SubjectCreate) SetNameCn(s string) *SubjectCreate {
 	return sc
 }
 
-// SetOnHold sets the "on_hold" field.
-func (sc *SubjectCreate) SetOnHold(u uint32) *SubjectCreate {
-	sc.mutation.SetOnHold(u)
+// SetDate sets the "date" field.
+func (sc *SubjectCreate) SetDate(s string) *SubjectCreate {
+	sc.mutation.SetDate(s)
 	return sc
 }
 
-// SetNillableOnHold sets the "on_hold" field if the given value is not nil.
-func (sc *SubjectCreate) SetNillableOnHold(u *uint32) *SubjectCreate {
-	if u != nil {
-		sc.SetOnHold(*u)
-	}
+// SetEpisodes sets the "episodes" field.
+func (sc *SubjectCreate) SetEpisodes(u uint8) *SubjectCreate {
+	sc.mutation.SetEpisodes(u)
 	return sc
 }
 
@@ -100,48 +100,6 @@ func (sc *SubjectCreate) SetNillableDoing(u *uint32) *SubjectCreate {
 	return sc
 }
 
-// SetSubjectType sets the "subject_type" field.
-func (sc *SubjectCreate) SetSubjectType(u uint8) *SubjectCreate {
-	sc.mutation.SetSubjectType(u)
-	return sc
-}
-
-// SetNillableSubjectType sets the "subject_type" field if the given value is not nil.
-func (sc *SubjectCreate) SetNillableSubjectType(u *uint8) *SubjectCreate {
-	if u != nil {
-		sc.SetSubjectType(*u)
-	}
-	return sc
-}
-
-// SetCollect sets the "collect" field.
-func (sc *SubjectCreate) SetCollect(u uint32) *SubjectCreate {
-	sc.mutation.SetCollect(u)
-	return sc
-}
-
-// SetNillableCollect sets the "collect" field if the given value is not nil.
-func (sc *SubjectCreate) SetNillableCollect(u *uint32) *SubjectCreate {
-	if u != nil {
-		sc.SetCollect(*u)
-	}
-	return sc
-}
-
-// SetDrop sets the "drop" field.
-func (sc *SubjectCreate) SetDrop(u uint32) *SubjectCreate {
-	sc.mutation.SetDrop(u)
-	return sc
-}
-
-// SetNillableDrop sets the "drop" field if the given value is not nil.
-func (sc *SubjectCreate) SetNillableDrop(u *uint32) *SubjectCreate {
-	if u != nil {
-		sc.SetDrop(*u)
-	}
-	return sc
-}
-
 // SetWatched sets the "watched" field.
 func (sc *SubjectCreate) SetWatched(u uint32) *SubjectCreate {
 	sc.mutation.SetWatched(u)
@@ -156,15 +114,49 @@ func (sc *SubjectCreate) SetNillableWatched(u *uint32) *SubjectCreate {
 	return sc
 }
 
+// SetOnHold sets the "on_hold" field.
+func (sc *SubjectCreate) SetOnHold(u uint32) *SubjectCreate {
+	sc.mutation.SetOnHold(u)
+	return sc
+}
+
+// SetNillableOnHold sets the "on_hold" field if the given value is not nil.
+func (sc *SubjectCreate) SetNillableOnHold(u *uint32) *SubjectCreate {
+	if u != nil {
+		sc.SetOnHold(*u)
+	}
+	return sc
+}
+
+// SetDropped sets the "dropped" field.
+func (sc *SubjectCreate) SetDropped(u uint32) *SubjectCreate {
+	sc.mutation.SetDropped(u)
+	return sc
+}
+
+// SetNillableDropped sets the "dropped" field if the given value is not nil.
+func (sc *SubjectCreate) SetNillableDropped(u *uint32) *SubjectCreate {
+	if u != nil {
+		sc.SetDropped(*u)
+	}
+	return sc
+}
+
+// SetID sets the "id" field.
+func (sc *SubjectCreate) SetID(u uint32) *SubjectCreate {
+	sc.mutation.SetID(u)
+	return sc
+}
+
 // AddCollectionIDs adds the "collections" edge to the Collection entity by IDs.
-func (sc *SubjectCreate) AddCollectionIDs(ids ...int) *SubjectCreate {
+func (sc *SubjectCreate) AddCollectionIDs(ids ...uint32) *SubjectCreate {
 	sc.mutation.AddCollectionIDs(ids...)
 	return sc
 }
 
 // AddCollections adds the "collections" edges to the Collection entity.
 func (sc *SubjectCreate) AddCollections(c ...*Collection) *SubjectCreate {
-	ids := make([]int, len(c))
+	ids := make([]uint32, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
@@ -210,9 +202,9 @@ func (sc *SubjectCreate) defaults() {
 		v := subject.DefaultImage
 		sc.mutation.SetImage(v)
 	}
-	if _, ok := sc.mutation.OnHold(); !ok {
-		v := subject.DefaultOnHold
-		sc.mutation.SetOnHold(v)
+	if _, ok := sc.mutation.Summary(); !ok {
+		v := subject.DefaultSummary
+		sc.mutation.SetSummary(v)
 	}
 	if _, ok := sc.mutation.Wish(); !ok {
 		v := subject.DefaultWish
@@ -222,21 +214,17 @@ func (sc *SubjectCreate) defaults() {
 		v := subject.DefaultDoing
 		sc.mutation.SetDoing(v)
 	}
-	if _, ok := sc.mutation.SubjectType(); !ok {
-		v := subject.DefaultSubjectType
-		sc.mutation.SetSubjectType(v)
-	}
-	if _, ok := sc.mutation.Collect(); !ok {
-		v := subject.DefaultCollect
-		sc.mutation.SetCollect(v)
-	}
-	if _, ok := sc.mutation.Drop(); !ok {
-		v := subject.DefaultDrop
-		sc.mutation.SetDrop(v)
-	}
 	if _, ok := sc.mutation.Watched(); !ok {
 		v := subject.DefaultWatched
 		sc.mutation.SetWatched(v)
+	}
+	if _, ok := sc.mutation.OnHold(); !ok {
+		v := subject.DefaultOnHold
+		sc.mutation.SetOnHold(v)
+	}
+	if _, ok := sc.mutation.Dropped(); !ok {
+		v := subject.DefaultDropped
+		sc.mutation.SetDropped(v)
 	}
 }
 
@@ -261,14 +249,14 @@ func (sc *SubjectCreate) check() error {
 	if _, ok := sc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Subject.name"`)}
 	}
-	if _, ok := sc.mutation.Date(); !ok {
-		return &ValidationError{Name: "date", err: errors.New(`ent: missing required field "Subject.date"`)}
-	}
 	if _, ok := sc.mutation.NameCn(); !ok {
 		return &ValidationError{Name: "name_cn", err: errors.New(`ent: missing required field "Subject.name_cn"`)}
 	}
-	if _, ok := sc.mutation.OnHold(); !ok {
-		return &ValidationError{Name: "on_hold", err: errors.New(`ent: missing required field "Subject.on_hold"`)}
+	if _, ok := sc.mutation.Date(); !ok {
+		return &ValidationError{Name: "date", err: errors.New(`ent: missing required field "Subject.date"`)}
+	}
+	if _, ok := sc.mutation.Episodes(); !ok {
+		return &ValidationError{Name: "episodes", err: errors.New(`ent: missing required field "Subject.episodes"`)}
 	}
 	if _, ok := sc.mutation.Wish(); !ok {
 		return &ValidationError{Name: "wish", err: errors.New(`ent: missing required field "Subject.wish"`)}
@@ -276,17 +264,14 @@ func (sc *SubjectCreate) check() error {
 	if _, ok := sc.mutation.Doing(); !ok {
 		return &ValidationError{Name: "doing", err: errors.New(`ent: missing required field "Subject.doing"`)}
 	}
-	if _, ok := sc.mutation.SubjectType(); !ok {
-		return &ValidationError{Name: "subject_type", err: errors.New(`ent: missing required field "Subject.subject_type"`)}
-	}
-	if _, ok := sc.mutation.Collect(); !ok {
-		return &ValidationError{Name: "collect", err: errors.New(`ent: missing required field "Subject.collect"`)}
-	}
-	if _, ok := sc.mutation.Drop(); !ok {
-		return &ValidationError{Name: "drop", err: errors.New(`ent: missing required field "Subject.drop"`)}
-	}
 	if _, ok := sc.mutation.Watched(); !ok {
 		return &ValidationError{Name: "watched", err: errors.New(`ent: missing required field "Subject.watched"`)}
+	}
+	if _, ok := sc.mutation.OnHold(); !ok {
+		return &ValidationError{Name: "on_hold", err: errors.New(`ent: missing required field "Subject.on_hold"`)}
+	}
+	if _, ok := sc.mutation.Dropped(); !ok {
+		return &ValidationError{Name: "dropped", err: errors.New(`ent: missing required field "Subject.dropped"`)}
 	}
 	return nil
 }
@@ -302,8 +287,10 @@ func (sc *SubjectCreate) sqlSave(ctx context.Context) (*Subject, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = uint32(id)
+	}
 	sc.mutation.id = &_node.ID
 	sc.mutation.done = true
 	return _node, nil
@@ -312,8 +299,12 @@ func (sc *SubjectCreate) sqlSave(ctx context.Context) (*Subject, error) {
 func (sc *SubjectCreate) createSpec() (*Subject, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Subject{config: sc.config}
-		_spec = sqlgraph.NewCreateSpec(subject.Table, sqlgraph.NewFieldSpec(subject.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(subject.Table, sqlgraph.NewFieldSpec(subject.FieldID, field.TypeUint32))
 	)
+	if id, ok := sc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := sc.mutation.Image(); ok {
 		_spec.SetField(subject.FieldImage, field.TypeString, value)
 		_node.Image = value
@@ -326,17 +317,17 @@ func (sc *SubjectCreate) createSpec() (*Subject, *sqlgraph.CreateSpec) {
 		_spec.SetField(subject.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := sc.mutation.Date(); ok {
-		_spec.SetField(subject.FieldDate, field.TypeString, value)
-		_node.Date = value
-	}
 	if value, ok := sc.mutation.NameCn(); ok {
 		_spec.SetField(subject.FieldNameCn, field.TypeString, value)
 		_node.NameCn = value
 	}
-	if value, ok := sc.mutation.OnHold(); ok {
-		_spec.SetField(subject.FieldOnHold, field.TypeUint32, value)
-		_node.OnHold = value
+	if value, ok := sc.mutation.Date(); ok {
+		_spec.SetField(subject.FieldDate, field.TypeString, value)
+		_node.Date = value
+	}
+	if value, ok := sc.mutation.Episodes(); ok {
+		_spec.SetField(subject.FieldEpisodes, field.TypeUint8, value)
+		_node.Episodes = value
 	}
 	if value, ok := sc.mutation.Wish(); ok {
 		_spec.SetField(subject.FieldWish, field.TypeUint32, value)
@@ -346,21 +337,17 @@ func (sc *SubjectCreate) createSpec() (*Subject, *sqlgraph.CreateSpec) {
 		_spec.SetField(subject.FieldDoing, field.TypeUint32, value)
 		_node.Doing = value
 	}
-	if value, ok := sc.mutation.SubjectType(); ok {
-		_spec.SetField(subject.FieldSubjectType, field.TypeUint8, value)
-		_node.SubjectType = value
-	}
-	if value, ok := sc.mutation.Collect(); ok {
-		_spec.SetField(subject.FieldCollect, field.TypeUint32, value)
-		_node.Collect = value
-	}
-	if value, ok := sc.mutation.Drop(); ok {
-		_spec.SetField(subject.FieldDrop, field.TypeUint32, value)
-		_node.Drop = value
-	}
 	if value, ok := sc.mutation.Watched(); ok {
 		_spec.SetField(subject.FieldWatched, field.TypeUint32, value)
 		_node.Watched = value
+	}
+	if value, ok := sc.mutation.OnHold(); ok {
+		_spec.SetField(subject.FieldOnHold, field.TypeUint32, value)
+		_node.OnHold = value
+	}
+	if value, ok := sc.mutation.Dropped(); ok {
+		_spec.SetField(subject.FieldDropped, field.TypeUint32, value)
+		_node.Dropped = value
 	}
 	if nodes := sc.mutation.CollectionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -370,7 +357,7 @@ func (sc *SubjectCreate) createSpec() (*Subject, *sqlgraph.CreateSpec) {
 			Columns: []string{subject.CollectionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeUint32),
 			},
 		}
 		for _, k := range nodes {
@@ -422,9 +409,9 @@ func (scb *SubjectCreateBulk) Save(ctx context.Context) ([]*Subject, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = uint32(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

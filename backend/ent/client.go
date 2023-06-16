@@ -255,7 +255,7 @@ func (c *CollectionClient) UpdateOne(co *Collection) *CollectionUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *CollectionClient) UpdateOneID(id int) *CollectionUpdateOne {
+func (c *CollectionClient) UpdateOneID(id uint32) *CollectionUpdateOne {
 	mutation := newCollectionMutation(c.config, OpUpdateOne, withCollectionID(id))
 	return &CollectionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -272,7 +272,7 @@ func (c *CollectionClient) DeleteOne(co *Collection) *CollectionDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *CollectionClient) DeleteOneID(id int) *CollectionDeleteOne {
+func (c *CollectionClient) DeleteOneID(id uint32) *CollectionDeleteOne {
 	builder := c.Delete().Where(collection.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -289,12 +289,12 @@ func (c *CollectionClient) Query() *CollectionQuery {
 }
 
 // Get returns a Collection entity by its id.
-func (c *CollectionClient) Get(ctx context.Context, id int) (*Collection, error) {
+func (c *CollectionClient) Get(ctx context.Context, id uint32) (*Collection, error) {
 	return c.Query().Where(collection.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *CollectionClient) GetX(ctx context.Context, id int) *Collection {
+func (c *CollectionClient) GetX(ctx context.Context, id uint32) *Collection {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -539,7 +539,7 @@ func (c *SubjectClient) UpdateOne(s *Subject) *SubjectUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *SubjectClient) UpdateOneID(id int) *SubjectUpdateOne {
+func (c *SubjectClient) UpdateOneID(id uint32) *SubjectUpdateOne {
 	mutation := newSubjectMutation(c.config, OpUpdateOne, withSubjectID(id))
 	return &SubjectUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -556,7 +556,7 @@ func (c *SubjectClient) DeleteOne(s *Subject) *SubjectDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *SubjectClient) DeleteOneID(id int) *SubjectDeleteOne {
+func (c *SubjectClient) DeleteOneID(id uint32) *SubjectDeleteOne {
 	builder := c.Delete().Where(subject.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -573,12 +573,12 @@ func (c *SubjectClient) Query() *SubjectQuery {
 }
 
 // Get returns a Subject entity by its id.
-func (c *SubjectClient) Get(ctx context.Context, id int) (*Subject, error) {
+func (c *SubjectClient) Get(ctx context.Context, id uint32) (*Subject, error) {
 	return c.Query().Where(subject.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *SubjectClient) GetX(ctx context.Context, id int) *Subject {
+func (c *SubjectClient) GetX(ctx context.Context, id uint32) *Subject {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)

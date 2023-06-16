@@ -1,6 +1,11 @@
 package web
 
 import (
+	"github.com/labstack/echo/v4"
+	"github.com/spf13/cobra"
+	"go.uber.org/fx"
+
+	"backend/internal/collection"
 	"backend/internal/config"
 	"backend/internal/ctrl"
 	"backend/internal/driver"
@@ -8,9 +13,6 @@ import (
 	"backend/internal/user"
 	"backend/web"
 	"backend/web/util"
-	"github.com/labstack/echo/v4"
-	"github.com/spf13/cobra"
-	"go.uber.org/fx"
 )
 
 var Command = &cobra.Command{
@@ -31,6 +33,7 @@ func start() error {
 		fx.Provide(config.AppConfigReader, driver.NewMysqlClient, util.NewJwtUtil),
 		fx.Provide(user.NewRepo),
 		fx.Provide(subject.NewRepo),
+		fx.Provide(collection.NewRepo),
 
 		ctrl.Module,
 		web.Module,

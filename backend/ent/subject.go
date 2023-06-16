@@ -15,31 +15,29 @@ import (
 type Subject struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID uint32 `json:"id,omitempty"`
 	// Image holds the value of the "image" field.
 	Image string `json:"image,omitempty"`
 	// Summary holds the value of the "summary" field.
 	Summary string `json:"summary,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
-	// Date holds the value of the "date" field.
-	Date string `json:"date,omitempty"`
 	// NameCn holds the value of the "name_cn" field.
 	NameCn string `json:"name_cn,omitempty"`
-	// OnHold holds the value of the "on_hold" field.
-	OnHold uint32 `json:"on_hold,omitempty"`
+	// Date holds the value of the "date" field.
+	Date string `json:"date,omitempty"`
+	// Episodes holds the value of the "episodes" field.
+	Episodes uint8 `json:"episodes,omitempty"`
 	// Wish holds the value of the "wish" field.
 	Wish uint32 `json:"wish,omitempty"`
 	// Doing holds the value of the "doing" field.
 	Doing uint32 `json:"doing,omitempty"`
-	// SubjectType holds the value of the "subject_type" field.
-	SubjectType uint8 `json:"subject_type,omitempty"`
-	// Collect holds the value of the "collect" field.
-	Collect uint32 `json:"collect,omitempty"`
-	// Drop holds the value of the "drop" field.
-	Drop uint32 `json:"drop,omitempty"`
 	// Watched holds the value of the "watched" field.
 	Watched uint32 `json:"watched,omitempty"`
+	// OnHold holds the value of the "on_hold" field.
+	OnHold uint32 `json:"on_hold,omitempty"`
+	// Dropped holds the value of the "dropped" field.
+	Dropped uint32 `json:"dropped,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SubjectQuery when eager-loading is set.
 	Edges        SubjectEdges `json:"edges"`
@@ -69,9 +67,9 @@ func (*Subject) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case subject.FieldID, subject.FieldOnHold, subject.FieldWish, subject.FieldDoing, subject.FieldSubjectType, subject.FieldCollect, subject.FieldDrop, subject.FieldWatched:
+		case subject.FieldID, subject.FieldEpisodes, subject.FieldWish, subject.FieldDoing, subject.FieldWatched, subject.FieldOnHold, subject.FieldDropped:
 			values[i] = new(sql.NullInt64)
-		case subject.FieldImage, subject.FieldSummary, subject.FieldName, subject.FieldDate, subject.FieldNameCn:
+		case subject.FieldImage, subject.FieldSummary, subject.FieldName, subject.FieldNameCn, subject.FieldDate:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -93,7 +91,7 @@ func (s *Subject) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			s.ID = int(value.Int64)
+			s.ID = uint32(value.Int64)
 		case subject.FieldImage:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field image", values[i])
@@ -112,23 +110,23 @@ func (s *Subject) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.Name = value.String
 			}
-		case subject.FieldDate:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field date", values[i])
-			} else if value.Valid {
-				s.Date = value.String
-			}
 		case subject.FieldNameCn:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name_cn", values[i])
 			} else if value.Valid {
 				s.NameCn = value.String
 			}
-		case subject.FieldOnHold:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field on_hold", values[i])
+		case subject.FieldDate:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field date", values[i])
 			} else if value.Valid {
-				s.OnHold = uint32(value.Int64)
+				s.Date = value.String
+			}
+		case subject.FieldEpisodes:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field episodes", values[i])
+			} else if value.Valid {
+				s.Episodes = uint8(value.Int64)
 			}
 		case subject.FieldWish:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -142,29 +140,23 @@ func (s *Subject) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.Doing = uint32(value.Int64)
 			}
-		case subject.FieldSubjectType:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field subject_type", values[i])
-			} else if value.Valid {
-				s.SubjectType = uint8(value.Int64)
-			}
-		case subject.FieldCollect:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field collect", values[i])
-			} else if value.Valid {
-				s.Collect = uint32(value.Int64)
-			}
-		case subject.FieldDrop:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field drop", values[i])
-			} else if value.Valid {
-				s.Drop = uint32(value.Int64)
-			}
 		case subject.FieldWatched:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field watched", values[i])
 			} else if value.Valid {
 				s.Watched = uint32(value.Int64)
+			}
+		case subject.FieldOnHold:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field on_hold", values[i])
+			} else if value.Valid {
+				s.OnHold = uint32(value.Int64)
+			}
+		case subject.FieldDropped:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field dropped", values[i])
+			} else if value.Valid {
+				s.Dropped = uint32(value.Int64)
 			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
@@ -216,14 +208,14 @@ func (s *Subject) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(s.Name)
 	builder.WriteString(", ")
-	builder.WriteString("date=")
-	builder.WriteString(s.Date)
-	builder.WriteString(", ")
 	builder.WriteString("name_cn=")
 	builder.WriteString(s.NameCn)
 	builder.WriteString(", ")
-	builder.WriteString("on_hold=")
-	builder.WriteString(fmt.Sprintf("%v", s.OnHold))
+	builder.WriteString("date=")
+	builder.WriteString(s.Date)
+	builder.WriteString(", ")
+	builder.WriteString("episodes=")
+	builder.WriteString(fmt.Sprintf("%v", s.Episodes))
 	builder.WriteString(", ")
 	builder.WriteString("wish=")
 	builder.WriteString(fmt.Sprintf("%v", s.Wish))
@@ -231,17 +223,14 @@ func (s *Subject) String() string {
 	builder.WriteString("doing=")
 	builder.WriteString(fmt.Sprintf("%v", s.Doing))
 	builder.WriteString(", ")
-	builder.WriteString("subject_type=")
-	builder.WriteString(fmt.Sprintf("%v", s.SubjectType))
-	builder.WriteString(", ")
-	builder.WriteString("collect=")
-	builder.WriteString(fmt.Sprintf("%v", s.Collect))
-	builder.WriteString(", ")
-	builder.WriteString("drop=")
-	builder.WriteString(fmt.Sprintf("%v", s.Drop))
-	builder.WriteString(", ")
 	builder.WriteString("watched=")
 	builder.WriteString(fmt.Sprintf("%v", s.Watched))
+	builder.WriteString(", ")
+	builder.WriteString("on_hold=")
+	builder.WriteString(fmt.Sprintf("%v", s.OnHold))
+	builder.WriteString(", ")
+	builder.WriteString("dropped=")
+	builder.WriteString(fmt.Sprintf("%v", s.Dropped))
 	builder.WriteByte(')')
 	return builder.String()
 }

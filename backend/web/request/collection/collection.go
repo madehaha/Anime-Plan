@@ -1,8 +1,12 @@
 package collection
 
-type UpdateCollectionReq struct {
-	Comment        string `json:"comment"`
-	CollectionType uint8  `json:"collectionType"`
-	Score          int8   `json:"score"`
-	Episode        uint8  `json:"episode"`
+import (
+	"backend/internal/model"
+)
+
+type AddOrUpdateCollectionReq struct {
+	Type     model.CollectionType `json:"type" validate:"required"`
+	Comment  string               `json:"comment"`
+	Score    uint8                `json:"score"`
+	EpStatus uint8                `json:"ep_status"`
 }

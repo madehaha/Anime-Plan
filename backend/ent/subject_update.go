@@ -48,15 +48,17 @@ func (su *SubjectUpdate) SetSummary(s string) *SubjectUpdate {
 	return su
 }
 
-// SetName sets the "name" field.
-func (su *SubjectUpdate) SetName(s string) *SubjectUpdate {
-	su.mutation.SetName(s)
+// SetNillableSummary sets the "summary" field if the given value is not nil.
+func (su *SubjectUpdate) SetNillableSummary(s *string) *SubjectUpdate {
+	if s != nil {
+		su.SetSummary(*s)
+	}
 	return su
 }
 
-// SetDate sets the "date" field.
-func (su *SubjectUpdate) SetDate(s string) *SubjectUpdate {
-	su.mutation.SetDate(s)
+// SetName sets the "name" field.
+func (su *SubjectUpdate) SetName(s string) *SubjectUpdate {
+	su.mutation.SetName(s)
 	return su
 }
 
@@ -66,24 +68,22 @@ func (su *SubjectUpdate) SetNameCn(s string) *SubjectUpdate {
 	return su
 }
 
-// SetOnHold sets the "on_hold" field.
-func (su *SubjectUpdate) SetOnHold(u uint32) *SubjectUpdate {
-	su.mutation.ResetOnHold()
-	su.mutation.SetOnHold(u)
+// SetDate sets the "date" field.
+func (su *SubjectUpdate) SetDate(s string) *SubjectUpdate {
+	su.mutation.SetDate(s)
 	return su
 }
 
-// SetNillableOnHold sets the "on_hold" field if the given value is not nil.
-func (su *SubjectUpdate) SetNillableOnHold(u *uint32) *SubjectUpdate {
-	if u != nil {
-		su.SetOnHold(*u)
-	}
+// SetEpisodes sets the "episodes" field.
+func (su *SubjectUpdate) SetEpisodes(u uint8) *SubjectUpdate {
+	su.mutation.ResetEpisodes()
+	su.mutation.SetEpisodes(u)
 	return su
 }
 
-// AddOnHold adds u to the "on_hold" field.
-func (su *SubjectUpdate) AddOnHold(u int32) *SubjectUpdate {
-	su.mutation.AddOnHold(u)
+// AddEpisodes adds u to the "episodes" field.
+func (su *SubjectUpdate) AddEpisodes(u int8) *SubjectUpdate {
+	su.mutation.AddEpisodes(u)
 	return su
 }
 
@@ -129,69 +129,6 @@ func (su *SubjectUpdate) AddDoing(u int32) *SubjectUpdate {
 	return su
 }
 
-// SetSubjectType sets the "subject_type" field.
-func (su *SubjectUpdate) SetSubjectType(u uint8) *SubjectUpdate {
-	su.mutation.ResetSubjectType()
-	su.mutation.SetSubjectType(u)
-	return su
-}
-
-// SetNillableSubjectType sets the "subject_type" field if the given value is not nil.
-func (su *SubjectUpdate) SetNillableSubjectType(u *uint8) *SubjectUpdate {
-	if u != nil {
-		su.SetSubjectType(*u)
-	}
-	return su
-}
-
-// AddSubjectType adds u to the "subject_type" field.
-func (su *SubjectUpdate) AddSubjectType(u int8) *SubjectUpdate {
-	su.mutation.AddSubjectType(u)
-	return su
-}
-
-// SetCollect sets the "collect" field.
-func (su *SubjectUpdate) SetCollect(u uint32) *SubjectUpdate {
-	su.mutation.ResetCollect()
-	su.mutation.SetCollect(u)
-	return su
-}
-
-// SetNillableCollect sets the "collect" field if the given value is not nil.
-func (su *SubjectUpdate) SetNillableCollect(u *uint32) *SubjectUpdate {
-	if u != nil {
-		su.SetCollect(*u)
-	}
-	return su
-}
-
-// AddCollect adds u to the "collect" field.
-func (su *SubjectUpdate) AddCollect(u int32) *SubjectUpdate {
-	su.mutation.AddCollect(u)
-	return su
-}
-
-// SetDrop sets the "drop" field.
-func (su *SubjectUpdate) SetDrop(u uint32) *SubjectUpdate {
-	su.mutation.ResetDrop()
-	su.mutation.SetDrop(u)
-	return su
-}
-
-// SetNillableDrop sets the "drop" field if the given value is not nil.
-func (su *SubjectUpdate) SetNillableDrop(u *uint32) *SubjectUpdate {
-	if u != nil {
-		su.SetDrop(*u)
-	}
-	return su
-}
-
-// AddDrop adds u to the "drop" field.
-func (su *SubjectUpdate) AddDrop(u int32) *SubjectUpdate {
-	su.mutation.AddDrop(u)
-	return su
-}
-
 // SetWatched sets the "watched" field.
 func (su *SubjectUpdate) SetWatched(u uint32) *SubjectUpdate {
 	su.mutation.ResetWatched()
@@ -213,15 +150,57 @@ func (su *SubjectUpdate) AddWatched(u int32) *SubjectUpdate {
 	return su
 }
 
+// SetOnHold sets the "on_hold" field.
+func (su *SubjectUpdate) SetOnHold(u uint32) *SubjectUpdate {
+	su.mutation.ResetOnHold()
+	su.mutation.SetOnHold(u)
+	return su
+}
+
+// SetNillableOnHold sets the "on_hold" field if the given value is not nil.
+func (su *SubjectUpdate) SetNillableOnHold(u *uint32) *SubjectUpdate {
+	if u != nil {
+		su.SetOnHold(*u)
+	}
+	return su
+}
+
+// AddOnHold adds u to the "on_hold" field.
+func (su *SubjectUpdate) AddOnHold(u int32) *SubjectUpdate {
+	su.mutation.AddOnHold(u)
+	return su
+}
+
+// SetDropped sets the "dropped" field.
+func (su *SubjectUpdate) SetDropped(u uint32) *SubjectUpdate {
+	su.mutation.ResetDropped()
+	su.mutation.SetDropped(u)
+	return su
+}
+
+// SetNillableDropped sets the "dropped" field if the given value is not nil.
+func (su *SubjectUpdate) SetNillableDropped(u *uint32) *SubjectUpdate {
+	if u != nil {
+		su.SetDropped(*u)
+	}
+	return su
+}
+
+// AddDropped adds u to the "dropped" field.
+func (su *SubjectUpdate) AddDropped(u int32) *SubjectUpdate {
+	su.mutation.AddDropped(u)
+	return su
+}
+
 // AddCollectionIDs adds the "collections" edge to the Collection entity by IDs.
-func (su *SubjectUpdate) AddCollectionIDs(ids ...int) *SubjectUpdate {
+func (su *SubjectUpdate) AddCollectionIDs(ids ...uint32) *SubjectUpdate {
 	su.mutation.AddCollectionIDs(ids...)
 	return su
 }
 
 // AddCollections adds the "collections" edges to the Collection entity.
 func (su *SubjectUpdate) AddCollections(c ...*Collection) *SubjectUpdate {
-	ids := make([]int, len(c))
+	ids := make([]uint32, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
@@ -240,14 +219,14 @@ func (su *SubjectUpdate) ClearCollections() *SubjectUpdate {
 }
 
 // RemoveCollectionIDs removes the "collections" edge to Collection entities by IDs.
-func (su *SubjectUpdate) RemoveCollectionIDs(ids ...int) *SubjectUpdate {
+func (su *SubjectUpdate) RemoveCollectionIDs(ids ...uint32) *SubjectUpdate {
 	su.mutation.RemoveCollectionIDs(ids...)
 	return su
 }
 
 // RemoveCollections removes "collections" edges to Collection entities.
 func (su *SubjectUpdate) RemoveCollections(c ...*Collection) *SubjectUpdate {
-	ids := make([]int, len(c))
+	ids := make([]uint32, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
@@ -300,7 +279,7 @@ func (su *SubjectUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := su.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(subject.Table, subject.Columns, sqlgraph.NewFieldSpec(subject.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(subject.Table, subject.Columns, sqlgraph.NewFieldSpec(subject.FieldID, field.TypeUint32))
 	if ps := su.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -317,17 +296,17 @@ func (su *SubjectUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := su.mutation.Name(); ok {
 		_spec.SetField(subject.FieldName, field.TypeString, value)
 	}
-	if value, ok := su.mutation.Date(); ok {
-		_spec.SetField(subject.FieldDate, field.TypeString, value)
-	}
 	if value, ok := su.mutation.NameCn(); ok {
 		_spec.SetField(subject.FieldNameCn, field.TypeString, value)
 	}
-	if value, ok := su.mutation.OnHold(); ok {
-		_spec.SetField(subject.FieldOnHold, field.TypeUint32, value)
+	if value, ok := su.mutation.Date(); ok {
+		_spec.SetField(subject.FieldDate, field.TypeString, value)
 	}
-	if value, ok := su.mutation.AddedOnHold(); ok {
-		_spec.AddField(subject.FieldOnHold, field.TypeUint32, value)
+	if value, ok := su.mutation.Episodes(); ok {
+		_spec.SetField(subject.FieldEpisodes, field.TypeUint8, value)
+	}
+	if value, ok := su.mutation.AddedEpisodes(); ok {
+		_spec.AddField(subject.FieldEpisodes, field.TypeUint8, value)
 	}
 	if value, ok := su.mutation.Wish(); ok {
 		_spec.SetField(subject.FieldWish, field.TypeUint32, value)
@@ -341,29 +320,23 @@ func (su *SubjectUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := su.mutation.AddedDoing(); ok {
 		_spec.AddField(subject.FieldDoing, field.TypeUint32, value)
 	}
-	if value, ok := su.mutation.SubjectType(); ok {
-		_spec.SetField(subject.FieldSubjectType, field.TypeUint8, value)
-	}
-	if value, ok := su.mutation.AddedSubjectType(); ok {
-		_spec.AddField(subject.FieldSubjectType, field.TypeUint8, value)
-	}
-	if value, ok := su.mutation.Collect(); ok {
-		_spec.SetField(subject.FieldCollect, field.TypeUint32, value)
-	}
-	if value, ok := su.mutation.AddedCollect(); ok {
-		_spec.AddField(subject.FieldCollect, field.TypeUint32, value)
-	}
-	if value, ok := su.mutation.Drop(); ok {
-		_spec.SetField(subject.FieldDrop, field.TypeUint32, value)
-	}
-	if value, ok := su.mutation.AddedDrop(); ok {
-		_spec.AddField(subject.FieldDrop, field.TypeUint32, value)
-	}
 	if value, ok := su.mutation.Watched(); ok {
 		_spec.SetField(subject.FieldWatched, field.TypeUint32, value)
 	}
 	if value, ok := su.mutation.AddedWatched(); ok {
 		_spec.AddField(subject.FieldWatched, field.TypeUint32, value)
+	}
+	if value, ok := su.mutation.OnHold(); ok {
+		_spec.SetField(subject.FieldOnHold, field.TypeUint32, value)
+	}
+	if value, ok := su.mutation.AddedOnHold(); ok {
+		_spec.AddField(subject.FieldOnHold, field.TypeUint32, value)
+	}
+	if value, ok := su.mutation.Dropped(); ok {
+		_spec.SetField(subject.FieldDropped, field.TypeUint32, value)
+	}
+	if value, ok := su.mutation.AddedDropped(); ok {
+		_spec.AddField(subject.FieldDropped, field.TypeUint32, value)
 	}
 	if su.mutation.CollectionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -373,7 +346,7 @@ func (su *SubjectUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{subject.CollectionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeUint32),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -386,7 +359,7 @@ func (su *SubjectUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{subject.CollectionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeUint32),
 			},
 		}
 		for _, k := range nodes {
@@ -402,7 +375,7 @@ func (su *SubjectUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{subject.CollectionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeUint32),
 			},
 		}
 		for _, k := range nodes {
@@ -450,15 +423,17 @@ func (suo *SubjectUpdateOne) SetSummary(s string) *SubjectUpdateOne {
 	return suo
 }
 
-// SetName sets the "name" field.
-func (suo *SubjectUpdateOne) SetName(s string) *SubjectUpdateOne {
-	suo.mutation.SetName(s)
+// SetNillableSummary sets the "summary" field if the given value is not nil.
+func (suo *SubjectUpdateOne) SetNillableSummary(s *string) *SubjectUpdateOne {
+	if s != nil {
+		suo.SetSummary(*s)
+	}
 	return suo
 }
 
-// SetDate sets the "date" field.
-func (suo *SubjectUpdateOne) SetDate(s string) *SubjectUpdateOne {
-	suo.mutation.SetDate(s)
+// SetName sets the "name" field.
+func (suo *SubjectUpdateOne) SetName(s string) *SubjectUpdateOne {
+	suo.mutation.SetName(s)
 	return suo
 }
 
@@ -468,24 +443,22 @@ func (suo *SubjectUpdateOne) SetNameCn(s string) *SubjectUpdateOne {
 	return suo
 }
 
-// SetOnHold sets the "on_hold" field.
-func (suo *SubjectUpdateOne) SetOnHold(u uint32) *SubjectUpdateOne {
-	suo.mutation.ResetOnHold()
-	suo.mutation.SetOnHold(u)
+// SetDate sets the "date" field.
+func (suo *SubjectUpdateOne) SetDate(s string) *SubjectUpdateOne {
+	suo.mutation.SetDate(s)
 	return suo
 }
 
-// SetNillableOnHold sets the "on_hold" field if the given value is not nil.
-func (suo *SubjectUpdateOne) SetNillableOnHold(u *uint32) *SubjectUpdateOne {
-	if u != nil {
-		suo.SetOnHold(*u)
-	}
+// SetEpisodes sets the "episodes" field.
+func (suo *SubjectUpdateOne) SetEpisodes(u uint8) *SubjectUpdateOne {
+	suo.mutation.ResetEpisodes()
+	suo.mutation.SetEpisodes(u)
 	return suo
 }
 
-// AddOnHold adds u to the "on_hold" field.
-func (suo *SubjectUpdateOne) AddOnHold(u int32) *SubjectUpdateOne {
-	suo.mutation.AddOnHold(u)
+// AddEpisodes adds u to the "episodes" field.
+func (suo *SubjectUpdateOne) AddEpisodes(u int8) *SubjectUpdateOne {
+	suo.mutation.AddEpisodes(u)
 	return suo
 }
 
@@ -531,69 +504,6 @@ func (suo *SubjectUpdateOne) AddDoing(u int32) *SubjectUpdateOne {
 	return suo
 }
 
-// SetSubjectType sets the "subject_type" field.
-func (suo *SubjectUpdateOne) SetSubjectType(u uint8) *SubjectUpdateOne {
-	suo.mutation.ResetSubjectType()
-	suo.mutation.SetSubjectType(u)
-	return suo
-}
-
-// SetNillableSubjectType sets the "subject_type" field if the given value is not nil.
-func (suo *SubjectUpdateOne) SetNillableSubjectType(u *uint8) *SubjectUpdateOne {
-	if u != nil {
-		suo.SetSubjectType(*u)
-	}
-	return suo
-}
-
-// AddSubjectType adds u to the "subject_type" field.
-func (suo *SubjectUpdateOne) AddSubjectType(u int8) *SubjectUpdateOne {
-	suo.mutation.AddSubjectType(u)
-	return suo
-}
-
-// SetCollect sets the "collect" field.
-func (suo *SubjectUpdateOne) SetCollect(u uint32) *SubjectUpdateOne {
-	suo.mutation.ResetCollect()
-	suo.mutation.SetCollect(u)
-	return suo
-}
-
-// SetNillableCollect sets the "collect" field if the given value is not nil.
-func (suo *SubjectUpdateOne) SetNillableCollect(u *uint32) *SubjectUpdateOne {
-	if u != nil {
-		suo.SetCollect(*u)
-	}
-	return suo
-}
-
-// AddCollect adds u to the "collect" field.
-func (suo *SubjectUpdateOne) AddCollect(u int32) *SubjectUpdateOne {
-	suo.mutation.AddCollect(u)
-	return suo
-}
-
-// SetDrop sets the "drop" field.
-func (suo *SubjectUpdateOne) SetDrop(u uint32) *SubjectUpdateOne {
-	suo.mutation.ResetDrop()
-	suo.mutation.SetDrop(u)
-	return suo
-}
-
-// SetNillableDrop sets the "drop" field if the given value is not nil.
-func (suo *SubjectUpdateOne) SetNillableDrop(u *uint32) *SubjectUpdateOne {
-	if u != nil {
-		suo.SetDrop(*u)
-	}
-	return suo
-}
-
-// AddDrop adds u to the "drop" field.
-func (suo *SubjectUpdateOne) AddDrop(u int32) *SubjectUpdateOne {
-	suo.mutation.AddDrop(u)
-	return suo
-}
-
 // SetWatched sets the "watched" field.
 func (suo *SubjectUpdateOne) SetWatched(u uint32) *SubjectUpdateOne {
 	suo.mutation.ResetWatched()
@@ -615,15 +525,57 @@ func (suo *SubjectUpdateOne) AddWatched(u int32) *SubjectUpdateOne {
 	return suo
 }
 
+// SetOnHold sets the "on_hold" field.
+func (suo *SubjectUpdateOne) SetOnHold(u uint32) *SubjectUpdateOne {
+	suo.mutation.ResetOnHold()
+	suo.mutation.SetOnHold(u)
+	return suo
+}
+
+// SetNillableOnHold sets the "on_hold" field if the given value is not nil.
+func (suo *SubjectUpdateOne) SetNillableOnHold(u *uint32) *SubjectUpdateOne {
+	if u != nil {
+		suo.SetOnHold(*u)
+	}
+	return suo
+}
+
+// AddOnHold adds u to the "on_hold" field.
+func (suo *SubjectUpdateOne) AddOnHold(u int32) *SubjectUpdateOne {
+	suo.mutation.AddOnHold(u)
+	return suo
+}
+
+// SetDropped sets the "dropped" field.
+func (suo *SubjectUpdateOne) SetDropped(u uint32) *SubjectUpdateOne {
+	suo.mutation.ResetDropped()
+	suo.mutation.SetDropped(u)
+	return suo
+}
+
+// SetNillableDropped sets the "dropped" field if the given value is not nil.
+func (suo *SubjectUpdateOne) SetNillableDropped(u *uint32) *SubjectUpdateOne {
+	if u != nil {
+		suo.SetDropped(*u)
+	}
+	return suo
+}
+
+// AddDropped adds u to the "dropped" field.
+func (suo *SubjectUpdateOne) AddDropped(u int32) *SubjectUpdateOne {
+	suo.mutation.AddDropped(u)
+	return suo
+}
+
 // AddCollectionIDs adds the "collections" edge to the Collection entity by IDs.
-func (suo *SubjectUpdateOne) AddCollectionIDs(ids ...int) *SubjectUpdateOne {
+func (suo *SubjectUpdateOne) AddCollectionIDs(ids ...uint32) *SubjectUpdateOne {
 	suo.mutation.AddCollectionIDs(ids...)
 	return suo
 }
 
 // AddCollections adds the "collections" edges to the Collection entity.
 func (suo *SubjectUpdateOne) AddCollections(c ...*Collection) *SubjectUpdateOne {
-	ids := make([]int, len(c))
+	ids := make([]uint32, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
@@ -642,14 +594,14 @@ func (suo *SubjectUpdateOne) ClearCollections() *SubjectUpdateOne {
 }
 
 // RemoveCollectionIDs removes the "collections" edge to Collection entities by IDs.
-func (suo *SubjectUpdateOne) RemoveCollectionIDs(ids ...int) *SubjectUpdateOne {
+func (suo *SubjectUpdateOne) RemoveCollectionIDs(ids ...uint32) *SubjectUpdateOne {
 	suo.mutation.RemoveCollectionIDs(ids...)
 	return suo
 }
 
 // RemoveCollections removes "collections" edges to Collection entities.
 func (suo *SubjectUpdateOne) RemoveCollections(c ...*Collection) *SubjectUpdateOne {
-	ids := make([]int, len(c))
+	ids := make([]uint32, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
@@ -715,7 +667,7 @@ func (suo *SubjectUpdateOne) sqlSave(ctx context.Context) (_node *Subject, err e
 	if err := suo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(subject.Table, subject.Columns, sqlgraph.NewFieldSpec(subject.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(subject.Table, subject.Columns, sqlgraph.NewFieldSpec(subject.FieldID, field.TypeUint32))
 	id, ok := suo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Subject.id" for update`)}
@@ -749,17 +701,17 @@ func (suo *SubjectUpdateOne) sqlSave(ctx context.Context) (_node *Subject, err e
 	if value, ok := suo.mutation.Name(); ok {
 		_spec.SetField(subject.FieldName, field.TypeString, value)
 	}
-	if value, ok := suo.mutation.Date(); ok {
-		_spec.SetField(subject.FieldDate, field.TypeString, value)
-	}
 	if value, ok := suo.mutation.NameCn(); ok {
 		_spec.SetField(subject.FieldNameCn, field.TypeString, value)
 	}
-	if value, ok := suo.mutation.OnHold(); ok {
-		_spec.SetField(subject.FieldOnHold, field.TypeUint32, value)
+	if value, ok := suo.mutation.Date(); ok {
+		_spec.SetField(subject.FieldDate, field.TypeString, value)
 	}
-	if value, ok := suo.mutation.AddedOnHold(); ok {
-		_spec.AddField(subject.FieldOnHold, field.TypeUint32, value)
+	if value, ok := suo.mutation.Episodes(); ok {
+		_spec.SetField(subject.FieldEpisodes, field.TypeUint8, value)
+	}
+	if value, ok := suo.mutation.AddedEpisodes(); ok {
+		_spec.AddField(subject.FieldEpisodes, field.TypeUint8, value)
 	}
 	if value, ok := suo.mutation.Wish(); ok {
 		_spec.SetField(subject.FieldWish, field.TypeUint32, value)
@@ -773,29 +725,23 @@ func (suo *SubjectUpdateOne) sqlSave(ctx context.Context) (_node *Subject, err e
 	if value, ok := suo.mutation.AddedDoing(); ok {
 		_spec.AddField(subject.FieldDoing, field.TypeUint32, value)
 	}
-	if value, ok := suo.mutation.SubjectType(); ok {
-		_spec.SetField(subject.FieldSubjectType, field.TypeUint8, value)
-	}
-	if value, ok := suo.mutation.AddedSubjectType(); ok {
-		_spec.AddField(subject.FieldSubjectType, field.TypeUint8, value)
-	}
-	if value, ok := suo.mutation.Collect(); ok {
-		_spec.SetField(subject.FieldCollect, field.TypeUint32, value)
-	}
-	if value, ok := suo.mutation.AddedCollect(); ok {
-		_spec.AddField(subject.FieldCollect, field.TypeUint32, value)
-	}
-	if value, ok := suo.mutation.Drop(); ok {
-		_spec.SetField(subject.FieldDrop, field.TypeUint32, value)
-	}
-	if value, ok := suo.mutation.AddedDrop(); ok {
-		_spec.AddField(subject.FieldDrop, field.TypeUint32, value)
-	}
 	if value, ok := suo.mutation.Watched(); ok {
 		_spec.SetField(subject.FieldWatched, field.TypeUint32, value)
 	}
 	if value, ok := suo.mutation.AddedWatched(); ok {
 		_spec.AddField(subject.FieldWatched, field.TypeUint32, value)
+	}
+	if value, ok := suo.mutation.OnHold(); ok {
+		_spec.SetField(subject.FieldOnHold, field.TypeUint32, value)
+	}
+	if value, ok := suo.mutation.AddedOnHold(); ok {
+		_spec.AddField(subject.FieldOnHold, field.TypeUint32, value)
+	}
+	if value, ok := suo.mutation.Dropped(); ok {
+		_spec.SetField(subject.FieldDropped, field.TypeUint32, value)
+	}
+	if value, ok := suo.mutation.AddedDropped(); ok {
+		_spec.AddField(subject.FieldDropped, field.TypeUint32, value)
 	}
 	if suo.mutation.CollectionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -805,7 +751,7 @@ func (suo *SubjectUpdateOne) sqlSave(ctx context.Context) (_node *Subject, err e
 			Columns: []string{subject.CollectionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeUint32),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -818,7 +764,7 @@ func (suo *SubjectUpdateOne) sqlSave(ctx context.Context) (_node *Subject, err e
 			Columns: []string{subject.CollectionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeUint32),
 			},
 		}
 		for _, k := range nodes {
@@ -834,7 +780,7 @@ func (suo *SubjectUpdateOne) sqlSave(ctx context.Context) (_node *Subject, err e
 			Columns: []string{subject.CollectionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeUint32),
 			},
 		}
 		for _, k := range nodes {

@@ -14,14 +14,16 @@ const (
 	FieldID = "id"
 	// FieldType holds the string denoting the type field in the database.
 	FieldType = "type"
-	// FieldIfComment holds the string denoting the if_comment field in the database.
-	FieldIfComment = "if_comment"
+	// FieldHasComment holds the string denoting the has_comment field in the database.
+	FieldHasComment = "has_comment"
 	// FieldComment holds the string denoting the comment field in the database.
 	FieldComment = "comment"
 	// FieldScore holds the string denoting the score field in the database.
 	FieldScore = "score"
-	// FieldTime holds the string denoting the time field in the database.
-	FieldTime = "time"
+	// FieldAddTime holds the string denoting the add_time field in the database.
+	FieldAddTime = "add_time"
+	// FieldEpStatus holds the string denoting the ep_status field in the database.
+	FieldEpStatus = "ep_status"
 	// EdgeMember holds the string denoting the member edge name in mutations.
 	EdgeMember = "member"
 	// EdgeSubject holds the string denoting the subject edge name in mutations.
@@ -50,10 +52,11 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldType,
-	FieldIfComment,
+	FieldHasComment,
 	FieldComment,
 	FieldScore,
-	FieldTime,
+	FieldAddTime,
+	FieldEpStatus,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "collections"
@@ -79,16 +82,20 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultIfComment holds the default value on creation for the "if_comment" field.
-	DefaultIfComment bool
+	// TypeValidator is a validator for the "type" field. It is called by the builders before save.
+	TypeValidator func(uint8) error
+	// DefaultHasComment holds the default value on creation for the "has_comment" field.
+	DefaultHasComment bool
 	// DefaultComment holds the default value on creation for the "comment" field.
 	DefaultComment string
 	// CommentValidator is a validator for the "comment" field. It is called by the builders before save.
 	CommentValidator func(string) error
 	// DefaultScore holds the default value on creation for the "score" field.
-	DefaultScore int8
-	// DefaultTime holds the default value on creation for the "time" field.
-	DefaultTime string
+	DefaultScore uint8
+	// DefaultAddTime holds the default value on creation for the "add_time" field.
+	DefaultAddTime string
+	// DefaultEpStatus holds the default value on creation for the "ep_status" field.
+	DefaultEpStatus uint8
 )
 
 // OrderOption defines the ordering options for the Collection queries.
@@ -104,9 +111,9 @@ func ByType(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldType, opts...).ToFunc()
 }
 
-// ByIfComment orders the results by the if_comment field.
-func ByIfComment(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldIfComment, opts...).ToFunc()
+// ByHasComment orders the results by the has_comment field.
+func ByHasComment(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldHasComment, opts...).ToFunc()
 }
 
 // ByComment orders the results by the comment field.
@@ -119,9 +126,14 @@ func ByScore(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldScore, opts...).ToFunc()
 }
 
-// ByTime orders the results by the time field.
-func ByTime(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTime, opts...).ToFunc()
+// ByAddTime orders the results by the add_time field.
+func ByAddTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAddTime, opts...).ToFunc()
+}
+
+// ByEpStatus orders the results by the ep_status field.
+func ByEpStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEpStatus, opts...).ToFunc()
 }
 
 // ByMemberField orders the results by member field.
