@@ -3,7 +3,7 @@ package response
 import "backend/ent"
 
 type SubjectGetResp struct {
-	ID          int    `json:"id,omitempty"`
+	ID          uint32 `json:"id,omitempty"`
 	Image       string `json:"image,omitempty"`
 	Summary     string `json:"summary,omitempty"`
 	Name        string `json:"name,omitempty"`
@@ -13,25 +13,22 @@ type SubjectGetResp struct {
 	Wish        uint32 `json:"wish,omitempty"`
 	Doing       uint32 `json:"doing,omitempty"`
 	SubjectType uint8  `json:"subject_type,omitempty"`
-	Collect     uint32 `json:"collect,omitempty"`
-	Drop        uint32 `json:"drop,omitempty"`
+	Dropped     uint32 `json:"dropped,omitempty"`
 	Watched     uint32 `json:"watched,omitempty"`
 }
 
-func NewSubjectResp(sub *ent.Subject) SubjectGetResp {
+func NewSubjectResp(subject *ent.Subject) SubjectGetResp {
 	return SubjectGetResp{
-		ID:          sub.ID,
-		Image:       sub.Image,
-		Summary:     sub.Summary,
-		Name:        sub.NameCn,
-		Date:        sub.Date,
-		OnHold:      sub.OnHold,
-		Doing:       sub.Doing,
-		Drop:        sub.Drop,
-		Collect:     sub.Collect,
-		Wish:        sub.Wish,
-		Watched:     sub.Watched,
-		SubjectType: sub.SubjectType,
-		NameCn:      sub.Name,
+		ID:      subject.ID,
+		Image:   subject.Image,
+		Summary: subject.Summary,
+		Name:    subject.NameCn,
+		Date:    subject.Date,
+		OnHold:  subject.OnHold,
+		Doing:   subject.Doing,
+		Dropped: subject.Dropped,
+		Wish:    subject.Wish,
+		Watched: subject.Watched,
+		NameCn:  subject.Name,
 	}
 }

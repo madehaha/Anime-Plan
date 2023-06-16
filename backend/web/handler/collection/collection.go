@@ -19,7 +19,7 @@ func (h Handler) AddCollection(c echo.Context) error {
 	}
 	if err := c.Validate(&req); err != nil {
 		logger.Error("Failed to validate")
-		return util.Success(c, http.StatusOK, err.Error())
+		return util.Success(c, http.StatusBadRequest, err.Error())
 	}
 	uid := c.Get("uid").(uint32)
 	subjectId, err := strconv.ParseUint(c.Param("subject_id"), 10, 64)
@@ -47,7 +47,7 @@ func (h Handler) UpdateCollection(c echo.Context) error {
 	}
 	if err := c.Validate(&req); err != nil {
 		logger.Error("Failed to validate")
-		return util.Success(c, http.StatusOK, err.Error())
+		return util.Success(c, http.StatusBadRequest, err.Error())
 	}
 	uid := c.Get("uid").(uint32)
 	subjectId, err := strconv.ParseUint(c.Param("subject_id"), 10, 64)

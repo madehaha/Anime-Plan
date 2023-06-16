@@ -51,7 +51,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjMsImdpZCI6M
 Content-Type: application/json
 
 ### collection
-POST http://localhost:2333/collection/update/2
+POST http://localhost:2333/collection/updata/2
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjMsImdpZCI6MSwiZXhwIjoxNjg3MzY0MTg0fQ.LqbQqj6Hc0-HM3fND5_zemx9b7KXqi7B9raR3sT6Lqw
 Content-Type: application/json
 
@@ -61,3 +61,20 @@ Content-Type: application/json
   "collectionType": 3
 
 }
+
+###
+PATCH http://localhost:2333/collection/2
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjMsImdpZCI6MSwiZXhwIjoxNjg3MzY0MTg0fQ.LqbQqj6Hc0-HM3fND5_zemx9b7KXqi7B9raR3sT6Lqw
+Content-Type: application/json
+
+{
+  "comment": "非常非常非常非常非常好看",
+  "score": 10,
+  "collectionType": 3
+
+}
+### Get avatar
+GET http://localhost:2333/user/12/dsadas
+Content-Type: application/json
+
+

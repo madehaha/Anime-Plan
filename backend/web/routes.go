@@ -25,8 +25,9 @@ func AddRouters(
 	app.GET("/subject/get", subjectHandler.GetSubject)
 	app.GET("/subject/:subject_id", subjectHandler.GetSubjectByID)
 	app.POST("/subject/create", subjectHandler.CreateSubject, middleware.UserJWTAuth)
-	app.GET("/subject/search", subjectHandler.SearchSubject)
+	//app.GET("/subject/search", subjectHandler.SearchSubject)
 
 	app.POST("/collection/:subject_id", collectionHandler.AddCollection, middleware.UserJWTAuth)
 	app.PATCH("/collection/:subject_id", collectionHandler.UpdateCollection, middleware.UserJWTAuth)
+
 }
