@@ -67,6 +67,21 @@ func (h Handler) UpdateCollection(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
+func (h Handler) DeleteCollection(c echo.Context) error {
+	uid := c.Get("uid").(uint32)
+	subjectId, err := strconv.ParseUint(c.Param("subject_id"), 10, 64)
+	if err != nil {
+		logger.Error("convert error")
+		return util.Error(c, http.StatusNotFound, err.Error())
+	}
+	err = h.ctrl.DeleteCollection(uid, uint32(subjectId))
+	if err != nil {
+		logger.Error("Failed to delete collection")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	return c.NoContent(http.StatusOK)
+}
+
 func (h Handler) GetComment(c echo.Context) error {
 	return nil
 }

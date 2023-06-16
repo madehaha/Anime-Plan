@@ -63,3 +63,7 @@ func (cc CollectionCtrl) UpdateCollection(
 	}
 	return err
 }
+
+func (cc CollectionCtrl) DeleteCollection(uid uint32, subjectId uint32) error {
+	return cc.Repo.DeleteCollection(context.Background(), uid, subjectId)
+}

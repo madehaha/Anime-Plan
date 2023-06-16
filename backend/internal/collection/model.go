@@ -2,12 +2,14 @@ package collection
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"backend/ent"
 	"backend/ent/collection"
 	"backend/ent/members"
 	"backend/ent/subject"
+	"backend/internal/logger"
 	"backend/internal/model"
 	collectionReq "backend/web/request/collection"
 )
@@ -20,29 +22,6 @@ func NewRepo(client *ent.Client) MysqlRepo {
 	return MysqlRepo{Client: client}
 }
 
-// func (m MysqlRepo) UpdateCollection(
-//
-//	ctx context.Context, MemberId uint32, SubjectId int, req collectionReq.UpdateCollectionReq,
-//
-//	) error {
-//		// mem, err := m.client.Members.Query().Where(members.ID(MemberId)).First(ctx)
-//		// col, _ := m.client.Members.QueryCollections(mem).All(ctx)
-//		// m.client.Collection.Query
-//		// col, _ := mem.QueryCollections().QuerySubject()
-//		if err != nil {
-//			return err
-//		}
-//		ent.Collection{}
-//		m.client.Subject.Query().Where(subject.ID(req.))
-//		m.client.Members.Query().Where(members.Has)
-//		if req.Comment != "" {
-//			col.Update().SetType(req.CollectionType).SetIfComment(true).SetComment(req.Comment).
-//				SetTime(time.Now().String()).SetScore(req.Score).Save(ctx)
-//		}
-//
-//		col.Update().AddType(int8(req.CollectionType)).SetScore(req.Score).SetTime(time.Now().String()).Save(ctx)
-//		return nil
-//	}
 func (m MysqlRepo) GetCollectionByUidAndSubjectId(
 	ctx context.Context, uid uint32,
 	subjectId uint32,
@@ -89,5 +68,17 @@ func (m MysqlRepo) UpdateCollection(
 	).SetComment(collectionEntity.Comment).SetScore(collectionEntity.Score).
 		SetAddTime(collectionEntity.AddTime).SetEpStatus(collectionEntity.EpStatus).Exec(ctx)
 
+	return err
+}
+
+func (m MysqlRepo) DeleteCollection(ctx context.Context, uid uint32, subjectId uint32) error {
+	number, err := m.Client.Collection.Delete().Where(
+		collection.And(
+			collection.HasMemberWith(members.ID(uid)),
+			collection.HasSubjectWith(subject.ID(subjectId)),
+		),
+	).Exec(ctx)
+	s := fmt.Sprintf("Delete collection %d", number)
+	logger.Info(s)
 	return err
 }

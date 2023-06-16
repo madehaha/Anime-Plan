@@ -25,13 +25,17 @@ func AddRouters(
 	app.GET("/user/:id/avatar", userHandler.GetAvatar)
 
 	// Subject
-	// app.GET("/subject/get", subjectHandler.GetSubject)
+	app.GET("/subject/get", subjectHandler.GetSubject)
 	app.POST("/subject/create", subjectHandler.CreateSubject, middleware.UserJWTAuth)
 
-	// app.GET("/subject/:subject_id", subjectHandler.GetSubjectByID)
+	app.GET("/subject/:subject_id", subjectHandler.GetSubjectByID)
 
 	app.POST("/collection/:subject_id", collectionHandler.AddCollection, middleware.UserJWTAuth)
 	app.PATCH("/collection/:subject_id", collectionHandler.UpdateCollection, middleware.UserJWTAuth)
+	// TODO
+	app.DELETE("/collection/:subject_id", collectionHandler.DeleteCollection, middleware.UserJWTAuth)
+	// TODO
+	app.POST("/collection/comment", collectionHandler.GetComment)
 
 	app.Any(
 		"/*", func(c echo.Context) error {
