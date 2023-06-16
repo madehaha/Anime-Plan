@@ -3,11 +3,11 @@ package model
 type CollectionType = uint8
 
 const (
-	Wish CollectionType = iota
-	Watched
-	Doing
-	OnHold
-	Dropped
+	Wish    CollectionType = 1
+	Watched CollectionType = 2
+	Doing   CollectionType = 3
+	OnHold  CollectionType = 4
+	Dropped CollectionType = 5
 )
 
 const (

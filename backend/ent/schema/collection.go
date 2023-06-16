@@ -16,7 +16,7 @@ func (Collection) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint32("id").Unique().Immutable(),
 		// Enum, 0 for "wish", 1 for "watched", 2 for "doing", 3 for "on_hold", 4 for "dropped"
-		field.Uint8("type").Max(4).Min(0),
+		field.Uint8("type").Max(5).Min(1),
 		field.Bool("has_comment").Default(false),
 		field.String("comment").Default("").MaxLen(100),
 		field.Uint8("score").Default(0),
