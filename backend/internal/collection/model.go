@@ -50,12 +50,14 @@ func (m MysqlRepo) AddCollection(
 		score = 0
 		epStatus = 0
 	}
-	// not exist
 	_, err := m.Client.Collection.Create().SetType(req.Type).SetHasComment(hasComment).SetComment(req.Comment).
 		SetScore(score).SetAddTime(date).SetEpStatus(epStatus).SetMemberID(uid).SetSubjectID(subjectId).Save(ctx)
 	if err != nil {
 		return err
 	}
+	// 如果 score 不为0，则要更新 subject field 的 rate_* 和 average score
+	// 要更新 subject {wish, doing, watched, on_hold, dropped} 人数，找到对应的直接+1即可
+
 	return nil
 }
 

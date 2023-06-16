@@ -4,6 +4,7 @@ package ent
 
 import (
 	"backend/ent/subject"
+	"backend/ent/subjectfield"
 	"fmt"
 	"strings"
 
@@ -24,8 +25,6 @@ type Subject struct {
 	Name string `json:"name,omitempty"`
 	// NameCn holds the value of the "name_cn" field.
 	NameCn string `json:"name_cn,omitempty"`
-	// Date holds the value of the "date" field.
-	Date string `json:"date,omitempty"`
 	// Episodes holds the value of the "episodes" field.
 	Episodes uint8 `json:"episodes,omitempty"`
 	// Wish holds the value of the "wish" field.
@@ -48,9 +47,11 @@ type Subject struct {
 type SubjectEdges struct {
 	// Collections holds the value of the collections edge.
 	Collections []*Collection `json:"collections,omitempty"`
+	// SubjectField holds the value of the subject_field edge.
+	SubjectField *SubjectField `json:"subject_field,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // CollectionsOrErr returns the Collections value or an error if the edge
@@ -62,6 +63,19 @@ func (e SubjectEdges) CollectionsOrErr() ([]*Collection, error) {
 	return nil, &NotLoadedError{edge: "collections"}
 }
 
+// SubjectFieldOrErr returns the SubjectField value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e SubjectEdges) SubjectFieldOrErr() (*SubjectField, error) {
+	if e.loadedTypes[1] {
+		if e.SubjectField == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: subjectfield.Label}
+		}
+		return e.SubjectField, nil
+	}
+	return nil, &NotLoadedError{edge: "subject_field"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Subject) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -69,7 +83,7 @@ func (*Subject) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case subject.FieldID, subject.FieldEpisodes, subject.FieldWish, subject.FieldDoing, subject.FieldWatched, subject.FieldOnHold, subject.FieldDropped:
 			values[i] = new(sql.NullInt64)
-		case subject.FieldImage, subject.FieldSummary, subject.FieldName, subject.FieldNameCn, subject.FieldDate:
+		case subject.FieldImage, subject.FieldSummary, subject.FieldName, subject.FieldNameCn:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -115,12 +129,6 @@ func (s *Subject) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field name_cn", values[i])
 			} else if value.Valid {
 				s.NameCn = value.String
-			}
-		case subject.FieldDate:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field date", values[i])
-			} else if value.Valid {
-				s.Date = value.String
 			}
 		case subject.FieldEpisodes:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -176,6 +184,11 @@ func (s *Subject) QueryCollections() *CollectionQuery {
 	return NewSubjectClient(s.config).QueryCollections(s)
 }
 
+// QuerySubjectField queries the "subject_field" edge of the Subject entity.
+func (s *Subject) QuerySubjectField() *SubjectFieldQuery {
+	return NewSubjectClient(s.config).QuerySubjectField(s)
+}
+
 // Update returns a builder for updating this Subject.
 // Note that you need to call Subject.Unwrap() before calling this method if this Subject
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -210,9 +223,6 @@ func (s *Subject) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("name_cn=")
 	builder.WriteString(s.NameCn)
-	builder.WriteString(", ")
-	builder.WriteString("date=")
-	builder.WriteString(s.Date)
 	builder.WriteString(", ")
 	builder.WriteString("episodes=")
 	builder.WriteString(fmt.Sprintf("%v", s.Episodes))

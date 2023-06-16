@@ -6,6 +6,7 @@ import (
 	"backend/ent/collection"
 	"backend/ent/predicate"
 	"backend/ent/subject"
+	"backend/ent/subjectfield"
 	"context"
 	"errors"
 	"fmt"
@@ -65,12 +66,6 @@ func (su *SubjectUpdate) SetName(s string) *SubjectUpdate {
 // SetNameCn sets the "name_cn" field.
 func (su *SubjectUpdate) SetNameCn(s string) *SubjectUpdate {
 	su.mutation.SetNameCn(s)
-	return su
-}
-
-// SetDate sets the "date" field.
-func (su *SubjectUpdate) SetDate(s string) *SubjectUpdate {
-	su.mutation.SetDate(s)
 	return su
 }
 
@@ -207,6 +202,25 @@ func (su *SubjectUpdate) AddCollections(c ...*Collection) *SubjectUpdate {
 	return su.AddCollectionIDs(ids...)
 }
 
+// SetSubjectFieldID sets the "subject_field" edge to the SubjectField entity by ID.
+func (su *SubjectUpdate) SetSubjectFieldID(id int) *SubjectUpdate {
+	su.mutation.SetSubjectFieldID(id)
+	return su
+}
+
+// SetNillableSubjectFieldID sets the "subject_field" edge to the SubjectField entity by ID if the given value is not nil.
+func (su *SubjectUpdate) SetNillableSubjectFieldID(id *int) *SubjectUpdate {
+	if id != nil {
+		su = su.SetSubjectFieldID(*id)
+	}
+	return su
+}
+
+// SetSubjectField sets the "subject_field" edge to the SubjectField entity.
+func (su *SubjectUpdate) SetSubjectField(s *SubjectField) *SubjectUpdate {
+	return su.SetSubjectFieldID(s.ID)
+}
+
 // Mutation returns the SubjectMutation object of the builder.
 func (su *SubjectUpdate) Mutation() *SubjectMutation {
 	return su.mutation
@@ -231,6 +245,12 @@ func (su *SubjectUpdate) RemoveCollections(c ...*Collection) *SubjectUpdate {
 		ids[i] = c[i].ID
 	}
 	return su.RemoveCollectionIDs(ids...)
+}
+
+// ClearSubjectField clears the "subject_field" edge to the SubjectField entity.
+func (su *SubjectUpdate) ClearSubjectField() *SubjectUpdate {
+	su.mutation.ClearSubjectField()
+	return su
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -298,9 +318,6 @@ func (su *SubjectUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := su.mutation.NameCn(); ok {
 		_spec.SetField(subject.FieldNameCn, field.TypeString, value)
-	}
-	if value, ok := su.mutation.Date(); ok {
-		_spec.SetField(subject.FieldDate, field.TypeString, value)
 	}
 	if value, ok := su.mutation.Episodes(); ok {
 		_spec.SetField(subject.FieldEpisodes, field.TypeUint8, value)
@@ -383,6 +400,35 @@ func (su *SubjectUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if su.mutation.SubjectFieldCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   subject.SubjectFieldTable,
+			Columns: []string{subject.SubjectFieldColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subjectfield.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.SubjectFieldIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   subject.SubjectFieldTable,
+			Columns: []string{subject.SubjectFieldColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subjectfield.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, su.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{subject.Label}
@@ -440,12 +486,6 @@ func (suo *SubjectUpdateOne) SetName(s string) *SubjectUpdateOne {
 // SetNameCn sets the "name_cn" field.
 func (suo *SubjectUpdateOne) SetNameCn(s string) *SubjectUpdateOne {
 	suo.mutation.SetNameCn(s)
-	return suo
-}
-
-// SetDate sets the "date" field.
-func (suo *SubjectUpdateOne) SetDate(s string) *SubjectUpdateOne {
-	suo.mutation.SetDate(s)
 	return suo
 }
 
@@ -582,6 +622,25 @@ func (suo *SubjectUpdateOne) AddCollections(c ...*Collection) *SubjectUpdateOne 
 	return suo.AddCollectionIDs(ids...)
 }
 
+// SetSubjectFieldID sets the "subject_field" edge to the SubjectField entity by ID.
+func (suo *SubjectUpdateOne) SetSubjectFieldID(id int) *SubjectUpdateOne {
+	suo.mutation.SetSubjectFieldID(id)
+	return suo
+}
+
+// SetNillableSubjectFieldID sets the "subject_field" edge to the SubjectField entity by ID if the given value is not nil.
+func (suo *SubjectUpdateOne) SetNillableSubjectFieldID(id *int) *SubjectUpdateOne {
+	if id != nil {
+		suo = suo.SetSubjectFieldID(*id)
+	}
+	return suo
+}
+
+// SetSubjectField sets the "subject_field" edge to the SubjectField entity.
+func (suo *SubjectUpdateOne) SetSubjectField(s *SubjectField) *SubjectUpdateOne {
+	return suo.SetSubjectFieldID(s.ID)
+}
+
 // Mutation returns the SubjectMutation object of the builder.
 func (suo *SubjectUpdateOne) Mutation() *SubjectMutation {
 	return suo.mutation
@@ -606,6 +665,12 @@ func (suo *SubjectUpdateOne) RemoveCollections(c ...*Collection) *SubjectUpdateO
 		ids[i] = c[i].ID
 	}
 	return suo.RemoveCollectionIDs(ids...)
+}
+
+// ClearSubjectField clears the "subject_field" edge to the SubjectField entity.
+func (suo *SubjectUpdateOne) ClearSubjectField() *SubjectUpdateOne {
+	suo.mutation.ClearSubjectField()
+	return suo
 }
 
 // Where appends a list predicates to the SubjectUpdate builder.
@@ -704,9 +769,6 @@ func (suo *SubjectUpdateOne) sqlSave(ctx context.Context) (_node *Subject, err e
 	if value, ok := suo.mutation.NameCn(); ok {
 		_spec.SetField(subject.FieldNameCn, field.TypeString, value)
 	}
-	if value, ok := suo.mutation.Date(); ok {
-		_spec.SetField(subject.FieldDate, field.TypeString, value)
-	}
 	if value, ok := suo.mutation.Episodes(); ok {
 		_spec.SetField(subject.FieldEpisodes, field.TypeUint8, value)
 	}
@@ -781,6 +843,35 @@ func (suo *SubjectUpdateOne) sqlSave(ctx context.Context) (_node *Subject, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeUint32),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if suo.mutation.SubjectFieldCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   subject.SubjectFieldTable,
+			Columns: []string{subject.SubjectFieldColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subjectfield.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.SubjectFieldIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   subject.SubjectFieldTable,
+			Columns: []string{subject.SubjectFieldColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subjectfield.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

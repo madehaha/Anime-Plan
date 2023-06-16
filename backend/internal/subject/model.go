@@ -36,15 +36,21 @@ func (m MysqlRepo) GetSubjectByID(ctx context.Context, subjectId uint32) (*ent.S
 
 func (m MysqlRepo) CreateSubject(ctx context.Context, req subjectReq.CreateSubjectReq) error {
 	if u, _ := m.client.Subject.Query().Where(subject.Name(req.Name)).First(ctx); u != nil {
-
 		logger.Error("created same subject")
 		err := errors.New("already created same subject")
 		return err
 	}
-	_, err := m.client.Subject.Create().SetImage(req.Image).SetSummary(req.Summary).SetName(req.Name).
-		SetNameCn(req.NameCN).SetDate(req.Date).SetEpisodes(req.Episodes).Save(ctx)
+	// create subject than create subject field
+	subjectEntity, err := m.client.Subject.Create().SetImage(req.Image).SetSummary(req.Summary).SetName(req.Name).
+		SetNameCn(req.NameCN).SetEpisodes(req.Episodes).Save(ctx)
 	if err != nil {
-		logger.Error("error to create this subject")
+		logger.Error("error to create the subject")
+		return err
+	}
+	_, err = m.client.SubjectField.Create().SetYear(req.Year).SetMonth(req.Month).
+		SetDate(req.Date).SetWeekday(req.WeekDay).SetSubject(subjectEntity).Save(ctx)
+	if err != nil {
+		logger.Error("error to create the subject field")
 		return err
 	}
 	return nil

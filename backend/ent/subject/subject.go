@@ -20,8 +20,6 @@ const (
 	FieldName = "name"
 	// FieldNameCn holds the string denoting the name_cn field in the database.
 	FieldNameCn = "name_cn"
-	// FieldDate holds the string denoting the date field in the database.
-	FieldDate = "date"
 	// FieldEpisodes holds the string denoting the episodes field in the database.
 	FieldEpisodes = "episodes"
 	// FieldWish holds the string denoting the wish field in the database.
@@ -36,6 +34,8 @@ const (
 	FieldDropped = "dropped"
 	// EdgeCollections holds the string denoting the collections edge name in mutations.
 	EdgeCollections = "collections"
+	// EdgeSubjectField holds the string denoting the subject_field edge name in mutations.
+	EdgeSubjectField = "subject_field"
 	// Table holds the table name of the subject in the database.
 	Table = "subjects"
 	// CollectionsTable is the table that holds the collections relation/edge.
@@ -45,6 +45,13 @@ const (
 	CollectionsInverseTable = "collections"
 	// CollectionsColumn is the table column denoting the collections relation/edge.
 	CollectionsColumn = "subject_collections"
+	// SubjectFieldTable is the table that holds the subject_field relation/edge.
+	SubjectFieldTable = "subject_fields"
+	// SubjectFieldInverseTable is the table name for the SubjectField entity.
+	// It exists in this package in order to avoid circular dependency with the "subjectfield" package.
+	SubjectFieldInverseTable = "subject_fields"
+	// SubjectFieldColumn is the table column denoting the subject_field relation/edge.
+	SubjectFieldColumn = "subject_subject_field"
 )
 
 // Columns holds all SQL columns for subject fields.
@@ -54,7 +61,6 @@ var Columns = []string{
 	FieldSummary,
 	FieldName,
 	FieldNameCn,
-	FieldDate,
 	FieldEpisodes,
 	FieldWish,
 	FieldDoing,
@@ -122,11 +128,6 @@ func ByNameCn(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldNameCn, opts...).ToFunc()
 }
 
-// ByDate orders the results by the date field.
-func ByDate(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDate, opts...).ToFunc()
-}
-
 // ByEpisodes orders the results by the episodes field.
 func ByEpisodes(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEpisodes, opts...).ToFunc()
@@ -170,10 +171,24 @@ func ByCollections(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newCollectionsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// BySubjectFieldField orders the results by subject_field field.
+func BySubjectFieldField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSubjectFieldStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newCollectionsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CollectionsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, CollectionsTable, CollectionsColumn),
+	)
+}
+func newSubjectFieldStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SubjectFieldInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, SubjectFieldTable, SubjectFieldColumn),
 	)
 }

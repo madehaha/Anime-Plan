@@ -6,6 +6,7 @@ import (
 	"backend/ent/collection"
 	"backend/ent/predicate"
 	"backend/ent/subject"
+	"backend/ent/subjectfield"
 	"context"
 	"database/sql/driver"
 	"fmt"
@@ -19,11 +20,12 @@ import (
 // SubjectQuery is the builder for querying Subject entities.
 type SubjectQuery struct {
 	config
-	ctx             *QueryContext
-	order           []subject.OrderOption
-	inters          []Interceptor
-	predicates      []predicate.Subject
-	withCollections *CollectionQuery
+	ctx              *QueryContext
+	order            []subject.OrderOption
+	inters           []Interceptor
+	predicates       []predicate.Subject
+	withCollections  *CollectionQuery
+	withSubjectField *SubjectFieldQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -75,6 +77,28 @@ func (sq *SubjectQuery) QueryCollections() *CollectionQuery {
 			sqlgraph.From(subject.Table, subject.FieldID, selector),
 			sqlgraph.To(collection.Table, collection.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, subject.CollectionsTable, subject.CollectionsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QuerySubjectField chains the current query on the "subject_field" edge.
+func (sq *SubjectQuery) QuerySubjectField() *SubjectFieldQuery {
+	query := (&SubjectFieldClient{config: sq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := sq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := sq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(subject.Table, subject.FieldID, selector),
+			sqlgraph.To(subjectfield.Table, subjectfield.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, subject.SubjectFieldTable, subject.SubjectFieldColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -269,12 +293,13 @@ func (sq *SubjectQuery) Clone() *SubjectQuery {
 		return nil
 	}
 	return &SubjectQuery{
-		config:          sq.config,
-		ctx:             sq.ctx.Clone(),
-		order:           append([]subject.OrderOption{}, sq.order...),
-		inters:          append([]Interceptor{}, sq.inters...),
-		predicates:      append([]predicate.Subject{}, sq.predicates...),
-		withCollections: sq.withCollections.Clone(),
+		config:           sq.config,
+		ctx:              sq.ctx.Clone(),
+		order:            append([]subject.OrderOption{}, sq.order...),
+		inters:           append([]Interceptor{}, sq.inters...),
+		predicates:       append([]predicate.Subject{}, sq.predicates...),
+		withCollections:  sq.withCollections.Clone(),
+		withSubjectField: sq.withSubjectField.Clone(),
 		// clone intermediate query.
 		sql:  sq.sql.Clone(),
 		path: sq.path,
@@ -289,6 +314,17 @@ func (sq *SubjectQuery) WithCollections(opts ...func(*CollectionQuery)) *Subject
 		opt(query)
 	}
 	sq.withCollections = query
+	return sq
+}
+
+// WithSubjectField tells the query-builder to eager-load the nodes that are connected to
+// the "subject_field" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *SubjectQuery) WithSubjectField(opts ...func(*SubjectFieldQuery)) *SubjectQuery {
+	query := (&SubjectFieldClient{config: sq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	sq.withSubjectField = query
 	return sq
 }
 
@@ -370,8 +406,9 @@ func (sq *SubjectQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Subj
 	var (
 		nodes       = []*Subject{}
 		_spec       = sq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			sq.withCollections != nil,
+			sq.withSubjectField != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -396,6 +433,12 @@ func (sq *SubjectQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Subj
 		if err := sq.loadCollections(ctx, query, nodes,
 			func(n *Subject) { n.Edges.Collections = []*Collection{} },
 			func(n *Subject, e *Collection) { n.Edges.Collections = append(n.Edges.Collections, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := sq.withSubjectField; query != nil {
+		if err := sq.loadSubjectField(ctx, query, nodes, nil,
+			func(n *Subject, e *SubjectField) { n.Edges.SubjectField = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -428,6 +471,34 @@ func (sq *SubjectQuery) loadCollections(ctx context.Context, query *CollectionQu
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "subject_collections" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (sq *SubjectQuery) loadSubjectField(ctx context.Context, query *SubjectFieldQuery, nodes []*Subject, init func(*Subject), assign func(*Subject, *SubjectField)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uint32]*Subject)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+	}
+	query.withFKs = true
+	query.Where(predicate.SubjectField(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(subject.SubjectFieldColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.subject_subject_field
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "subject_subject_field" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "subject_subject_field" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

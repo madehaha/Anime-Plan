@@ -26,13 +26,17 @@ func AddRouters(
 
 	// Subject
 	app.GET("/subject/get", subjectHandler.GetSubject)
-	app.POST("/subject/create", subjectHandler.CreateSubject, middleware.UserJWTAuth)
+	// TODO update subject field
+	app.POST(
+		"/subject/create", subjectHandler.CreateSubject,
+		middleware.WikiJWTAuth,
+	) // verify if having permission to edit subject
 
 	app.GET("/subject/:subject_id", subjectHandler.GetSubjectByID)
 
+	// TODO update subject_field
 	app.POST("/collection/:subject_id", collectionHandler.AddCollection, middleware.UserJWTAuth)
 	app.PATCH("/collection/:subject_id", collectionHandler.UpdateCollection, middleware.UserJWTAuth)
-	// TODO
 	app.DELETE("/collection/:subject_id", collectionHandler.DeleteCollection, middleware.UserJWTAuth)
 	// TODO
 	app.POST("/collection/comment", collectionHandler.GetComment)

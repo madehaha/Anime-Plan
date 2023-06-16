@@ -5,6 +5,7 @@ package ent
 import (
 	"backend/ent/collection"
 	"backend/ent/subject"
+	"backend/ent/subjectfield"
 	"context"
 	"errors"
 	"fmt"
@@ -57,12 +58,6 @@ func (sc *SubjectCreate) SetName(s string) *SubjectCreate {
 // SetNameCn sets the "name_cn" field.
 func (sc *SubjectCreate) SetNameCn(s string) *SubjectCreate {
 	sc.mutation.SetNameCn(s)
-	return sc
-}
-
-// SetDate sets the "date" field.
-func (sc *SubjectCreate) SetDate(s string) *SubjectCreate {
-	sc.mutation.SetDate(s)
 	return sc
 }
 
@@ -163,6 +158,25 @@ func (sc *SubjectCreate) AddCollections(c ...*Collection) *SubjectCreate {
 	return sc.AddCollectionIDs(ids...)
 }
 
+// SetSubjectFieldID sets the "subject_field" edge to the SubjectField entity by ID.
+func (sc *SubjectCreate) SetSubjectFieldID(id int) *SubjectCreate {
+	sc.mutation.SetSubjectFieldID(id)
+	return sc
+}
+
+// SetNillableSubjectFieldID sets the "subject_field" edge to the SubjectField entity by ID if the given value is not nil.
+func (sc *SubjectCreate) SetNillableSubjectFieldID(id *int) *SubjectCreate {
+	if id != nil {
+		sc = sc.SetSubjectFieldID(*id)
+	}
+	return sc
+}
+
+// SetSubjectField sets the "subject_field" edge to the SubjectField entity.
+func (sc *SubjectCreate) SetSubjectField(s *SubjectField) *SubjectCreate {
+	return sc.SetSubjectFieldID(s.ID)
+}
+
 // Mutation returns the SubjectMutation object of the builder.
 func (sc *SubjectCreate) Mutation() *SubjectMutation {
 	return sc.mutation
@@ -252,9 +266,6 @@ func (sc *SubjectCreate) check() error {
 	if _, ok := sc.mutation.NameCn(); !ok {
 		return &ValidationError{Name: "name_cn", err: errors.New(`ent: missing required field "Subject.name_cn"`)}
 	}
-	if _, ok := sc.mutation.Date(); !ok {
-		return &ValidationError{Name: "date", err: errors.New(`ent: missing required field "Subject.date"`)}
-	}
 	if _, ok := sc.mutation.Episodes(); !ok {
 		return &ValidationError{Name: "episodes", err: errors.New(`ent: missing required field "Subject.episodes"`)}
 	}
@@ -321,10 +332,6 @@ func (sc *SubjectCreate) createSpec() (*Subject, *sqlgraph.CreateSpec) {
 		_spec.SetField(subject.FieldNameCn, field.TypeString, value)
 		_node.NameCn = value
 	}
-	if value, ok := sc.mutation.Date(); ok {
-		_spec.SetField(subject.FieldDate, field.TypeString, value)
-		_node.Date = value
-	}
 	if value, ok := sc.mutation.Episodes(); ok {
 		_spec.SetField(subject.FieldEpisodes, field.TypeUint8, value)
 		_node.Episodes = value
@@ -358,6 +365,22 @@ func (sc *SubjectCreate) createSpec() (*Subject, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeUint32),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.SubjectFieldIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   subject.SubjectFieldTable,
+			Columns: []string{subject.SubjectFieldColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subjectfield.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

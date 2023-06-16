@@ -64,7 +64,6 @@ var (
 		{Name: "summary", Type: field.TypeString, Size: 300, Default: "No summary."},
 		{Name: "name", Type: field.TypeString},
 		{Name: "name_cn", Type: field.TypeString},
-		{Name: "date", Type: field.TypeString},
 		{Name: "episodes", Type: field.TypeUint8},
 		{Name: "wish", Type: field.TypeUint32, Default: 0},
 		{Name: "doing", Type: field.TypeUint32, Default: 0},
@@ -78,15 +77,52 @@ var (
 		Columns:    SubjectsColumns,
 		PrimaryKey: []*schema.Column{SubjectsColumns[0]},
 	}
+	// SubjectFieldsColumns holds the columns for the "subject_fields" table.
+	SubjectFieldsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "rate_1", Type: field.TypeUint32, Default: 0},
+		{Name: "rate_2", Type: field.TypeUint32, Default: 0},
+		{Name: "rate_3", Type: field.TypeUint32, Default: 0},
+		{Name: "rate_4", Type: field.TypeUint32, Default: 0},
+		{Name: "rate_5", Type: field.TypeUint32, Default: 0},
+		{Name: "rate_6", Type: field.TypeUint32, Default: 0},
+		{Name: "rate_7", Type: field.TypeUint32, Default: 0},
+		{Name: "rate_8", Type: field.TypeUint32, Default: 0},
+		{Name: "rate_9", Type: field.TypeUint32, Default: 0},
+		{Name: "rate_10", Type: field.TypeUint32, Default: 0},
+		{Name: "average_score", Type: field.TypeFloat64, Default: 0},
+		{Name: "rank", Type: field.TypeUint32, Default: 4294967295},
+		{Name: "year", Type: field.TypeUint32},
+		{Name: "month", Type: field.TypeUint8},
+		{Name: "date", Type: field.TypeUint8},
+		{Name: "weekday", Type: field.TypeUint8},
+		{Name: "subject_subject_field", Type: field.TypeUint32, Unique: true, Nullable: true},
+	}
+	// SubjectFieldsTable holds the schema information for the "subject_fields" table.
+	SubjectFieldsTable = &schema.Table{
+		Name:       "subject_fields",
+		Columns:    SubjectFieldsColumns,
+		PrimaryKey: []*schema.Column{SubjectFieldsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "subject_fields_subjects_subject_field",
+				Columns:    []*schema.Column{SubjectFieldsColumns[17]},
+				RefColumns: []*schema.Column{SubjectsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		CollectionsTable,
 		MembersTable,
 		SubjectsTable,
+		SubjectFieldsTable,
 	}
 )
 
 func init() {
 	CollectionsTable.ForeignKeys[0].RefTable = MembersTable
 	CollectionsTable.ForeignKeys[1].RefTable = SubjectsTable
+	SubjectFieldsTable.ForeignKeys[0].RefTable = SubjectsTable
 }

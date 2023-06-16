@@ -74,11 +74,6 @@ func NameCn(v string) predicate.Subject {
 	return predicate.Subject(sql.FieldEQ(FieldNameCn, v))
 }
 
-// Date applies equality check predicate on the "date" field. It's identical to DateEQ.
-func Date(v string) predicate.Subject {
-	return predicate.Subject(sql.FieldEQ(FieldDate, v))
-}
-
 // Episodes applies equality check predicate on the "episodes" field. It's identical to EpisodesEQ.
 func Episodes(v uint8) predicate.Subject {
 	return predicate.Subject(sql.FieldEQ(FieldEpisodes, v))
@@ -369,71 +364,6 @@ func NameCnContainsFold(v string) predicate.Subject {
 	return predicate.Subject(sql.FieldContainsFold(FieldNameCn, v))
 }
 
-// DateEQ applies the EQ predicate on the "date" field.
-func DateEQ(v string) predicate.Subject {
-	return predicate.Subject(sql.FieldEQ(FieldDate, v))
-}
-
-// DateNEQ applies the NEQ predicate on the "date" field.
-func DateNEQ(v string) predicate.Subject {
-	return predicate.Subject(sql.FieldNEQ(FieldDate, v))
-}
-
-// DateIn applies the In predicate on the "date" field.
-func DateIn(vs ...string) predicate.Subject {
-	return predicate.Subject(sql.FieldIn(FieldDate, vs...))
-}
-
-// DateNotIn applies the NotIn predicate on the "date" field.
-func DateNotIn(vs ...string) predicate.Subject {
-	return predicate.Subject(sql.FieldNotIn(FieldDate, vs...))
-}
-
-// DateGT applies the GT predicate on the "date" field.
-func DateGT(v string) predicate.Subject {
-	return predicate.Subject(sql.FieldGT(FieldDate, v))
-}
-
-// DateGTE applies the GTE predicate on the "date" field.
-func DateGTE(v string) predicate.Subject {
-	return predicate.Subject(sql.FieldGTE(FieldDate, v))
-}
-
-// DateLT applies the LT predicate on the "date" field.
-func DateLT(v string) predicate.Subject {
-	return predicate.Subject(sql.FieldLT(FieldDate, v))
-}
-
-// DateLTE applies the LTE predicate on the "date" field.
-func DateLTE(v string) predicate.Subject {
-	return predicate.Subject(sql.FieldLTE(FieldDate, v))
-}
-
-// DateContains applies the Contains predicate on the "date" field.
-func DateContains(v string) predicate.Subject {
-	return predicate.Subject(sql.FieldContains(FieldDate, v))
-}
-
-// DateHasPrefix applies the HasPrefix predicate on the "date" field.
-func DateHasPrefix(v string) predicate.Subject {
-	return predicate.Subject(sql.FieldHasPrefix(FieldDate, v))
-}
-
-// DateHasSuffix applies the HasSuffix predicate on the "date" field.
-func DateHasSuffix(v string) predicate.Subject {
-	return predicate.Subject(sql.FieldHasSuffix(FieldDate, v))
-}
-
-// DateEqualFold applies the EqualFold predicate on the "date" field.
-func DateEqualFold(v string) predicate.Subject {
-	return predicate.Subject(sql.FieldEqualFold(FieldDate, v))
-}
-
-// DateContainsFold applies the ContainsFold predicate on the "date" field.
-func DateContainsFold(v string) predicate.Subject {
-	return predicate.Subject(sql.FieldContainsFold(FieldDate, v))
-}
-
 // EpisodesEQ applies the EQ predicate on the "episodes" field.
 func EpisodesEQ(v uint8) predicate.Subject {
 	return predicate.Subject(sql.FieldEQ(FieldEpisodes, v))
@@ -689,6 +619,29 @@ func HasCollections() predicate.Subject {
 func HasCollectionsWith(preds ...predicate.Collection) predicate.Subject {
 	return predicate.Subject(func(s *sql.Selector) {
 		step := newCollectionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasSubjectField applies the HasEdge predicate on the "subject_field" edge.
+func HasSubjectField() predicate.Subject {
+	return predicate.Subject(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, SubjectFieldTable, SubjectFieldColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSubjectFieldWith applies the HasEdge predicate on the "subject_field" edge with a given conditions (other predicates).
+func HasSubjectFieldWith(preds ...predicate.SubjectField) predicate.Subject {
+	return predicate.Subject(func(s *sql.Selector) {
+		step := newSubjectFieldStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
