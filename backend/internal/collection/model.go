@@ -83,6 +83,6 @@ func (m MysqlRepo) AddCollection(
 func (m MysqlRepo) UpdateCollection(
 	ctx context.Context, collectionEntity *ent.Collection,
 ) error {
-	_, err := m.Client.Collection.UpdateOne(collectionEntity).Save(ctx)
+	_, err := m.Client.Collection.UpdateOneID(collection.ID(collectionEntity
 	return err
 }

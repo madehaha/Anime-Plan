@@ -40,6 +40,7 @@ func (cc CollectionCtrl) UpdateCollection(
 	if err != nil {
 		return err
 	}
+	logger.Info(collectionEntity.String())
 	// update
 	hasComment := req.Comment != ""
 	collectionEntity.HasComment = hasComment
@@ -51,7 +52,10 @@ func (cc CollectionCtrl) UpdateCollection(
 		collectionEntity.EpStatus = 0
 		collectionEntity.Score = 0
 	}
+	collectionEntity.Comment = req.Comment
+	collectionEntity.Type = req.Type
 	collectionEntity.AddTime = time.Now().Format("2006-01-02")
+	logger.Info(collectionEntity.String())
 	err = cc.Repo.UpdateCollection(ctx, collectionEntity)
 	if err != nil {
 		logger.Error("Failed to update collection")

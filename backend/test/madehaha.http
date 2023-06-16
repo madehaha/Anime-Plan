@@ -3,10 +3,10 @@ POST http://localhost:2333/register
 Content-Type: application/json
 
 {
-  "email": "lajizr@er.com",
+  "email": "lajizr@ser.com",
   "nickname": "ass",
   "password": "b",
-  "username": "ssbsss"
+  "username": "ssbssss"
 }
 
 ### Create Subject
@@ -15,12 +15,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEzLCJnaWQiO
 Content-Type: application/json
 
 {
-  "name": "Comic girls",
+  "name": "Comic girlss",
   "name_cn": "动漫女孩",
   "image": "http://www.csdn.com",
   "date": "2023-06-07",
   "summary": "非常非常非常非常非常好看",
-  "type": 1
+  "episodes": 20
 }
 
 ### Login
@@ -28,7 +28,7 @@ POST http://localhost:2333/login
 Content-Type: application/json
 
 {
-  "email": "lajizr@er.com",
+  "email": "lajizr@ser.com",
   "password": "b"
 }
 
@@ -51,26 +51,24 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjMsImdpZCI6M
 Content-Type: application/json
 
 ### collection
-PATCH http://localhost:2333/collection/2
+PATCH http://localhost:2333/collection/1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjMsImdpZCI6MSwiZXhwIjoxNjg3MzY0MTg0fQ.LqbQqj6Hc0-HM3fND5_zemx9b7KXqi7B9raR3sT6Lqw
 Content-Type: application/json
 
 {
-  "comment": "非常非常非常非常非常好看",
-  "type": 1
-
+  "comment": "非常非常非常非常非常好看xzc",
+  "type": 3
 }
 
 ###
 PATCH http://localhost:2333/collection/update/2
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjMsImdpZCI6MSwiZXhwIjoxNjg3MzY0MTg0fQ.LqbQqj6Hc0-HM3fND5_zemx9b7KXqi7B9raR3sT6Lqw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjQsImdpZCI6MCwiZXhwIjoxNjg3NDkwNDM3fQ.LHHcTywhLkEW6NNKaDU2brHvvk7ETE1mDTGjAiXIi5k
 Content-Type: application/json
 
 {
   "comment": "非常非常非常非常非常好看",
   "score": 10,
   "collectionType": 3
-
 }
 
 
