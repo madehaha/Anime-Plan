@@ -83,6 +83,9 @@ func (m MysqlRepo) AddCollection(
 func (m MysqlRepo) UpdateCollection(
 	ctx context.Context, collectionEntity *ent.Collection,
 ) error {
-	_, err := m.Client.Collection.UpdateOne(collectionEntity).Save(ctx)
+	err := m.Client.Collection.UpdateOne(collectionEntity).SetType(collectionEntity.Type).SetHasComment(
+		collectionEntity.HasComment,
+	).SetComment(collectionEntity.Comment).SetScore(collectionEntity.Score).
+		SetAddTime(collectionEntity.AddTime).SetEpStatus(collectionEntity.EpStatus).Exec(ctx)
 	return err
 }

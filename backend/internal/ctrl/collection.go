@@ -51,6 +51,7 @@ func (cc CollectionCtrl) UpdateCollection(
 		collectionEntity.EpStatus = 0
 		collectionEntity.Score = 0
 	}
+	collectionEntity.Type = req.Type
 	collectionEntity.AddTime = time.Now().Format("2006-01-02")
 	err = cc.Repo.UpdateCollection(ctx, collectionEntity)
 	if err != nil {
