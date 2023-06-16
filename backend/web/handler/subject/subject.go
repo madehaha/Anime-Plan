@@ -4,6 +4,7 @@ import (
 	"backend/internal/logger"
 	"backend/web/request/collection"
 	"backend/web/request/subject"
+	"backend/web/response"
 	"backend/web/util"
 	"github.com/labstack/echo/v4"
 	"net/http"
@@ -76,6 +77,21 @@ func (h Handler) UpdateCollection(c echo.Context) error {
 	}
 	return c.NoContent(http.StatusOK)
 }
+
+func (h Handler) SearchSubject(c echo.Context) error {
+	searchTerm := c.QueryParam("term")
+	if searchTerm == "" {
+		logger.Error("fail to get term")
+		return util.Error(c, http.StatusBadRequest, "term is nil")
+	}
+	Subject, err := h.ctrl.SearchSubject(searchTerm)
+	if err != nil {
+		logger.Error("fail to search")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	return util.Success(c, http.StatusOK, response.NewSubjectResp(Subject))
+}
+
 func (h Handler) CreateSubject(c echo.Context) error {
 	var req subject.CreateSubjectReq
 	if err := c.Bind(&req); err != nil {

@@ -19,6 +19,7 @@ func (Collection) Fields() []ent.Field {
 		field.String("comment").Default("").MaxLen(100),
 		field.Int8("score").Default(10),
 		field.String("time").Default(time.Now().Format("2006-01-02")),
+		field.Uint8("episode").Default(0),
 	}
 }
 

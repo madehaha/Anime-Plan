@@ -27,6 +27,7 @@ func (Subject) Fields() []ent.Field {
 		field.Uint32("collect").Default(0),
 		field.Uint32("drop").Default(0),
 		field.Uint32("watched").Default(0),
+		field.Uint8("episode").Default(0),
 	}
 }
 

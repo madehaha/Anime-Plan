@@ -9,4 +9,5 @@ type CreateSubjectReq struct {
 	Type    model.SubjectType `json:"type" validate:"required"`
 	Date    string            `json:"date" validate:"required"`
 	Summary string            `json:"summary" validate:"required"`
+	Episode uint8             `json:"episode"`
 }

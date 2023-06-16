@@ -19,6 +19,7 @@ func AddRouters(app *echo.Echo, middleware middleware.JwtMiddleware, userHandler
 	app.GET("/subject/get", subjectHandler.GetSubject)
 	app.GET("/subject/:id", subjectHandler.GetSubjectByID)
 	app.POST("/subject/create", subjectHandler.CreateSubject, middleware.UserJWTAuth)
+	app.GET("/subject/search", subjectHandler.SearchSubject)
 
 	app.POST("/collection/:id", subjectHandler.AddOrUpdateCollection, middleware.UserJWTAuth)
 

@@ -3,7 +3,6 @@ package ctrl
 import (
 	"backend/ent"
 	"backend/internal/logger"
-	"backend/internal/model"
 	"backend/internal/subject"
 	collection2 "backend/web/request/collection"
 	subject2 "backend/web/request/subject"
@@ -36,13 +35,14 @@ func (sc SubjectCtrl) GetSubjectByID(id int64) (ent.Subject, error) {
 	}
 	return subject, nil
 }
-func (sc SubjectCtrl) AddCollection(MemberId uint32, SubjectId int, AddType model.SubjectType) error {
-	err := sc.Repo.AddCollection(context.Background(), MemberId, SubjectId, AddType)
-	if err != nil {
-		return err
-	}
-	return nil
-}
+
+//func (sc SubjectCtrl) AddCollection(MemberId uint32, SubjectId int, AddType model.SubjectType) error {
+//	err := sc.Repo.AddCollection(context.Background(), MemberId, SubjectId, AddType)
+//	if err != nil {
+//		return err
+//	}
+//	return nil
+//}
 
 func (sc SubjectCtrl) UpdateCollection(MemberId uint32, SubjectId int, req collection2.UpdateCollectionReq) error {
 	err := sc.Repo.UpdateCollection(context.Background(), MemberId, SubjectId, req)
@@ -50,6 +50,14 @@ func (sc SubjectCtrl) UpdateCollection(MemberId uint32, SubjectId int, req colle
 		return err
 	}
 	return nil
+}
+
+func (sc SubjectCtrl) SearchSubject(Name string) (*ent.Subject, error) {
+	Subject, err := sc.Repo.SearchSubjection(context.Background(), Name)
+	if err != nil {
+		return Subject, err
+	}
+	return Subject, nil
 }
 
 func (sc SubjectCtrl) CreateSubject(req subject2.CreateSubjectReq, gid uint8) error {

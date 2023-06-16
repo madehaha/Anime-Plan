@@ -34,20 +34,30 @@ func (m MysqlRepo) GetSubjectByID(ctx context.Context, id int64) (ent.Subject, e
 	}
 	return *subject, nil
 }
+
+func (m MysqlRepo) SearchSubjection(ctx context.Context, name string) (*ent.Subject, error) {
+	Subject, err := m.client.Subject.Query().Where(subject.Name(name)).First(ctx)
+	if err != nil {
+		return Subject, err
+	}
+	return Subject, nil
+}
 func (m MysqlRepo) UpdateCollection(ctx context.Context, MemberId uint32, SubjectId int, req collection.UpdateCollectionReq) error {
 	//mem, err := m.client.Members.Query().Where(members.ID(MemberId)).First(ctx)
+	//mem.QueryCollections().s
 	//col, _ := m.client.Members.QueryCollections(mem).All(ctx)
 	//m.client.Collection.Query
-	//col, _ := mem.QueryCollections().QuerySubject()
-	if err != nil {
-		return err
-	}
-	if req.Comment != "" {
-		col.Update().SetType(req.CollectionType).SetIfComment(true).SetComment(req.Comment).
-			SetTime(time.Now().String()).SetScore(req.Score).Save(ctx)
-	}
+	//m.client..Query().Where(c2.HasSubjectWith())
 
-	col.Update().AddType(int8(req.CollectionType)).SetScore(req.Score).SetTime(time.Now().String()).Save(ctx)
+	//if err != nil {
+	//	return err
+	//}
+	//if req.Comment != "" {
+	//	col.Update().SetType(req.CollectionType).SetIfComment(true).SetComment(req.Comment).
+	//		SetTime(time.Now().String()).SetScore(req.Score).Save(ctx)
+	//}
+
+	//col.Update().AddType(int8(req.CollectionType)).SetScore(req.Score).SetTime(time.Now().String()).Save(ctx)
 	return nil
 }
 func (m MysqlRepo) AddOrUpdateCollection(ctx context.Context, MemberId uint32, SubjectId int, AddType model.CollectionType) error {
