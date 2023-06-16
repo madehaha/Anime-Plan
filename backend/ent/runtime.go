@@ -15,24 +15,46 @@ import (
 func init() {
 	collectionFields := schema.Collection{}.Fields()
 	_ = collectionFields
-	// collectionDescIfComment is the schema descriptor for if_comment field.
-	collectionDescIfComment := collectionFields[1].Descriptor()
-	// collection.DefaultIfComment holds the default value on creation for the if_comment field.
-	collection.DefaultIfComment = collectionDescIfComment.Default.(bool)
+	// collectionDescType is the schema descriptor for type field.
+	collectionDescType := collectionFields[1].Descriptor()
+	// collection.TypeValidator is a validator for the "type" field. It is called by the builders before save.
+	collection.TypeValidator = func() func(uint8) error {
+		validators := collectionDescType.Validators
+		fns := [...]func(uint8) error{
+			validators[0].(func(uint8) error),
+			validators[1].(func(uint8) error),
+		}
+		return func(_type uint8) error {
+			for _, fn := range fns {
+				if err := fn(_type); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// collectionDescHasComment is the schema descriptor for has_comment field.
+	collectionDescHasComment := collectionFields[2].Descriptor()
+	// collection.DefaultHasComment holds the default value on creation for the has_comment field.
+	collection.DefaultHasComment = collectionDescHasComment.Default.(bool)
 	// collectionDescComment is the schema descriptor for comment field.
-	collectionDescComment := collectionFields[2].Descriptor()
+	collectionDescComment := collectionFields[3].Descriptor()
 	// collection.DefaultComment holds the default value on creation for the comment field.
 	collection.DefaultComment = collectionDescComment.Default.(string)
 	// collection.CommentValidator is a validator for the "comment" field. It is called by the builders before save.
 	collection.CommentValidator = collectionDescComment.Validators[0].(func(string) error)
 	// collectionDescScore is the schema descriptor for score field.
-	collectionDescScore := collectionFields[3].Descriptor()
+	collectionDescScore := collectionFields[4].Descriptor()
 	// collection.DefaultScore holds the default value on creation for the score field.
-	collection.DefaultScore = collectionDescScore.Default.(int8)
-	// collectionDescTime is the schema descriptor for time field.
-	collectionDescTime := collectionFields[4].Descriptor()
-	// collection.DefaultTime holds the default value on creation for the time field.
-	collection.DefaultTime = collectionDescTime.Default.(string)
+	collection.DefaultScore = collectionDescScore.Default.(uint8)
+	// collectionDescAddTime is the schema descriptor for add_time field.
+	collectionDescAddTime := collectionFields[5].Descriptor()
+	// collection.DefaultAddTime holds the default value on creation for the add_time field.
+	collection.DefaultAddTime = collectionDescAddTime.Default.(string)
+	// collectionDescEpStatus is the schema descriptor for ep_status field.
+	collectionDescEpStatus := collectionFields[6].Descriptor()
+	// collection.DefaultEpStatus holds the default value on creation for the ep_status field.
+	collection.DefaultEpStatus = collectionDescEpStatus.Default.(uint8)
 	membersFields := schema.Members{}.Fields()
 	_ = membersFields
 	// membersDescUsername is the schema descriptor for username field.
@@ -74,41 +96,35 @@ func init() {
 	subjectFields := schema.Subject{}.Fields()
 	_ = subjectFields
 	// subjectDescImage is the schema descriptor for image field.
-	subjectDescImage := subjectFields[0].Descriptor()
+	subjectDescImage := subjectFields[1].Descriptor()
 	// subject.DefaultImage holds the default value on creation for the image field.
 	subject.DefaultImage = subjectDescImage.Default.(string)
 	// subject.ImageValidator is a validator for the "image" field. It is called by the builders before save.
 	subject.ImageValidator = subjectDescImage.Validators[0].(func(string) error)
 	// subjectDescSummary is the schema descriptor for summary field.
-	subjectDescSummary := subjectFields[1].Descriptor()
+	subjectDescSummary := subjectFields[2].Descriptor()
+	// subject.DefaultSummary holds the default value on creation for the summary field.
+	subject.DefaultSummary = subjectDescSummary.Default.(string)
 	// subject.SummaryValidator is a validator for the "summary" field. It is called by the builders before save.
 	subject.SummaryValidator = subjectDescSummary.Validators[0].(func(string) error)
-	// subjectDescOnHold is the schema descriptor for on_hold field.
-	subjectDescOnHold := subjectFields[5].Descriptor()
-	// subject.DefaultOnHold holds the default value on creation for the on_hold field.
-	subject.DefaultOnHold = subjectDescOnHold.Default.(uint32)
 	// subjectDescWish is the schema descriptor for wish field.
-	subjectDescWish := subjectFields[6].Descriptor()
+	subjectDescWish := subjectFields[7].Descriptor()
 	// subject.DefaultWish holds the default value on creation for the wish field.
 	subject.DefaultWish = subjectDescWish.Default.(uint32)
 	// subjectDescDoing is the schema descriptor for doing field.
-	subjectDescDoing := subjectFields[7].Descriptor()
+	subjectDescDoing := subjectFields[8].Descriptor()
 	// subject.DefaultDoing holds the default value on creation for the doing field.
 	subject.DefaultDoing = subjectDescDoing.Default.(uint32)
-	// subjectDescSubjectType is the schema descriptor for subject_type field.
-	subjectDescSubjectType := subjectFields[8].Descriptor()
-	// subject.DefaultSubjectType holds the default value on creation for the subject_type field.
-	subject.DefaultSubjectType = subjectDescSubjectType.Default.(uint8)
-	// subjectDescCollect is the schema descriptor for collect field.
-	subjectDescCollect := subjectFields[9].Descriptor()
-	// subject.DefaultCollect holds the default value on creation for the collect field.
-	subject.DefaultCollect = subjectDescCollect.Default.(uint32)
-	// subjectDescDrop is the schema descriptor for drop field.
-	subjectDescDrop := subjectFields[10].Descriptor()
-	// subject.DefaultDrop holds the default value on creation for the drop field.
-	subject.DefaultDrop = subjectDescDrop.Default.(uint32)
 	// subjectDescWatched is the schema descriptor for watched field.
-	subjectDescWatched := subjectFields[11].Descriptor()
+	subjectDescWatched := subjectFields[9].Descriptor()
 	// subject.DefaultWatched holds the default value on creation for the watched field.
 	subject.DefaultWatched = subjectDescWatched.Default.(uint32)
+	// subjectDescOnHold is the schema descriptor for on_hold field.
+	subjectDescOnHold := subjectFields[10].Descriptor()
+	// subject.DefaultOnHold holds the default value on creation for the on_hold field.
+	subject.DefaultOnHold = subjectDescOnHold.Default.(uint32)
+	// subjectDescDropped is the schema descriptor for dropped field.
+	subjectDescDropped := subjectFields[11].Descriptor()
+	// subject.DefaultDropped holds the default value on creation for the dropped field.
+	subject.DefaultDropped = subjectDescDropped.Default.(uint32)
 }

@@ -10,14 +10,15 @@ import (
 var (
 	// CollectionsColumns holds the columns for the "collections" table.
 	CollectionsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeUint32, Increment: true},
 		{Name: "type", Type: field.TypeUint8},
-		{Name: "if_comment", Type: field.TypeBool, Default: false},
+		{Name: "has_comment", Type: field.TypeBool, Default: false},
 		{Name: "comment", Type: field.TypeString, Size: 100, Default: ""},
-		{Name: "score", Type: field.TypeInt8, Default: 10},
-		{Name: "time", Type: field.TypeString, Default: "2023-06-15"},
+		{Name: "score", Type: field.TypeUint8, Default: 0},
+		{Name: "add_time", Type: field.TypeString, Default: "2000-01-01"},
+		{Name: "ep_status", Type: field.TypeUint8, Default: 0},
 		{Name: "members_collections", Type: field.TypeUint32, Nullable: true},
-		{Name: "subject_collections", Type: field.TypeInt, Nullable: true},
+		{Name: "subject_collections", Type: field.TypeUint32, Nullable: true},
 	}
 	// CollectionsTable holds the schema information for the "collections" table.
 	CollectionsTable = &schema.Table{
@@ -27,13 +28,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "collections_members_collections",
-				Columns:    []*schema.Column{CollectionsColumns[6]},
+				Columns:    []*schema.Column{CollectionsColumns[7]},
 				RefColumns: []*schema.Column{MembersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "collections_subjects_collections",
-				Columns:    []*schema.Column{CollectionsColumns[7]},
+				Columns:    []*schema.Column{CollectionsColumns[8]},
 				RefColumns: []*schema.Column{SubjectsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -58,19 +59,18 @@ var (
 	}
 	// SubjectsColumns holds the columns for the "subjects" table.
 	SubjectsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "id", Type: field.TypeUint32, Increment: true},
 		{Name: "image", Type: field.TypeString, Size: 255, Default: "https://lain.bgm.tv/pic/user/l/icon.jpg"},
-		{Name: "summary", Type: field.TypeString, Size: 300},
+		{Name: "summary", Type: field.TypeString, Size: 300, Default: "No summary."},
 		{Name: "name", Type: field.TypeString},
-		{Name: "date", Type: field.TypeString},
 		{Name: "name_cn", Type: field.TypeString},
-		{Name: "on_hold", Type: field.TypeUint32, Default: 0},
+		{Name: "date", Type: field.TypeString},
+		{Name: "episodes", Type: field.TypeUint8},
 		{Name: "wish", Type: field.TypeUint32, Default: 0},
 		{Name: "doing", Type: field.TypeUint32, Default: 0},
-		{Name: "subject_type", Type: field.TypeUint8, Default: 0},
-		{Name: "collect", Type: field.TypeUint32, Default: 0},
-		{Name: "drop", Type: field.TypeUint32, Default: 0},
 		{Name: "watched", Type: field.TypeUint32, Default: 0},
+		{Name: "on_hold", Type: field.TypeUint32, Default: 0},
+		{Name: "dropped", Type: field.TypeUint32, Default: 0},
 	}
 	// SubjectsTable holds the schema information for the "subjects" table.
 	SubjectsTable = &schema.Table{

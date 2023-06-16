@@ -18,24 +18,22 @@ const (
 	FieldSummary = "summary"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// FieldDate holds the string denoting the date field in the database.
-	FieldDate = "date"
 	// FieldNameCn holds the string denoting the name_cn field in the database.
 	FieldNameCn = "name_cn"
-	// FieldOnHold holds the string denoting the on_hold field in the database.
-	FieldOnHold = "on_hold"
+	// FieldDate holds the string denoting the date field in the database.
+	FieldDate = "date"
+	// FieldEpisodes holds the string denoting the episodes field in the database.
+	FieldEpisodes = "episodes"
 	// FieldWish holds the string denoting the wish field in the database.
 	FieldWish = "wish"
 	// FieldDoing holds the string denoting the doing field in the database.
 	FieldDoing = "doing"
-	// FieldSubjectType holds the string denoting the subject_type field in the database.
-	FieldSubjectType = "subject_type"
-	// FieldCollect holds the string denoting the collect field in the database.
-	FieldCollect = "collect"
-	// FieldDrop holds the string denoting the drop field in the database.
-	FieldDrop = "drop"
 	// FieldWatched holds the string denoting the watched field in the database.
 	FieldWatched = "watched"
+	// FieldOnHold holds the string denoting the on_hold field in the database.
+	FieldOnHold = "on_hold"
+	// FieldDropped holds the string denoting the dropped field in the database.
+	FieldDropped = "dropped"
 	// EdgeCollections holds the string denoting the collections edge name in mutations.
 	EdgeCollections = "collections"
 	// Table holds the table name of the subject in the database.
@@ -55,15 +53,14 @@ var Columns = []string{
 	FieldImage,
 	FieldSummary,
 	FieldName,
-	FieldDate,
 	FieldNameCn,
-	FieldOnHold,
+	FieldDate,
+	FieldEpisodes,
 	FieldWish,
 	FieldDoing,
-	FieldSubjectType,
-	FieldCollect,
-	FieldDrop,
 	FieldWatched,
+	FieldOnHold,
+	FieldDropped,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -81,22 +78,20 @@ var (
 	DefaultImage string
 	// ImageValidator is a validator for the "image" field. It is called by the builders before save.
 	ImageValidator func(string) error
+	// DefaultSummary holds the default value on creation for the "summary" field.
+	DefaultSummary string
 	// SummaryValidator is a validator for the "summary" field. It is called by the builders before save.
 	SummaryValidator func(string) error
-	// DefaultOnHold holds the default value on creation for the "on_hold" field.
-	DefaultOnHold uint32
 	// DefaultWish holds the default value on creation for the "wish" field.
 	DefaultWish uint32
 	// DefaultDoing holds the default value on creation for the "doing" field.
 	DefaultDoing uint32
-	// DefaultSubjectType holds the default value on creation for the "subject_type" field.
-	DefaultSubjectType uint8
-	// DefaultCollect holds the default value on creation for the "collect" field.
-	DefaultCollect uint32
-	// DefaultDrop holds the default value on creation for the "drop" field.
-	DefaultDrop uint32
 	// DefaultWatched holds the default value on creation for the "watched" field.
 	DefaultWatched uint32
+	// DefaultOnHold holds the default value on creation for the "on_hold" field.
+	DefaultOnHold uint32
+	// DefaultDropped holds the default value on creation for the "dropped" field.
+	DefaultDropped uint32
 )
 
 // OrderOption defines the ordering options for the Subject queries.
@@ -122,19 +117,19 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
-// ByDate orders the results by the date field.
-func ByDate(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDate, opts...).ToFunc()
-}
-
 // ByNameCn orders the results by the name_cn field.
 func ByNameCn(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldNameCn, opts...).ToFunc()
 }
 
-// ByOnHold orders the results by the on_hold field.
-func ByOnHold(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldOnHold, opts...).ToFunc()
+// ByDate orders the results by the date field.
+func ByDate(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDate, opts...).ToFunc()
+}
+
+// ByEpisodes orders the results by the episodes field.
+func ByEpisodes(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEpisodes, opts...).ToFunc()
 }
 
 // ByWish orders the results by the wish field.
@@ -147,24 +142,19 @@ func ByDoing(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDoing, opts...).ToFunc()
 }
 
-// BySubjectType orders the results by the subject_type field.
-func BySubjectType(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldSubjectType, opts...).ToFunc()
-}
-
-// ByCollect orders the results by the collect field.
-func ByCollect(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCollect, opts...).ToFunc()
-}
-
-// ByDrop orders the results by the drop field.
-func ByDrop(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDrop, opts...).ToFunc()
-}
-
 // ByWatched orders the results by the watched field.
 func ByWatched(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldWatched, opts...).ToFunc()
+}
+
+// ByOnHold orders the results by the on_hold field.
+func ByOnHold(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldOnHold, opts...).ToFunc()
+}
+
+// ByDropped orders the results by the dropped field.
+func ByDropped(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDropped, opts...).ToFunc()
 }
 
 // ByCollectionsCount orders the results by collections count.

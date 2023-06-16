@@ -17,22 +17,24 @@ import (
 type Collection struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID uint32 `json:"id,omitempty"`
 	// Type holds the value of the "type" field.
 	Type uint8 `json:"type,omitempty"`
-	// IfComment holds the value of the "if_comment" field.
-	IfComment bool `json:"if_comment,omitempty"`
+	// HasComment holds the value of the "has_comment" field.
+	HasComment bool `json:"has_comment,omitempty"`
 	// Comment holds the value of the "comment" field.
 	Comment string `json:"comment,omitempty"`
 	// Score holds the value of the "score" field.
-	Score int8 `json:"score,omitempty"`
-	// Time holds the value of the "time" field.
-	Time string `json:"time,omitempty"`
+	Score uint8 `json:"score,omitempty"`
+	// AddTime holds the value of the "add_time" field.
+	AddTime string `json:"add_time,omitempty"`
+	// EpStatus holds the value of the "ep_status" field.
+	EpStatus uint8 `json:"ep_status,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CollectionQuery when eager-loading is set.
 	Edges               CollectionEdges `json:"edges"`
 	members_collections *uint32
-	subject_collections *int
+	subject_collections *uint32
 	selectValues        sql.SelectValues
 }
 
@@ -78,11 +80,11 @@ func (*Collection) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case collection.FieldIfComment:
+		case collection.FieldHasComment:
 			values[i] = new(sql.NullBool)
-		case collection.FieldID, collection.FieldType, collection.FieldScore:
+		case collection.FieldID, collection.FieldType, collection.FieldScore, collection.FieldEpStatus:
 			values[i] = new(sql.NullInt64)
-		case collection.FieldComment, collection.FieldTime:
+		case collection.FieldComment, collection.FieldAddTime:
 			values[i] = new(sql.NullString)
 		case collection.ForeignKeys[0]: // members_collections
 			values[i] = new(sql.NullInt64)
@@ -108,18 +110,18 @@ func (c *Collection) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			c.ID = int(value.Int64)
+			c.ID = uint32(value.Int64)
 		case collection.FieldType:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field type", values[i])
 			} else if value.Valid {
 				c.Type = uint8(value.Int64)
 			}
-		case collection.FieldIfComment:
+		case collection.FieldHasComment:
 			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field if_comment", values[i])
+				return fmt.Errorf("unexpected type %T for field has_comment", values[i])
 			} else if value.Valid {
-				c.IfComment = value.Bool
+				c.HasComment = value.Bool
 			}
 		case collection.FieldComment:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -131,13 +133,19 @@ func (c *Collection) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field score", values[i])
 			} else if value.Valid {
-				c.Score = int8(value.Int64)
+				c.Score = uint8(value.Int64)
 			}
-		case collection.FieldTime:
+		case collection.FieldAddTime:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field time", values[i])
+				return fmt.Errorf("unexpected type %T for field add_time", values[i])
 			} else if value.Valid {
-				c.Time = value.String
+				c.AddTime = value.String
+			}
+		case collection.FieldEpStatus:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field ep_status", values[i])
+			} else if value.Valid {
+				c.EpStatus = uint8(value.Int64)
 			}
 		case collection.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -150,8 +158,8 @@ func (c *Collection) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field subject_collections", value)
 			} else if value.Valid {
-				c.subject_collections = new(int)
-				*c.subject_collections = int(value.Int64)
+				c.subject_collections = new(uint32)
+				*c.subject_collections = uint32(value.Int64)
 			}
 		default:
 			c.selectValues.Set(columns[i], values[i])
@@ -202,8 +210,8 @@ func (c *Collection) String() string {
 	builder.WriteString("type=")
 	builder.WriteString(fmt.Sprintf("%v", c.Type))
 	builder.WriteString(", ")
-	builder.WriteString("if_comment=")
-	builder.WriteString(fmt.Sprintf("%v", c.IfComment))
+	builder.WriteString("has_comment=")
+	builder.WriteString(fmt.Sprintf("%v", c.HasComment))
 	builder.WriteString(", ")
 	builder.WriteString("comment=")
 	builder.WriteString(c.Comment)
@@ -211,8 +219,11 @@ func (c *Collection) String() string {
 	builder.WriteString("score=")
 	builder.WriteString(fmt.Sprintf("%v", c.Score))
 	builder.WriteString(", ")
-	builder.WriteString("time=")
-	builder.WriteString(c.Time)
+	builder.WriteString("add_time=")
+	builder.WriteString(c.AddTime)
+	builder.WriteString(", ")
+	builder.WriteString("ep_status=")
+	builder.WriteString(fmt.Sprintf("%v", c.EpStatus))
 	builder.WriteByte(')')
 	return builder.String()
 }

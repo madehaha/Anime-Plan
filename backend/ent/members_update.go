@@ -88,14 +88,14 @@ func (mu *MembersUpdate) AddGid(u int8) *MembersUpdate {
 }
 
 // AddCollectionIDs adds the "collections" edge to the Collection entity by IDs.
-func (mu *MembersUpdate) AddCollectionIDs(ids ...int) *MembersUpdate {
+func (mu *MembersUpdate) AddCollectionIDs(ids ...uint32) *MembersUpdate {
 	mu.mutation.AddCollectionIDs(ids...)
 	return mu
 }
 
 // AddCollections adds the "collections" edges to the Collection entity.
 func (mu *MembersUpdate) AddCollections(c ...*Collection) *MembersUpdate {
-	ids := make([]int, len(c))
+	ids := make([]uint32, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
@@ -114,14 +114,14 @@ func (mu *MembersUpdate) ClearCollections() *MembersUpdate {
 }
 
 // RemoveCollectionIDs removes the "collections" edge to Collection entities by IDs.
-func (mu *MembersUpdate) RemoveCollectionIDs(ids ...int) *MembersUpdate {
+func (mu *MembersUpdate) RemoveCollectionIDs(ids ...uint32) *MembersUpdate {
 	mu.mutation.RemoveCollectionIDs(ids...)
 	return mu
 }
 
 // RemoveCollections removes "collections" edges to Collection entities.
 func (mu *MembersUpdate) RemoveCollections(c ...*Collection) *MembersUpdate {
-	ids := make([]int, len(c))
+	ids := make([]uint32, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
@@ -221,7 +221,7 @@ func (mu *MembersUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{members.CollectionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeUint32),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -234,7 +234,7 @@ func (mu *MembersUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{members.CollectionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeUint32),
 			},
 		}
 		for _, k := range nodes {
@@ -250,7 +250,7 @@ func (mu *MembersUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{members.CollectionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeUint32),
 			},
 		}
 		for _, k := range nodes {
@@ -338,14 +338,14 @@ func (muo *MembersUpdateOne) AddGid(u int8) *MembersUpdateOne {
 }
 
 // AddCollectionIDs adds the "collections" edge to the Collection entity by IDs.
-func (muo *MembersUpdateOne) AddCollectionIDs(ids ...int) *MembersUpdateOne {
+func (muo *MembersUpdateOne) AddCollectionIDs(ids ...uint32) *MembersUpdateOne {
 	muo.mutation.AddCollectionIDs(ids...)
 	return muo
 }
 
 // AddCollections adds the "collections" edges to the Collection entity.
 func (muo *MembersUpdateOne) AddCollections(c ...*Collection) *MembersUpdateOne {
-	ids := make([]int, len(c))
+	ids := make([]uint32, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
@@ -364,14 +364,14 @@ func (muo *MembersUpdateOne) ClearCollections() *MembersUpdateOne {
 }
 
 // RemoveCollectionIDs removes the "collections" edge to Collection entities by IDs.
-func (muo *MembersUpdateOne) RemoveCollectionIDs(ids ...int) *MembersUpdateOne {
+func (muo *MembersUpdateOne) RemoveCollectionIDs(ids ...uint32) *MembersUpdateOne {
 	muo.mutation.RemoveCollectionIDs(ids...)
 	return muo
 }
 
 // RemoveCollections removes "collections" edges to Collection entities.
 func (muo *MembersUpdateOne) RemoveCollections(c ...*Collection) *MembersUpdateOne {
-	ids := make([]int, len(c))
+	ids := make([]uint32, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
@@ -501,7 +501,7 @@ func (muo *MembersUpdateOne) sqlSave(ctx context.Context) (_node *Members, err e
 			Columns: []string{members.CollectionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeUint32),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -514,7 +514,7 @@ func (muo *MembersUpdateOne) sqlSave(ctx context.Context) (_node *Members, err e
 			Columns: []string{members.CollectionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeUint32),
 			},
 		}
 		for _, k := range nodes {
@@ -530,7 +530,7 @@ func (muo *MembersUpdateOne) sqlSave(ctx context.Context) (_node *Members, err e
 			Columns: []string{members.CollectionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeUint32),
 			},
 		}
 		for _, k := range nodes {

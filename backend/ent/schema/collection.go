@@ -4,7 +4,6 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"time"
 )
 
 // Collection holds the schema definition for the Collection entity.
@@ -15,10 +14,15 @@ type Collection struct {
 // Fields of the Collection.
 func (Collection) Fields() []ent.Field {
 	return []ent.Field{
-		field.Uint8("type"),
+		field.Uint32("id").Unique().Immutable(),
+		// Enum, 0 for "wish", 1 for "watched", 2 for "doing", 3 for "on_hold", 4 for "dropped"
+		field.Uint8("type").Max(4).Min(0),
+		field.Bool("has_comment").Default(false),
 		field.String("comment").Default("").MaxLen(100),
-		field.Int8("score").Default(10),
-		field.String("time").Default(time.Now().Format("2006-01-02")),
+		field.Uint8("score").Default(0),
+		field.String("add_time").Default("2000-01-01"), // add date
+		field.Uint8("ep_status").Default(0),            // watching progress
+		// maybe private
 	}
 }
 

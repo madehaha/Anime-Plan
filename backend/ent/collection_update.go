@@ -42,16 +42,16 @@ func (cu *CollectionUpdate) AddType(u int8) *CollectionUpdate {
 	return cu
 }
 
-// SetIfComment sets the "if_comment" field.
-func (cu *CollectionUpdate) SetIfComment(b bool) *CollectionUpdate {
-	cu.mutation.SetIfComment(b)
+// SetHasComment sets the "has_comment" field.
+func (cu *CollectionUpdate) SetHasComment(b bool) *CollectionUpdate {
+	cu.mutation.SetHasComment(b)
 	return cu
 }
 
-// SetNillableIfComment sets the "if_comment" field if the given value is not nil.
-func (cu *CollectionUpdate) SetNillableIfComment(b *bool) *CollectionUpdate {
+// SetNillableHasComment sets the "has_comment" field if the given value is not nil.
+func (cu *CollectionUpdate) SetNillableHasComment(b *bool) *CollectionUpdate {
 	if b != nil {
-		cu.SetIfComment(*b)
+		cu.SetHasComment(*b)
 	}
 	return cu
 }
@@ -71,37 +71,58 @@ func (cu *CollectionUpdate) SetNillableComment(s *string) *CollectionUpdate {
 }
 
 // SetScore sets the "score" field.
-func (cu *CollectionUpdate) SetScore(i int8) *CollectionUpdate {
+func (cu *CollectionUpdate) SetScore(u uint8) *CollectionUpdate {
 	cu.mutation.ResetScore()
-	cu.mutation.SetScore(i)
+	cu.mutation.SetScore(u)
 	return cu
 }
 
 // SetNillableScore sets the "score" field if the given value is not nil.
-func (cu *CollectionUpdate) SetNillableScore(i *int8) *CollectionUpdate {
-	if i != nil {
-		cu.SetScore(*i)
+func (cu *CollectionUpdate) SetNillableScore(u *uint8) *CollectionUpdate {
+	if u != nil {
+		cu.SetScore(*u)
 	}
 	return cu
 }
 
-// AddScore adds i to the "score" field.
-func (cu *CollectionUpdate) AddScore(i int8) *CollectionUpdate {
-	cu.mutation.AddScore(i)
+// AddScore adds u to the "score" field.
+func (cu *CollectionUpdate) AddScore(u int8) *CollectionUpdate {
+	cu.mutation.AddScore(u)
 	return cu
 }
 
-// SetTime sets the "time" field.
-func (cu *CollectionUpdate) SetTime(s string) *CollectionUpdate {
-	cu.mutation.SetTime(s)
+// SetAddTime sets the "add_time" field.
+func (cu *CollectionUpdate) SetAddTime(s string) *CollectionUpdate {
+	cu.mutation.SetAddTime(s)
 	return cu
 }
 
-// SetNillableTime sets the "time" field if the given value is not nil.
-func (cu *CollectionUpdate) SetNillableTime(s *string) *CollectionUpdate {
+// SetNillableAddTime sets the "add_time" field if the given value is not nil.
+func (cu *CollectionUpdate) SetNillableAddTime(s *string) *CollectionUpdate {
 	if s != nil {
-		cu.SetTime(*s)
+		cu.SetAddTime(*s)
 	}
+	return cu
+}
+
+// SetEpStatus sets the "ep_status" field.
+func (cu *CollectionUpdate) SetEpStatus(u uint8) *CollectionUpdate {
+	cu.mutation.ResetEpStatus()
+	cu.mutation.SetEpStatus(u)
+	return cu
+}
+
+// SetNillableEpStatus sets the "ep_status" field if the given value is not nil.
+func (cu *CollectionUpdate) SetNillableEpStatus(u *uint8) *CollectionUpdate {
+	if u != nil {
+		cu.SetEpStatus(*u)
+	}
+	return cu
+}
+
+// AddEpStatus adds u to the "ep_status" field.
+func (cu *CollectionUpdate) AddEpStatus(u int8) *CollectionUpdate {
+	cu.mutation.AddEpStatus(u)
 	return cu
 }
 
@@ -125,13 +146,13 @@ func (cu *CollectionUpdate) SetMember(m *Members) *CollectionUpdate {
 }
 
 // SetSubjectID sets the "subject" edge to the Subject entity by ID.
-func (cu *CollectionUpdate) SetSubjectID(id int) *CollectionUpdate {
+func (cu *CollectionUpdate) SetSubjectID(id uint32) *CollectionUpdate {
 	cu.mutation.SetSubjectID(id)
 	return cu
 }
 
 // SetNillableSubjectID sets the "subject" edge to the Subject entity by ID if the given value is not nil.
-func (cu *CollectionUpdate) SetNillableSubjectID(id *int) *CollectionUpdate {
+func (cu *CollectionUpdate) SetNillableSubjectID(id *uint32) *CollectionUpdate {
 	if id != nil {
 		cu = cu.SetSubjectID(*id)
 	}
@@ -189,6 +210,11 @@ func (cu *CollectionUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cu *CollectionUpdate) check() error {
+	if v, ok := cu.mutation.GetType(); ok {
+		if err := collection.TypeValidator(v); err != nil {
+			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Collection.type": %w`, err)}
+		}
+	}
 	if v, ok := cu.mutation.Comment(); ok {
 		if err := collection.CommentValidator(v); err != nil {
 			return &ValidationError{Name: "comment", err: fmt.Errorf(`ent: validator failed for field "Collection.comment": %w`, err)}
@@ -201,7 +227,7 @@ func (cu *CollectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := cu.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(collection.Table, collection.Columns, sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(collection.Table, collection.Columns, sqlgraph.NewFieldSpec(collection.FieldID, field.TypeUint32))
 	if ps := cu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -215,20 +241,26 @@ func (cu *CollectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.AddedType(); ok {
 		_spec.AddField(collection.FieldType, field.TypeUint8, value)
 	}
-	if value, ok := cu.mutation.IfComment(); ok {
-		_spec.SetField(collection.FieldIfComment, field.TypeBool, value)
+	if value, ok := cu.mutation.HasComment(); ok {
+		_spec.SetField(collection.FieldHasComment, field.TypeBool, value)
 	}
 	if value, ok := cu.mutation.Comment(); ok {
 		_spec.SetField(collection.FieldComment, field.TypeString, value)
 	}
 	if value, ok := cu.mutation.Score(); ok {
-		_spec.SetField(collection.FieldScore, field.TypeInt8, value)
+		_spec.SetField(collection.FieldScore, field.TypeUint8, value)
 	}
 	if value, ok := cu.mutation.AddedScore(); ok {
-		_spec.AddField(collection.FieldScore, field.TypeInt8, value)
+		_spec.AddField(collection.FieldScore, field.TypeUint8, value)
 	}
-	if value, ok := cu.mutation.Time(); ok {
-		_spec.SetField(collection.FieldTime, field.TypeString, value)
+	if value, ok := cu.mutation.AddTime(); ok {
+		_spec.SetField(collection.FieldAddTime, field.TypeString, value)
+	}
+	if value, ok := cu.mutation.EpStatus(); ok {
+		_spec.SetField(collection.FieldEpStatus, field.TypeUint8, value)
+	}
+	if value, ok := cu.mutation.AddedEpStatus(); ok {
+		_spec.AddField(collection.FieldEpStatus, field.TypeUint8, value)
 	}
 	if cu.mutation.MemberCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -267,7 +299,7 @@ func (cu *CollectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{collection.SubjectColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subject.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(subject.FieldID, field.TypeUint32),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -280,7 +312,7 @@ func (cu *CollectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{collection.SubjectColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subject.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(subject.FieldID, field.TypeUint32),
 			},
 		}
 		for _, k := range nodes {
@@ -321,16 +353,16 @@ func (cuo *CollectionUpdateOne) AddType(u int8) *CollectionUpdateOne {
 	return cuo
 }
 
-// SetIfComment sets the "if_comment" field.
-func (cuo *CollectionUpdateOne) SetIfComment(b bool) *CollectionUpdateOne {
-	cuo.mutation.SetIfComment(b)
+// SetHasComment sets the "has_comment" field.
+func (cuo *CollectionUpdateOne) SetHasComment(b bool) *CollectionUpdateOne {
+	cuo.mutation.SetHasComment(b)
 	return cuo
 }
 
-// SetNillableIfComment sets the "if_comment" field if the given value is not nil.
-func (cuo *CollectionUpdateOne) SetNillableIfComment(b *bool) *CollectionUpdateOne {
+// SetNillableHasComment sets the "has_comment" field if the given value is not nil.
+func (cuo *CollectionUpdateOne) SetNillableHasComment(b *bool) *CollectionUpdateOne {
 	if b != nil {
-		cuo.SetIfComment(*b)
+		cuo.SetHasComment(*b)
 	}
 	return cuo
 }
@@ -350,37 +382,58 @@ func (cuo *CollectionUpdateOne) SetNillableComment(s *string) *CollectionUpdateO
 }
 
 // SetScore sets the "score" field.
-func (cuo *CollectionUpdateOne) SetScore(i int8) *CollectionUpdateOne {
+func (cuo *CollectionUpdateOne) SetScore(u uint8) *CollectionUpdateOne {
 	cuo.mutation.ResetScore()
-	cuo.mutation.SetScore(i)
+	cuo.mutation.SetScore(u)
 	return cuo
 }
 
 // SetNillableScore sets the "score" field if the given value is not nil.
-func (cuo *CollectionUpdateOne) SetNillableScore(i *int8) *CollectionUpdateOne {
-	if i != nil {
-		cuo.SetScore(*i)
+func (cuo *CollectionUpdateOne) SetNillableScore(u *uint8) *CollectionUpdateOne {
+	if u != nil {
+		cuo.SetScore(*u)
 	}
 	return cuo
 }
 
-// AddScore adds i to the "score" field.
-func (cuo *CollectionUpdateOne) AddScore(i int8) *CollectionUpdateOne {
-	cuo.mutation.AddScore(i)
+// AddScore adds u to the "score" field.
+func (cuo *CollectionUpdateOne) AddScore(u int8) *CollectionUpdateOne {
+	cuo.mutation.AddScore(u)
 	return cuo
 }
 
-// SetTime sets the "time" field.
-func (cuo *CollectionUpdateOne) SetTime(s string) *CollectionUpdateOne {
-	cuo.mutation.SetTime(s)
+// SetAddTime sets the "add_time" field.
+func (cuo *CollectionUpdateOne) SetAddTime(s string) *CollectionUpdateOne {
+	cuo.mutation.SetAddTime(s)
 	return cuo
 }
 
-// SetNillableTime sets the "time" field if the given value is not nil.
-func (cuo *CollectionUpdateOne) SetNillableTime(s *string) *CollectionUpdateOne {
+// SetNillableAddTime sets the "add_time" field if the given value is not nil.
+func (cuo *CollectionUpdateOne) SetNillableAddTime(s *string) *CollectionUpdateOne {
 	if s != nil {
-		cuo.SetTime(*s)
+		cuo.SetAddTime(*s)
 	}
+	return cuo
+}
+
+// SetEpStatus sets the "ep_status" field.
+func (cuo *CollectionUpdateOne) SetEpStatus(u uint8) *CollectionUpdateOne {
+	cuo.mutation.ResetEpStatus()
+	cuo.mutation.SetEpStatus(u)
+	return cuo
+}
+
+// SetNillableEpStatus sets the "ep_status" field if the given value is not nil.
+func (cuo *CollectionUpdateOne) SetNillableEpStatus(u *uint8) *CollectionUpdateOne {
+	if u != nil {
+		cuo.SetEpStatus(*u)
+	}
+	return cuo
+}
+
+// AddEpStatus adds u to the "ep_status" field.
+func (cuo *CollectionUpdateOne) AddEpStatus(u int8) *CollectionUpdateOne {
+	cuo.mutation.AddEpStatus(u)
 	return cuo
 }
 
@@ -404,13 +457,13 @@ func (cuo *CollectionUpdateOne) SetMember(m *Members) *CollectionUpdateOne {
 }
 
 // SetSubjectID sets the "subject" edge to the Subject entity by ID.
-func (cuo *CollectionUpdateOne) SetSubjectID(id int) *CollectionUpdateOne {
+func (cuo *CollectionUpdateOne) SetSubjectID(id uint32) *CollectionUpdateOne {
 	cuo.mutation.SetSubjectID(id)
 	return cuo
 }
 
 // SetNillableSubjectID sets the "subject" edge to the Subject entity by ID if the given value is not nil.
-func (cuo *CollectionUpdateOne) SetNillableSubjectID(id *int) *CollectionUpdateOne {
+func (cuo *CollectionUpdateOne) SetNillableSubjectID(id *uint32) *CollectionUpdateOne {
 	if id != nil {
 		cuo = cuo.SetSubjectID(*id)
 	}
@@ -481,6 +534,11 @@ func (cuo *CollectionUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cuo *CollectionUpdateOne) check() error {
+	if v, ok := cuo.mutation.GetType(); ok {
+		if err := collection.TypeValidator(v); err != nil {
+			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Collection.type": %w`, err)}
+		}
+	}
 	if v, ok := cuo.mutation.Comment(); ok {
 		if err := collection.CommentValidator(v); err != nil {
 			return &ValidationError{Name: "comment", err: fmt.Errorf(`ent: validator failed for field "Collection.comment": %w`, err)}
@@ -493,7 +551,7 @@ func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection,
 	if err := cuo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(collection.Table, collection.Columns, sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(collection.Table, collection.Columns, sqlgraph.NewFieldSpec(collection.FieldID, field.TypeUint32))
 	id, ok := cuo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Collection.id" for update`)}
@@ -524,20 +582,26 @@ func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection,
 	if value, ok := cuo.mutation.AddedType(); ok {
 		_spec.AddField(collection.FieldType, field.TypeUint8, value)
 	}
-	if value, ok := cuo.mutation.IfComment(); ok {
-		_spec.SetField(collection.FieldIfComment, field.TypeBool, value)
+	if value, ok := cuo.mutation.HasComment(); ok {
+		_spec.SetField(collection.FieldHasComment, field.TypeBool, value)
 	}
 	if value, ok := cuo.mutation.Comment(); ok {
 		_spec.SetField(collection.FieldComment, field.TypeString, value)
 	}
 	if value, ok := cuo.mutation.Score(); ok {
-		_spec.SetField(collection.FieldScore, field.TypeInt8, value)
+		_spec.SetField(collection.FieldScore, field.TypeUint8, value)
 	}
 	if value, ok := cuo.mutation.AddedScore(); ok {
-		_spec.AddField(collection.FieldScore, field.TypeInt8, value)
+		_spec.AddField(collection.FieldScore, field.TypeUint8, value)
 	}
-	if value, ok := cuo.mutation.Time(); ok {
-		_spec.SetField(collection.FieldTime, field.TypeString, value)
+	if value, ok := cuo.mutation.AddTime(); ok {
+		_spec.SetField(collection.FieldAddTime, field.TypeString, value)
+	}
+	if value, ok := cuo.mutation.EpStatus(); ok {
+		_spec.SetField(collection.FieldEpStatus, field.TypeUint8, value)
+	}
+	if value, ok := cuo.mutation.AddedEpStatus(); ok {
+		_spec.AddField(collection.FieldEpStatus, field.TypeUint8, value)
 	}
 	if cuo.mutation.MemberCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -576,7 +640,7 @@ func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection,
 			Columns: []string{collection.SubjectColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subject.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(subject.FieldID, field.TypeUint32),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -589,7 +653,7 @@ func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection,
 			Columns: []string{collection.SubjectColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subject.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(subject.FieldID, field.TypeUint32),
 			},
 		}
 		for _, k := range nodes {

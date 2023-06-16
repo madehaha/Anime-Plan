@@ -85,14 +85,14 @@ func (mc *MembersCreate) SetID(u uint32) *MembersCreate {
 }
 
 // AddCollectionIDs adds the "collections" edge to the Collection entity by IDs.
-func (mc *MembersCreate) AddCollectionIDs(ids ...int) *MembersCreate {
+func (mc *MembersCreate) AddCollectionIDs(ids ...uint32) *MembersCreate {
 	mc.mutation.AddCollectionIDs(ids...)
 	return mc
 }
 
 // AddCollections adds the "collections" edges to the Collection entity.
 func (mc *MembersCreate) AddCollections(c ...*Collection) *MembersCreate {
-	ids := make([]int, len(c))
+	ids := make([]uint32, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
@@ -255,7 +255,7 @@ func (mc *MembersCreate) createSpec() (*Members, *sqlgraph.CreateSpec) {
 			Columns: []string{members.CollectionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeUint32),
 			},
 		}
 		for _, k := range nodes {
