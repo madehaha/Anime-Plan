@@ -102,6 +102,16 @@ func (h Handler) GetAvatar(c echo.Context) error {
 	return util.Success(c, http.StatusOK, echo.Map{"url": url})
 }
 
+// GetMe godoc
+//
+//		 @Title GetMe
+//			@Description	Get Me
+//	     @Security BearerAuth
+//			@Tags			Member
+//			@Accept			json
+//			@Produce		json
+//			@Success		200		 {object}   response.UserGetResp   "MemberInfo"
+//			@Router			/me [get]
 func (h Handler) GetMe(c echo.Context) error {
 	uid := c.Get("uid").(uint32)
 	member, err := h.userRepo.GetByUid(context.Background(), uid)

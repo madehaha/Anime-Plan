@@ -67,6 +67,14 @@ func (h Handler) UpdateCollection(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
+// @Title DeleteCollection
+//	@Description	Delete Collection by subject_id
+//	@Tags			Collection
+//	@Accept			json
+//	@Produce		json
+//	@Success		200				{object}
+//	@Router			/collection/:subject_id [delete]
+
 func (h Handler) DeleteCollection(c echo.Context) error {
 	uid := c.Get("uid").(uint32)
 	subjectId, err := strconv.ParseUint(c.Param("subject_id"), 10, 64)
@@ -83,5 +91,6 @@ func (h Handler) DeleteCollection(c echo.Context) error {
 }
 
 func (h Handler) GetComment(c echo.Context) error {
+
 	return nil
 }

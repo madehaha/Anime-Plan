@@ -1,0 +1,215 @@
+definitions:
+  ent.Collection:
+    properties:
+      add_time:
+        description: AddTime holds the value of the "add_time" field.
+        type: string
+      comment:
+        description: Comment holds the value of the "comment" field.
+        type: string
+      edges:
+        allOf:
+        - $ref: '#/definitions/ent.CollectionEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the CollectionQuery when eager-loading is set.
+      ep_status:
+        description: EpStatus holds the value of the "ep_status" field.
+        type: integer
+      has_comment:
+        description: HasComment holds the value of the "has_comment" field.
+        type: boolean
+      id:
+        description: ID of the ent.
+        type: integer
+      score:
+        description: Score holds the value of the "score" field.
+        type: integer
+      type:
+        description: Type holds the value of the "type" field.
+        type: integer
+    type: object
+  ent.CollectionEdges:
+    properties:
+      member:
+        allOf:
+        - $ref: '#/definitions/ent.Members'
+        description: Member holds the value of the member edge.
+      subject:
+        allOf:
+        - $ref: '#/definitions/ent.Subject'
+        description: Subject holds the value of the subject edge.
+    type: object
+  ent.Members:
+    properties:
+      avatar:
+        description: Avatar holds the value of the "avatar" field.
+        type: string
+      edges:
+        allOf:
+        - $ref: '#/definitions/ent.MembersEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the MembersQuery when eager-loading is set.
+      email:
+        description: Email holds the value of the "email" field.
+        type: string
+      gid:
+        description: Gid holds the value of the "gid" field.
+        type: integer
+      id:
+        description: ID of the ent.
+        type: integer
+      nickname:
+        description: Nickname holds the value of the "nickname" field.
+        type: string
+      password:
+        description: Password holds the value of the "password" field.
+        type: string
+      register_time:
+        description: RegisterTime holds the value of the "register_time" field.
+        type: string
+      username:
+        description: Username holds the value of the "username" field.
+        type: string
+    type: object
+  ent.MembersEdges:
+    properties:
+      collections:
+        description: Collections holds the value of the collections edge.
+        items:
+          $ref: '#/definitions/ent.Collection'
+        type: array
+    type: object
+  ent.Subject:
+    properties:
+      date:
+        description: Date holds the value of the "date" field.
+        type: string
+      doing:
+        description: Doing holds the value of the "doing" field.
+        type: integer
+      dropped:
+        description: Dropped holds the value of the "dropped" field.
+        type: integer
+      edges:
+        allOf:
+        - $ref: '#/definitions/ent.SubjectEdges'
+        description: |-
+          Edges holds the relations/edges for other nodes in the graph.
+          The values are being populated by the SubjectQuery when eager-loading is set.
+      episodes:
+        description: Episodes holds the value of the "episodes" field.
+        type: integer
+      id:
+        description: ID of the ent.
+        type: integer
+      image:
+        description: Image holds the value of the "image" field.
+        type: string
+      name:
+        description: Name holds the value of the "name" field.
+        type: string
+      name_cn:
+        description: NameCn holds the value of the "name_cn" field.
+        type: string
+      on_hold:
+        description: OnHold holds the value of the "on_hold" field.
+        type: integer
+      summary:
+        description: Summary holds the value of the "summary" field.
+        type: string
+      watched:
+        description: Watched holds the value of the "watched" field.
+        type: integer
+      wish:
+        description: Wish holds the value of the "wish" field.
+        type: integer
+    type: object
+  ent.SubjectEdges:
+    properties:
+      collections:
+        description: Collections holds the value of the collections edge.
+        items:
+          $ref: '#/definitions/ent.Collection'
+        type: array
+    type: object
+  response.UserGetResp:
+    properties:
+      avatar:
+        description: Avatar holds the value of the "avatar" field.
+        type: string
+      email:
+        description: Email holds the value of the "email" field.
+        type: string
+      gid:
+        description: Gid holds the value of the "gid" field.
+        type: integer
+      nickname:
+        description: Nickname holds the value of the "nickname" field.
+        type: string
+      register_time:
+        description: RegisterTime holds the value of the "register_time" field.
+        type: string
+      uid:
+        description: ID of the ent.
+        type: integer
+      username:
+        description: Username holds the value of the "username" field.
+        type: string
+    type: object
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server Petstore server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Swagger Example API
+  version: "1.0"
+paths:
+  /me:
+    get:
+      consumes:
+      - application/json
+      description: Get Me
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: MemberInfo
+          schema:
+            $ref: '#/definitions/response.UserGetResp'
+      security:
+      - BearerAuth: []
+      tags:
+      - Member
+  /subject/:subject_id:
+    get:
+      consumes:
+      - application/json
+      description: Get Subject by id
+      parameters:
+      - description: subject_id
+        in: path
+        name: subject_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: SubjectInfo
+          schema:
+            $ref: '#/definitions/ent.Subject'
+      tags:
+      - Subject
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

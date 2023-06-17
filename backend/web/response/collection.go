@@ -11,6 +11,10 @@ type GetAllCollectionsResp struct {
 	Collections []ent.Collection `json:"Collections"`
 }
 
+type CommentsResp struct {
+	Comments []CommentResp `json:"comments"`
+}
+
 type CommentResp struct {
 	Username    string    `json:"Username"`
 	SubjectName string    `json:"SubjectName"`
