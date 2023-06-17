@@ -51,3 +51,20 @@ func (jm JwtMiddleware) UserJWTAuth(next echo.HandlerFunc) echo.HandlerFunc {
 		return next(c)
 	}
 }
+
+func (jm JwtMiddleware) WikiJWTAuth(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		_, claims, err := jm.extractAndCheckToken(c)
+		if err != nil {
+			logger.Error("extract token or check token error")
+			return util.Error(c, http.StatusUnauthorized, err.Error())
+		}
+		if claims.Gid == 0 {
+			logger.Error("Permission denied")
+			return util.Error(c, http.StatusUnauthorized, "Permission denied. You need to upgrade your user group")
+		}
+		c.Set("uid", claims.Uid)
+		c.Set("gid", claims.Gid)
+		return next(c)
+	}
+}

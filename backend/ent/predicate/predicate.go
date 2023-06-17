@@ -14,3 +14,6 @@ type Members func(*sql.Selector)
 
 // Subject is the predicate function for subject builders.
 type Subject func(*sql.Selector)
+
+// SubjectField is the predicate function for subjectfield builders.
+type SubjectField func(*sql.Selector)

@@ -7,7 +7,6 @@ import (
 	subjectReq "backend/web/request/subject"
 
 	"context"
-	"errors"
 )
 
 type SubjectCtrl struct {
@@ -39,12 +38,7 @@ func (sc SubjectCtrl) GetSubjectByID(subjectId uint32) (*ent.Subject, error) {
 	return subjectEntity, nil
 }
 
-func (sc SubjectCtrl) CreateSubject(req subjectReq.CreateSubjectReq, gid uint8) error {
-	if gid == 0 {
-		logger.Error("Failed to create subjects")
-		err := errors.New("limit of permission")
-		return err
-	}
+func (sc SubjectCtrl) CreateSubject(req subjectReq.CreateSubjectReq) error {
 	if err := sc.Repo.CreateSubject(context.Background(), req); err != nil {
 		logger.Error("fail to create subjects")
 		return err

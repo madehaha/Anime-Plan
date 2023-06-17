@@ -13,6 +13,7 @@ import (
 	"backend/ent/collection"
 	"backend/ent/members"
 	"backend/ent/subject"
+	"backend/ent/subjectfield"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -31,6 +32,8 @@ type Client struct {
 	Members *MembersClient
 	// Subject is the client for interacting with the Subject builders.
 	Subject *SubjectClient
+	// SubjectField is the client for interacting with the SubjectField builders.
+	SubjectField *SubjectFieldClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -47,6 +50,7 @@ func (c *Client) init() {
 	c.Collection = NewCollectionClient(c.config)
 	c.Members = NewMembersClient(c.config)
 	c.Subject = NewSubjectClient(c.config)
+	c.SubjectField = NewSubjectFieldClient(c.config)
 }
 
 type (
@@ -127,11 +131,12 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:        ctx,
-		config:     cfg,
-		Collection: NewCollectionClient(cfg),
-		Members:    NewMembersClient(cfg),
-		Subject:    NewSubjectClient(cfg),
+		ctx:          ctx,
+		config:       cfg,
+		Collection:   NewCollectionClient(cfg),
+		Members:      NewMembersClient(cfg),
+		Subject:      NewSubjectClient(cfg),
+		SubjectField: NewSubjectFieldClient(cfg),
 	}, nil
 }
 
@@ -149,11 +154,12 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:        ctx,
-		config:     cfg,
-		Collection: NewCollectionClient(cfg),
-		Members:    NewMembersClient(cfg),
-		Subject:    NewSubjectClient(cfg),
+		ctx:          ctx,
+		config:       cfg,
+		Collection:   NewCollectionClient(cfg),
+		Members:      NewMembersClient(cfg),
+		Subject:      NewSubjectClient(cfg),
+		SubjectField: NewSubjectFieldClient(cfg),
 	}, nil
 }
 
@@ -185,6 +191,7 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Collection.Use(hooks...)
 	c.Members.Use(hooks...)
 	c.Subject.Use(hooks...)
+	c.SubjectField.Use(hooks...)
 }
 
 // Intercept adds the query interceptors to all the entity clients.
@@ -193,6 +200,7 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Collection.Intercept(interceptors...)
 	c.Members.Intercept(interceptors...)
 	c.Subject.Intercept(interceptors...)
+	c.SubjectField.Intercept(interceptors...)
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -204,6 +212,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Members.mutate(ctx, m)
 	case *SubjectMutation:
 		return c.Subject.mutate(ctx, m)
+	case *SubjectFieldMutation:
+		return c.SubjectField.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
@@ -602,6 +612,22 @@ func (c *SubjectClient) QueryCollections(s *Subject) *CollectionQuery {
 	return query
 }
 
+// QuerySubjectField queries the subject_field edge of a Subject.
+func (c *SubjectClient) QuerySubjectField(s *Subject) *SubjectFieldQuery {
+	query := (&SubjectFieldClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(subject.Table, subject.FieldID, id),
+			sqlgraph.To(subjectfield.Table, subjectfield.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, subject.SubjectFieldTable, subject.SubjectFieldColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *SubjectClient) Hooks() []Hook {
 	return c.hooks.Subject
@@ -627,12 +653,146 @@ func (c *SubjectClient) mutate(ctx context.Context, m *SubjectMutation) (Value, 
 	}
 }
 
+// SubjectFieldClient is a client for the SubjectField schema.
+type SubjectFieldClient struct {
+	config
+}
+
+// NewSubjectFieldClient returns a client for the SubjectField from the given config.
+func NewSubjectFieldClient(c config) *SubjectFieldClient {
+	return &SubjectFieldClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `subjectfield.Hooks(f(g(h())))`.
+func (c *SubjectFieldClient) Use(hooks ...Hook) {
+	c.hooks.SubjectField = append(c.hooks.SubjectField, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `subjectfield.Intercept(f(g(h())))`.
+func (c *SubjectFieldClient) Intercept(interceptors ...Interceptor) {
+	c.inters.SubjectField = append(c.inters.SubjectField, interceptors...)
+}
+
+// Create returns a builder for creating a SubjectField entity.
+func (c *SubjectFieldClient) Create() *SubjectFieldCreate {
+	mutation := newSubjectFieldMutation(c.config, OpCreate)
+	return &SubjectFieldCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of SubjectField entities.
+func (c *SubjectFieldClient) CreateBulk(builders ...*SubjectFieldCreate) *SubjectFieldCreateBulk {
+	return &SubjectFieldCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for SubjectField.
+func (c *SubjectFieldClient) Update() *SubjectFieldUpdate {
+	mutation := newSubjectFieldMutation(c.config, OpUpdate)
+	return &SubjectFieldUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SubjectFieldClient) UpdateOne(sf *SubjectField) *SubjectFieldUpdateOne {
+	mutation := newSubjectFieldMutation(c.config, OpUpdateOne, withSubjectField(sf))
+	return &SubjectFieldUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SubjectFieldClient) UpdateOneID(id int) *SubjectFieldUpdateOne {
+	mutation := newSubjectFieldMutation(c.config, OpUpdateOne, withSubjectFieldID(id))
+	return &SubjectFieldUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for SubjectField.
+func (c *SubjectFieldClient) Delete() *SubjectFieldDelete {
+	mutation := newSubjectFieldMutation(c.config, OpDelete)
+	return &SubjectFieldDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SubjectFieldClient) DeleteOne(sf *SubjectField) *SubjectFieldDeleteOne {
+	return c.DeleteOneID(sf.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *SubjectFieldClient) DeleteOneID(id int) *SubjectFieldDeleteOne {
+	builder := c.Delete().Where(subjectfield.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SubjectFieldDeleteOne{builder}
+}
+
+// Query returns a query builder for SubjectField.
+func (c *SubjectFieldClient) Query() *SubjectFieldQuery {
+	return &SubjectFieldQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSubjectField},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a SubjectField entity by its id.
+func (c *SubjectFieldClient) Get(ctx context.Context, id int) (*SubjectField, error) {
+	return c.Query().Where(subjectfield.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SubjectFieldClient) GetX(ctx context.Context, id int) *SubjectField {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QuerySubject queries the subject edge of a SubjectField.
+func (c *SubjectFieldClient) QuerySubject(sf *SubjectField) *SubjectQuery {
+	query := (&SubjectClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := sf.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(subjectfield.Table, subjectfield.FieldID, id),
+			sqlgraph.To(subject.Table, subject.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, subjectfield.SubjectTable, subjectfield.SubjectColumn),
+		)
+		fromV = sqlgraph.Neighbors(sf.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *SubjectFieldClient) Hooks() []Hook {
+	return c.hooks.SubjectField
+}
+
+// Interceptors returns the client interceptors.
+func (c *SubjectFieldClient) Interceptors() []Interceptor {
+	return c.inters.SubjectField
+}
+
+func (c *SubjectFieldClient) mutate(ctx context.Context, m *SubjectFieldMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SubjectFieldCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SubjectFieldUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SubjectFieldUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SubjectFieldDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown SubjectField mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Collection, Members, Subject []ent.Hook
+		Collection, Members, Subject, SubjectField []ent.Hook
 	}
 	inters struct {
-		Collection, Members, Subject []ent.Interceptor
+		Collection, Members, Subject, SubjectField []ent.Interceptor
 	}
 )

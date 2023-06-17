@@ -1,7 +1,6 @@
 package collection
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -24,17 +23,12 @@ func (h Handler) AddCollection(c echo.Context) error {
 		logger.Error("Failed to bind")
 		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
-	fmt.Println(req)
 	if err := c.Validate(&req); err != nil {
 		logger.Error("Failed to validate")
 		return util.Success(c, http.StatusBadRequest, err.Error())
 	}
-	uid := c.Get("uid").(uint32)
 
-	if err != nil {
-		logger.Error("Failed to add collection")
-		return util.Error(c, http.StatusBadRequest, err.Error())
-	}
+	uid := c.Get("uid").(uint32)
 	err = h.ctrl.AddCollection(uid, uint32(subjectId), req)
 	if err != nil {
 		logger.Error("Failed to add collection")

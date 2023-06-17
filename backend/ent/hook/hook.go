@@ -44,6 +44,18 @@ func (f SubjectFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SubjectMutation", m)
 }
 
+// The SubjectFieldFunc type is an adapter to allow the use of ordinary
+// function as SubjectField mutator.
+type SubjectFieldFunc func(context.Context, *ent.SubjectFieldMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SubjectFieldFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.SubjectFieldMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SubjectFieldMutation", m)
+}
+
 // Condition is a hook condition function.
 type Condition func(context.Context, ent.Mutation) bool
 

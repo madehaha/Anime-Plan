@@ -19,7 +19,6 @@ func (Subject) Fields() []ent.Field {
 		field.String("summary").MaxLen(300).Default("No summary."),
 		field.String("name"),
 		field.String("name_cn"),
-		field.String("date"),    // release date
 		field.Uint8("episodes"), // number of episodes
 
 		field.Uint32("wish").Default(0),
@@ -37,5 +36,6 @@ func (Subject) Fields() []ent.Field {
 func (Subject) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("collections", Collection.Type),
+		edge.To("subject_field", SubjectField.Type).Unique(),
 	}
 }

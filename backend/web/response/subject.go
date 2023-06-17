@@ -2,7 +2,7 @@ package response
 
 import "backend/ent"
 
-type SubjectGetResp struct {
+type GetSubjectResp struct {
 	ID          uint32 `json:"id,omitempty"`
 	Image       string `json:"image,omitempty"`
 	Summary     string `json:"summary,omitempty"`
@@ -17,13 +17,12 @@ type SubjectGetResp struct {
 	Watched     uint32 `json:"watched,omitempty"`
 }
 
-func NewSubjectResp(subject *ent.Subject) SubjectGetResp {
-	return SubjectGetResp{
+func NewSubjectResp(subject *ent.Subject) GetSubjectResp {
+	return GetSubjectResp{
 		ID:      subject.ID,
 		Image:   subject.Image,
 		Summary: subject.Summary,
 		Name:    subject.NameCn,
-		Date:    subject.Date,
 		OnHold:  subject.OnHold,
 		Doing:   subject.Doing,
 		Dropped: subject.Dropped,

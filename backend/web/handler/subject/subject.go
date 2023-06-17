@@ -56,8 +56,7 @@ func (h Handler) CreateSubject(c echo.Context) error {
 		logger.Error("Create Subject request validate failed")
 		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
-	gid := c.Get("gid").(uint8)
-	err := h.ctrl.CreateSubject(req, gid)
+	err := h.ctrl.CreateSubject(req)
 	if err != nil {
 		logger.Error("create subject failed")
 		return util.Error(c, http.StatusBadRequest, err.Error())
