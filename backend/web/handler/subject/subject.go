@@ -19,7 +19,7 @@ func (h Handler) GetSubject(c echo.Context) error {
 		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
 
-	_ = c.JSON(http.StatusOK, subjects)
+	_ = c.JSON(http.StatusOK, util.Map(subjects, response.NewSubjectResp))
 	return nil
 }
 

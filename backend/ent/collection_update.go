@@ -126,37 +126,49 @@ func (cu *CollectionUpdate) AddEpStatus(u int8) *CollectionUpdate {
 	return cu
 }
 
-// SetMemberID sets the "member" edge to the Members entity by ID.
-func (cu *CollectionUpdate) SetMemberID(id uint32) *CollectionUpdate {
-	cu.mutation.SetMemberID(id)
+// SetMemberID sets the "member_id" field.
+func (cu *CollectionUpdate) SetMemberID(u uint32) *CollectionUpdate {
+	cu.mutation.SetMemberID(u)
 	return cu
 }
 
-// SetNillableMemberID sets the "member" edge to the Members entity by ID if the given value is not nil.
-func (cu *CollectionUpdate) SetNillableMemberID(id *uint32) *CollectionUpdate {
-	if id != nil {
-		cu = cu.SetMemberID(*id)
+// SetNillableMemberID sets the "member_id" field if the given value is not nil.
+func (cu *CollectionUpdate) SetNillableMemberID(u *uint32) *CollectionUpdate {
+	if u != nil {
+		cu.SetMemberID(*u)
 	}
+	return cu
+}
+
+// ClearMemberID clears the value of the "member_id" field.
+func (cu *CollectionUpdate) ClearMemberID() *CollectionUpdate {
+	cu.mutation.ClearMemberID()
+	return cu
+}
+
+// SetSubjectID sets the "subject_id" field.
+func (cu *CollectionUpdate) SetSubjectID(u uint32) *CollectionUpdate {
+	cu.mutation.SetSubjectID(u)
+	return cu
+}
+
+// SetNillableSubjectID sets the "subject_id" field if the given value is not nil.
+func (cu *CollectionUpdate) SetNillableSubjectID(u *uint32) *CollectionUpdate {
+	if u != nil {
+		cu.SetSubjectID(*u)
+	}
+	return cu
+}
+
+// ClearSubjectID clears the value of the "subject_id" field.
+func (cu *CollectionUpdate) ClearSubjectID() *CollectionUpdate {
+	cu.mutation.ClearSubjectID()
 	return cu
 }
 
 // SetMember sets the "member" edge to the Members entity.
 func (cu *CollectionUpdate) SetMember(m *Members) *CollectionUpdate {
 	return cu.SetMemberID(m.ID)
-}
-
-// SetSubjectID sets the "subject" edge to the Subject entity by ID.
-func (cu *CollectionUpdate) SetSubjectID(id uint32) *CollectionUpdate {
-	cu.mutation.SetSubjectID(id)
-	return cu
-}
-
-// SetNillableSubjectID sets the "subject" edge to the Subject entity by ID if the given value is not nil.
-func (cu *CollectionUpdate) SetNillableSubjectID(id *uint32) *CollectionUpdate {
-	if id != nil {
-		cu = cu.SetSubjectID(*id)
-	}
-	return cu
 }
 
 // SetSubject sets the "subject" edge to the Subject entity.
@@ -437,37 +449,49 @@ func (cuo *CollectionUpdateOne) AddEpStatus(u int8) *CollectionUpdateOne {
 	return cuo
 }
 
-// SetMemberID sets the "member" edge to the Members entity by ID.
-func (cuo *CollectionUpdateOne) SetMemberID(id uint32) *CollectionUpdateOne {
-	cuo.mutation.SetMemberID(id)
+// SetMemberID sets the "member_id" field.
+func (cuo *CollectionUpdateOne) SetMemberID(u uint32) *CollectionUpdateOne {
+	cuo.mutation.SetMemberID(u)
 	return cuo
 }
 
-// SetNillableMemberID sets the "member" edge to the Members entity by ID if the given value is not nil.
-func (cuo *CollectionUpdateOne) SetNillableMemberID(id *uint32) *CollectionUpdateOne {
-	if id != nil {
-		cuo = cuo.SetMemberID(*id)
+// SetNillableMemberID sets the "member_id" field if the given value is not nil.
+func (cuo *CollectionUpdateOne) SetNillableMemberID(u *uint32) *CollectionUpdateOne {
+	if u != nil {
+		cuo.SetMemberID(*u)
 	}
+	return cuo
+}
+
+// ClearMemberID clears the value of the "member_id" field.
+func (cuo *CollectionUpdateOne) ClearMemberID() *CollectionUpdateOne {
+	cuo.mutation.ClearMemberID()
+	return cuo
+}
+
+// SetSubjectID sets the "subject_id" field.
+func (cuo *CollectionUpdateOne) SetSubjectID(u uint32) *CollectionUpdateOne {
+	cuo.mutation.SetSubjectID(u)
+	return cuo
+}
+
+// SetNillableSubjectID sets the "subject_id" field if the given value is not nil.
+func (cuo *CollectionUpdateOne) SetNillableSubjectID(u *uint32) *CollectionUpdateOne {
+	if u != nil {
+		cuo.SetSubjectID(*u)
+	}
+	return cuo
+}
+
+// ClearSubjectID clears the value of the "subject_id" field.
+func (cuo *CollectionUpdateOne) ClearSubjectID() *CollectionUpdateOne {
+	cuo.mutation.ClearSubjectID()
 	return cuo
 }
 
 // SetMember sets the "member" edge to the Members entity.
 func (cuo *CollectionUpdateOne) SetMember(m *Members) *CollectionUpdateOne {
 	return cuo.SetMemberID(m.ID)
-}
-
-// SetSubjectID sets the "subject" edge to the Subject entity by ID.
-func (cuo *CollectionUpdateOne) SetSubjectID(id uint32) *CollectionUpdateOne {
-	cuo.mutation.SetSubjectID(id)
-	return cuo
-}
-
-// SetNillableSubjectID sets the "subject" edge to the Subject entity by ID if the given value is not nil.
-func (cuo *CollectionUpdateOne) SetNillableSubjectID(id *uint32) *CollectionUpdateOne {
-	if id != nil {
-		cuo = cuo.SetSubjectID(*id)
-	}
-	return cuo
 }
 
 // SetSubject sets the "subject" edge to the Subject entity.

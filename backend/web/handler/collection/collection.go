@@ -1,6 +1,7 @@
 package collection
 
 import (
+	"backend/web/response"
 	"net/http"
 	"strconv"
 
@@ -29,6 +30,8 @@ func (h Handler) AddCollection(c echo.Context) error {
 	}
 
 	uid := c.Get("uid").(uint32)
+	println(uid)
+	println(subjectId)
 	err = h.ctrl.AddCollection(uid, uint32(subjectId), req)
 	if err != nil {
 		logger.Error("Failed to add collection")
@@ -84,7 +87,34 @@ func (h Handler) DeleteCollection(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
-func (h Handler) GetComment(c echo.Context) error {
+func (h Handler) GetSelfComment(c echo.Context) error {
+	MemberId, err := strconv.ParseUint(c.Param("member_id"), 10, 64)
+	if err != nil {
+		logger.Error("convert error")
+		return util.Error(c, http.StatusNotFound, err.Error())
+	}
+	collections, err := h.ctrl.GetCollectionById("member", uint32(MemberId))
+	if err != nil {
+		logger.Error("get error")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	comments := util.Map(collections, response.NewCommentResp)
+	responses := response.CommentsResp{Comments: comments}
+	return util.Success(c, http.StatusOK, responses)
+}
 
-	return nil
+func (h Handler) GetCommentsBySubjectID(c echo.Context) error {
+	subjectId, err := strconv.ParseUint(c.Param("subject_id"), 10, 64)
+	if err != nil {
+		logger.Error("convert error")
+		return util.Error(c, http.StatusNotFound, err.Error())
+	}
+	collections, err := h.ctrl.GetCollectionById("subject", uint32(subjectId))
+	if err != nil {
+		logger.Error("get error")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	comments := util.Map(collections, response.NewCommentResp)
+	responses := response.CommentsResp{Comments: comments}
+	return util.Success(c, http.StatusOK, responses)
 }

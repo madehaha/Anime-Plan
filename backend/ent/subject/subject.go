@@ -44,7 +44,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "collection" package.
 	CollectionsInverseTable = "collections"
 	// CollectionsColumn is the table column denoting the collections relation/edge.
-	CollectionsColumn = "subject_collections"
+	CollectionsColumn = "subject_id"
 	// SubjectFieldTable is the table that holds the subject_field relation/edge.
 	SubjectFieldTable = "subject_fields"
 	// SubjectFieldInverseTable is the table name for the SubjectField entity.

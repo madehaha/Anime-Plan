@@ -3,10 +3,10 @@ POST http://localhost:2333/register
 Content-Type: application/json
 
 {
-  "email": "lajizr@ser.com",
+  "email": "lajizr@sssser.com",
   "nickname": "ass",
   "password": "b",
-  "username": "ssbssss"
+  "username": "ssbssssss"
 }
 
 ### Create Subject
@@ -15,12 +15,15 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEzLCJnaWQiO
 Content-Type: application/json
 
 {
-  "name": "Comic girlss",
+  "name": "Comic girlsssss",
   "name_cn": "动漫女孩",
   "image": "http://www.csdn.com",
-  "date": "2023-06-07",
+  "year" : 2023,
+  "month" : 12,
+  "date"  : 1,
   "summary": "非常非常非常非常非常好看",
-  "episodes": 20
+  "episodes": 20,
+  "weekDay": 5
 }
 
 ### Login
@@ -28,7 +31,7 @@ POST http://localhost:2333/login
 Content-Type: application/json
 
 {
-  "email": "lajizr@ser.com",
+  "email": "lajizr@sssser.com",
   "password": "b"
 }
 
@@ -50,9 +53,16 @@ POST http://localhost:2333/subject_collection/add/2/1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjMsImdpZCI6MSwiZXhwIjoxNjg3MzY0MTg0fQ.LqbQqj6Hc0-HM3fND5_zemx9b7KXqi7B9raR3sT6Lqw
 Content-Type: application/json
 
+
+### Get Comments
+GET http://localhost:2333/collection/self/comment
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjcsImdpZCI6MCwiZXhwIjoxNjg3NjgzMDMzfQ.RwB9mTgeU2wpg4BynYbjWkfLwA7EqPeHgaL6rFyHfKg
+Content-Type: application/json
+
+
 ### collection
-PATCH http://localhost:2333/collection/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjMsImdpZCI6MSwiZXhwIjoxNjg3MzY0MTg0fQ.LqbQqj6Hc0-HM3fND5_zemx9b7KXqi7B9raR3sT6Lqw
+DELETE http://localhost:2333/collection/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjcsImdpZCI6MCwiZXhwIjoxNjg3NjgzMDMzfQ.RwB9mTgeU2wpg4BynYbjWkfLwA7EqPeHgaL6rFyHfKg
 Content-Type: application/json
 
 {
@@ -71,9 +81,22 @@ Content-Type: application/json
   "collectionType": 3
 }
 
+###
+GET http://localhost:2333/comments
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjcsImdpZCI6MCwiZXhwIjoxNjg3NjgzMDMzfQ.RwB9mTgeU2wpg4BynYbjWkfLwA7EqPeHgaL6rFyHfKg
+Content-Type: application/json
 
 ### Get avatar
 GET http://localhost:2333/user/12/dsadas
 Content-Type: application/json
+
+### Get Comments
+GET http://localhost:2333/collection/7/member/comment
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjcsImdpZCI6MCwiZXhwIjoxNjg3NjgzMDMzfQ.RwB9mTgeU2wpg4BynYbjWkfLwA7EqPeHgaL6rFyHfKg
+Content-Type: application/json
+
+
+
+
 
 

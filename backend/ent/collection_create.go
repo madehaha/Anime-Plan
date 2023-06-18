@@ -97,43 +97,43 @@ func (cc *CollectionCreate) SetNillableEpStatus(u *uint8) *CollectionCreate {
 	return cc
 }
 
+// SetMemberID sets the "member_id" field.
+func (cc *CollectionCreate) SetMemberID(u uint32) *CollectionCreate {
+	cc.mutation.SetMemberID(u)
+	return cc
+}
+
+// SetNillableMemberID sets the "member_id" field if the given value is not nil.
+func (cc *CollectionCreate) SetNillableMemberID(u *uint32) *CollectionCreate {
+	if u != nil {
+		cc.SetMemberID(*u)
+	}
+	return cc
+}
+
+// SetSubjectID sets the "subject_id" field.
+func (cc *CollectionCreate) SetSubjectID(u uint32) *CollectionCreate {
+	cc.mutation.SetSubjectID(u)
+	return cc
+}
+
+// SetNillableSubjectID sets the "subject_id" field if the given value is not nil.
+func (cc *CollectionCreate) SetNillableSubjectID(u *uint32) *CollectionCreate {
+	if u != nil {
+		cc.SetSubjectID(*u)
+	}
+	return cc
+}
+
 // SetID sets the "id" field.
 func (cc *CollectionCreate) SetID(u uint32) *CollectionCreate {
 	cc.mutation.SetID(u)
 	return cc
 }
 
-// SetMemberID sets the "member" edge to the Members entity by ID.
-func (cc *CollectionCreate) SetMemberID(id uint32) *CollectionCreate {
-	cc.mutation.SetMemberID(id)
-	return cc
-}
-
-// SetNillableMemberID sets the "member" edge to the Members entity by ID if the given value is not nil.
-func (cc *CollectionCreate) SetNillableMemberID(id *uint32) *CollectionCreate {
-	if id != nil {
-		cc = cc.SetMemberID(*id)
-	}
-	return cc
-}
-
 // SetMember sets the "member" edge to the Members entity.
 func (cc *CollectionCreate) SetMember(m *Members) *CollectionCreate {
 	return cc.SetMemberID(m.ID)
-}
-
-// SetSubjectID sets the "subject" edge to the Subject entity by ID.
-func (cc *CollectionCreate) SetSubjectID(id uint32) *CollectionCreate {
-	cc.mutation.SetSubjectID(id)
-	return cc
-}
-
-// SetNillableSubjectID sets the "subject" edge to the Subject entity by ID if the given value is not nil.
-func (cc *CollectionCreate) SetNillableSubjectID(id *uint32) *CollectionCreate {
-	if id != nil {
-		cc = cc.SetSubjectID(*id)
-	}
-	return cc
 }
 
 // SetSubject sets the "subject" edge to the Subject entity.
@@ -298,7 +298,7 @@ func (cc *CollectionCreate) createSpec() (*Collection, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.members_collections = &nodes[0]
+		_node.MemberID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := cc.mutation.SubjectIDs(); len(nodes) > 0 {
@@ -315,7 +315,7 @@ func (cc *CollectionCreate) createSpec() (*Collection, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.subject_collections = &nodes[0]
+		_node.SubjectID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

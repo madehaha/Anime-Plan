@@ -437,9 +437,102 @@ func (m *CollectionMutation) ResetEpStatus() {
 	m.addep_status = nil
 }
 
-// SetMemberID sets the "member" edge to the Members entity by id.
-func (m *CollectionMutation) SetMemberID(id uint32) {
-	m.member = &id
+// SetMemberID sets the "member_id" field.
+func (m *CollectionMutation) SetMemberID(u uint32) {
+	m.member = &u
+}
+
+// MemberID returns the value of the "member_id" field in the mutation.
+func (m *CollectionMutation) MemberID() (r uint32, exists bool) {
+	v := m.member
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMemberID returns the old "member_id" field's value of the Collection entity.
+// If the Collection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CollectionMutation) OldMemberID(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMemberID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMemberID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMemberID: %w", err)
+	}
+	return oldValue.MemberID, nil
+}
+
+// ClearMemberID clears the value of the "member_id" field.
+func (m *CollectionMutation) ClearMemberID() {
+	m.member = nil
+	m.clearedFields[collection.FieldMemberID] = struct{}{}
+}
+
+// MemberIDCleared returns if the "member_id" field was cleared in this mutation.
+func (m *CollectionMutation) MemberIDCleared() bool {
+	_, ok := m.clearedFields[collection.FieldMemberID]
+	return ok
+}
+
+// ResetMemberID resets all changes to the "member_id" field.
+func (m *CollectionMutation) ResetMemberID() {
+	m.member = nil
+	delete(m.clearedFields, collection.FieldMemberID)
+}
+
+// SetSubjectID sets the "subject_id" field.
+func (m *CollectionMutation) SetSubjectID(u uint32) {
+	m.subject = &u
+}
+
+// SubjectID returns the value of the "subject_id" field in the mutation.
+func (m *CollectionMutation) SubjectID() (r uint32, exists bool) {
+	v := m.subject
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSubjectID returns the old "subject_id" field's value of the Collection entity.
+// If the Collection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CollectionMutation) OldSubjectID(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSubjectID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSubjectID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSubjectID: %w", err)
+	}
+	return oldValue.SubjectID, nil
+}
+
+// ClearSubjectID clears the value of the "subject_id" field.
+func (m *CollectionMutation) ClearSubjectID() {
+	m.subject = nil
+	m.clearedFields[collection.FieldSubjectID] = struct{}{}
+}
+
+// SubjectIDCleared returns if the "subject_id" field was cleared in this mutation.
+func (m *CollectionMutation) SubjectIDCleared() bool {
+	_, ok := m.clearedFields[collection.FieldSubjectID]
+	return ok
+}
+
+// ResetSubjectID resets all changes to the "subject_id" field.
+func (m *CollectionMutation) ResetSubjectID() {
+	m.subject = nil
+	delete(m.clearedFields, collection.FieldSubjectID)
 }
 
 // ClearMember clears the "member" edge to the Members entity.
@@ -449,15 +542,7 @@ func (m *CollectionMutation) ClearMember() {
 
 // MemberCleared reports if the "member" edge to the Members entity was cleared.
 func (m *CollectionMutation) MemberCleared() bool {
-	return m.clearedmember
-}
-
-// MemberID returns the "member" edge ID in the mutation.
-func (m *CollectionMutation) MemberID() (id uint32, exists bool) {
-	if m.member != nil {
-		return *m.member, true
-	}
-	return
+	return m.MemberIDCleared() || m.clearedmember
 }
 
 // MemberIDs returns the "member" edge IDs in the mutation.
@@ -476,11 +561,6 @@ func (m *CollectionMutation) ResetMember() {
 	m.clearedmember = false
 }
 
-// SetSubjectID sets the "subject" edge to the Subject entity by id.
-func (m *CollectionMutation) SetSubjectID(id uint32) {
-	m.subject = &id
-}
-
 // ClearSubject clears the "subject" edge to the Subject entity.
 func (m *CollectionMutation) ClearSubject() {
 	m.clearedsubject = true
@@ -488,15 +568,7 @@ func (m *CollectionMutation) ClearSubject() {
 
 // SubjectCleared reports if the "subject" edge to the Subject entity was cleared.
 func (m *CollectionMutation) SubjectCleared() bool {
-	return m.clearedsubject
-}
-
-// SubjectID returns the "subject" edge ID in the mutation.
-func (m *CollectionMutation) SubjectID() (id uint32, exists bool) {
-	if m.subject != nil {
-		return *m.subject, true
-	}
-	return
+	return m.SubjectIDCleared() || m.clearedsubject
 }
 
 // SubjectIDs returns the "subject" edge IDs in the mutation.
@@ -549,7 +621,7 @@ func (m *CollectionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CollectionMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 8)
 	if m._type != nil {
 		fields = append(fields, collection.FieldType)
 	}
@@ -567,6 +639,12 @@ func (m *CollectionMutation) Fields() []string {
 	}
 	if m.ep_status != nil {
 		fields = append(fields, collection.FieldEpStatus)
+	}
+	if m.member != nil {
+		fields = append(fields, collection.FieldMemberID)
+	}
+	if m.subject != nil {
+		fields = append(fields, collection.FieldSubjectID)
 	}
 	return fields
 }
@@ -588,6 +666,10 @@ func (m *CollectionMutation) Field(name string) (ent.Value, bool) {
 		return m.AddTime()
 	case collection.FieldEpStatus:
 		return m.EpStatus()
+	case collection.FieldMemberID:
+		return m.MemberID()
+	case collection.FieldSubjectID:
+		return m.SubjectID()
 	}
 	return nil, false
 }
@@ -609,6 +691,10 @@ func (m *CollectionMutation) OldField(ctx context.Context, name string) (ent.Val
 		return m.OldAddTime(ctx)
 	case collection.FieldEpStatus:
 		return m.OldEpStatus(ctx)
+	case collection.FieldMemberID:
+		return m.OldMemberID(ctx)
+	case collection.FieldSubjectID:
+		return m.OldSubjectID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Collection field %s", name)
 }
@@ -659,6 +745,20 @@ func (m *CollectionMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetEpStatus(v)
+		return nil
+	case collection.FieldMemberID:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMemberID(v)
+		return nil
+	case collection.FieldSubjectID:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSubjectID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Collection field %s", name)
@@ -728,7 +828,14 @@ func (m *CollectionMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *CollectionMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(collection.FieldMemberID) {
+		fields = append(fields, collection.FieldMemberID)
+	}
+	if m.FieldCleared(collection.FieldSubjectID) {
+		fields = append(fields, collection.FieldSubjectID)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -741,6 +848,14 @@ func (m *CollectionMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *CollectionMutation) ClearField(name string) error {
+	switch name {
+	case collection.FieldMemberID:
+		m.ClearMemberID()
+		return nil
+	case collection.FieldSubjectID:
+		m.ClearSubjectID()
+		return nil
+	}
 	return fmt.Errorf("unknown Collection nullable field %s", name)
 }
 
@@ -765,6 +880,12 @@ func (m *CollectionMutation) ResetField(name string) error {
 		return nil
 	case collection.FieldEpStatus:
 		m.ResetEpStatus()
+		return nil
+	case collection.FieldMemberID:
+		m.ResetMemberID()
+		return nil
+	case collection.FieldSubjectID:
+		m.ResetSubjectID()
 		return nil
 	}
 	return fmt.Errorf("unknown Collection field %s", name)

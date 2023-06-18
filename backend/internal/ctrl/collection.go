@@ -1,6 +1,7 @@
 package ctrl
 
 import (
+	"backend/ent"
 	"context"
 	"time"
 
@@ -66,4 +67,12 @@ func (cc CollectionCtrl) UpdateCollection(
 
 func (cc CollectionCtrl) DeleteCollection(uid uint32, subjectId uint32) error {
 	return cc.Repo.DeleteCollection(context.Background(), uid, subjectId)
+}
+
+func (cc CollectionCtrl) GetCollectionById(searchType string, id uint32) (ent.Collections, error) {
+	collections, err := cc.Repo.GetCollectionByID(context.Background(), searchType, id)
+	if err != nil {
+		return nil, err
+	}
+	return collections, err
 }
