@@ -24,7 +24,6 @@ func (Subject) Fields() []ent.Field {
 		field.Uint32("wish").Default(0),
 		field.Uint32("doing").Default(0),
 		field.Uint32("watched").Default(0),
-
 		field.Uint32("on_hold").Default(0),
 		field.Uint32("dropped").Default(0),
 	}

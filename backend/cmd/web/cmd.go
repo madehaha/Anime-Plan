@@ -10,6 +10,7 @@ import (
 	"backend/internal/ctrl"
 	"backend/internal/driver"
 	"backend/internal/subject"
+	"backend/internal/subject_field"
 	"backend/internal/user"
 	"backend/web"
 	"backend/web/util"
@@ -34,6 +35,7 @@ func start() error {
 		fx.Provide(user.NewRepo),
 		fx.Provide(subject.NewRepo),
 		fx.Provide(collection.NewRepo),
+		fx.Provide(subjectField.NewRepo),
 
 		ctrl.Module,
 		web.Module,

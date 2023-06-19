@@ -26,11 +26,10 @@ func AddRouters(
 
 	// Subject
 	app.GET("/subject/get", subjectHandler.GetSubject)
-	// TODO update subject field
 	app.POST(
 		"/subject/create", subjectHandler.CreateSubject,
 		middleware.WikiJWTAuth,
-	) // verify if having permission to edit subject
+	) // verify if having permission to create subject
 
 	app.GET("/subject/:subject_id", subjectHandler.GetSubjectByID)
 

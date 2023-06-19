@@ -1,10 +1,10 @@
 package response
 
 import (
-	"backend/ent"
-	"backend/internal/model"
-
 	"time"
+
+	"backend/ent"
+	"backend/internal/collection"
 )
 
 type GetAllCollectionsResp struct {
@@ -21,8 +21,8 @@ type CommentResp struct {
 type GetCollectionResp struct {
 	ID uint32 `json:"id,omitempty"`
 	// Type holds the value of the "type" field.
-	SubjectId uint32               `json:"subject_id"`
-	Type      model.CollectionType `json:"type,omitempty"`
+	SubjectId uint32                    `json:"subject_id"`
+	Type      collection.CollectionType `json:"type,omitempty"`
 	// HasComment holds the value of the "has_comment" field.
 	HasComment bool `json:"has_comment,omitempty"`
 	// Comment holds the value of the "comment" field.

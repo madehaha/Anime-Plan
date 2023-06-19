@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"backend/cmd/web"
 	"github.com/spf13/cobra"
+
+	"backend/cmd/web"
 )
 
 var RootCmd = cobra.Command{}

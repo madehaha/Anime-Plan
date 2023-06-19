@@ -45,8 +45,7 @@ func (h Handler) CreateSubject(c echo.Context) error {
 		logger.Error("Create Subject request validate failed")
 		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
-	err := h.ctrl.CreateSubject(req)
-	if err != nil {
+	if err := h.ctrl.CreateSubject(req); err != nil {
 		logger.Error("create subject failed")
 		return util.Error(c, http.StatusBadRequest, err.Error())
 	}

@@ -91,7 +91,7 @@ var (
 		{Name: "rate_9", Type: field.TypeUint32, Default: 0},
 		{Name: "rate_10", Type: field.TypeUint32, Default: 0},
 		{Name: "average_score", Type: field.TypeFloat64, Default: 0},
-		{Name: "rank", Type: field.TypeUint32, Default: 4294967295},
+		{Name: "rank", Type: field.TypeUint32, Default: 0},
 		{Name: "year", Type: field.TypeUint32},
 		{Name: "month", Type: field.TypeUint8},
 		{Name: "date", Type: field.TypeUint8},

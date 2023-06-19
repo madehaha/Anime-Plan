@@ -1,26 +1,30 @@
 package ctrl
 
 import (
+	"context"
+	"errors"
+
 	"backend/ent"
 	"backend/internal/logger"
 	"backend/internal/subject"
+	subjectField "backend/internal/subject_field"
 	subjectReq "backend/web/request/subject"
-
-	"context"
 )
 
 type SubjectCtrl struct {
-	Repo subject.MysqlRepo
+	subjectRepo      subject.MysqlRepo
+	subjectFieldRepo subjectField.MysqlRepo
 }
 
-func NewSubjectCtrl(repo subject.MysqlRepo) SubjectCtrl {
+func NewSubjectCtrl(subjectRepo subject.MysqlRepo, subjectFieldRepo subjectField.MysqlRepo) SubjectCtrl {
 	return SubjectCtrl{
-		Repo: repo,
+		subjectRepo:      subjectRepo,
+		subjectFieldRepo: subjectFieldRepo,
 	}
 }
 
 func (sc SubjectCtrl) GetSubject() (ent.Subjects, error) {
-	subjects, err := sc.Repo.GetSubject(context.Background())
+	subjects, err := sc.subjectRepo.GetSubject(context.Background())
 	if err != nil {
 		logger.Error("Failed to Get subjects")
 		return nil, err
@@ -29,7 +33,7 @@ func (sc SubjectCtrl) GetSubject() (ent.Subjects, error) {
 }
 
 func (sc SubjectCtrl) GetSubjectByID(subjectId uint32) (*ent.Subject, error) {
-	subjectEntity, err := sc.Repo.GetSubjectByID(context.Background(), subjectId)
+	subjectEntity, err := sc.subjectRepo.GetSubjectByID(context.Background(), subjectId)
 	if err != nil {
 		logger.Error("Failed to Get subjects by id ")
 		return subjectEntity, err
@@ -39,8 +43,22 @@ func (sc SubjectCtrl) GetSubjectByID(subjectId uint32) (*ent.Subject, error) {
 }
 
 func (sc SubjectCtrl) CreateSubject(req subjectReq.CreateSubjectReq) error {
-	if err := sc.Repo.CreateSubject(context.Background(), req); err != nil {
-		logger.Error("fail to create subjects")
+	ctx := context.Background()
+	var subjectId uint32
+	var err error
+
+	if subjectEntity, _ := sc.subjectRepo.GetSubjectByName(ctx, req.Name); subjectEntity == nil {
+		logger.Error("The subject already exist")
+		return errors.New("subject already exist")
+	}
+	if subjectId, err = sc.subjectRepo.CreateSubject(ctx, req); err != nil {
+		logger.Error("Fail to create subjects")
+		return err
+	}
+	if err := sc.subjectFieldRepo.CreateSubjectField(
+		ctx, subjectId, req.Year, req.Month, req.Date, req.WeekDay,
+	); err != nil {
+		logger.Error("Failed to create subject field")
 		return err
 	}
 	return nil

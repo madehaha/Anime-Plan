@@ -1,4 +1,4 @@
-package model
+package collection
 
 type CollectionType = uint8
 

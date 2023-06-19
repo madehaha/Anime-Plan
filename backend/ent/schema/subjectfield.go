@@ -25,7 +25,7 @@ func (SubjectField) Fields() []ent.Field {
 		field.Uint32("rate_9").Default(0),
 		field.Uint32("rate_10").Default(0),
 		field.Float("average_score").Max(10.0).Default(0),
-		field.Uint32("rank").Default(^uint32(0)),
+		field.Uint32("rank").Default(0),
 		field.Uint32("year"),                // release year
 		field.Uint8("month").Min(1).Max(12), // release month
 		field.Uint8("date").Min(1).Max(31),  // release  date
