@@ -24,6 +24,10 @@ const (
 	FieldAddTime = "add_time"
 	// FieldEpStatus holds the string denoting the ep_status field in the database.
 	FieldEpStatus = "ep_status"
+	// FieldMemberID holds the string denoting the member_id field in the database.
+	FieldMemberID = "member_id"
+	// FieldSubjectID holds the string denoting the subject_id field in the database.
+	FieldSubjectID = "subject_id"
 	// EdgeMember holds the string denoting the member edge name in mutations.
 	EdgeMember = "member"
 	// EdgeSubject holds the string denoting the subject edge name in mutations.
@@ -38,14 +42,14 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "members" package.
 	MemberInverseTable = "members"
 	// MemberColumn is the table column denoting the member relation/edge.
-	MemberColumn = "members_collections"
+	MemberColumn = "member_id"
 	// SubjectTable is the table that holds the subject relation/edge.
 	SubjectTable = "collections"
 	// SubjectInverseTable is the table name for the Subject entity.
 	// It exists in this package in order to avoid circular dependency with the "subject" package.
 	SubjectInverseTable = "subjects"
 	// SubjectColumn is the table column denoting the subject relation/edge.
-	SubjectColumn = "subject_collections"
+	SubjectColumn = "subject_id"
 )
 
 // Columns holds all SQL columns for collection fields.
@@ -57,24 +61,14 @@ var Columns = []string{
 	FieldScore,
 	FieldAddTime,
 	FieldEpStatus,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "collections"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"members_collections",
-	"subject_collections",
+	FieldMemberID,
+	FieldSubjectID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -134,6 +128,16 @@ func ByAddTime(opts ...sql.OrderTermOption) OrderOption {
 // ByEpStatus orders the results by the ep_status field.
 func ByEpStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEpStatus, opts...).ToFunc()
+}
+
+// ByMemberID orders the results by the member_id field.
+func ByMemberID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMemberID, opts...).ToFunc()
+}
+
+// BySubjectID orders the results by the subject_id field.
+func BySubjectID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSubjectID, opts...).ToFunc()
 }
 
 // ByMemberField orders the results by member field.

@@ -1,0 +1,312 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a sample server Petstore server.",
+        "title": "Swagger Example API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "API Support",
+            "url": "http://www.swagger.io/support",
+            "email": "support@swagger.io"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "paths": {
+        "/me": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get Me",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Member"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "MemberInfo",
+                        "schema": {
+                            "$ref": "#/definitions/response.UserGetResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/subject/:subject_id": {
+            "get": {
+                "description": "Get Subject by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Subject"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "subject_id",
+                        "name": "subject_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "SubjectInfo",
+                        "schema": {
+                            "$ref": "#/definitions/ent.Subject"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "ent.Collection": {
+            "type": "object",
+            "properties": {
+                "add_time": {
+                    "description": "AddTime holds the value of the \"add_time\" field.",
+                    "type": "string"
+                },
+                "comment": {
+                    "description": "Comment holds the value of the \"comment\" field.",
+                    "type": "string"
+                },
+                "edges": {
+                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the CollectionQuery when eager-loading is set.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.CollectionEdges"
+                        }
+                    ]
+                },
+                "ep_status": {
+                    "description": "EpStatus holds the value of the \"ep_status\" field.",
+                    "type": "integer"
+                },
+                "has_comment": {
+                    "description": "HasComment holds the value of the \"has_comment\" field.",
+                    "type": "boolean"
+                },
+                "id": {
+                    "description": "ID of the ent.",
+                    "type": "integer"
+                },
+                "score": {
+                    "description": "Score holds the value of the \"score\" field.",
+                    "type": "integer"
+                },
+                "type": {
+                    "description": "Type holds the value of the \"type\" field.",
+                    "type": "integer"
+                }
+            }
+        },
+        "ent.CollectionEdges": {
+            "type": "object",
+            "properties": {
+                "member": {
+                    "description": "Member holds the value of the member edge.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.Members"
+                        }
+                    ]
+                },
+                "subject": {
+                    "description": "Subject holds the value of the subject edge.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.Subject"
+                        }
+                    ]
+                }
+            }
+        },
+        "ent.Members": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "description": "Avatar holds the value of the \"avatar\" field.",
+                    "type": "string"
+                },
+                "edges": {
+                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the MembersQuery when eager-loading is set.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.MembersEdges"
+                        }
+                    ]
+                },
+                "email": {
+                    "description": "Email holds the value of the \"email\" field.",
+                    "type": "string"
+                },
+                "gid": {
+                    "description": "Gid holds the value of the \"gid\" field.",
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "ID of the ent.",
+                    "type": "integer"
+                },
+                "nickname": {
+                    "description": "Nickname holds the value of the \"nickname\" field.",
+                    "type": "string"
+                },
+                "password": {
+                    "description": "Password holds the value of the \"password\" field.",
+                    "type": "string"
+                },
+                "register_time": {
+                    "description": "RegisterTime holds the value of the \"register_time\" field.",
+                    "type": "string"
+                },
+                "username": {
+                    "description": "Username holds the value of the \"username\" field.",
+                    "type": "string"
+                }
+            }
+        },
+        "ent.MembersEdges": {
+            "type": "object",
+            "properties": {
+                "collections": {
+                    "description": "Collections holds the value of the collections edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.Collection"
+                    }
+                }
+            }
+        },
+        "ent.Subject": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "description": "Date holds the value of the \"date\" field.",
+                    "type": "string"
+                },
+                "doing": {
+                    "description": "Doing holds the value of the \"doing\" field.",
+                    "type": "integer"
+                },
+                "dropped": {
+                    "description": "Dropped holds the value of the \"dropped\" field.",
+                    "type": "integer"
+                },
+                "edges": {
+                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the SubjectQuery when eager-loading is set.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.SubjectEdges"
+                        }
+                    ]
+                },
+                "episodes": {
+                    "description": "Episodes holds the value of the \"episodes\" field.",
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "ID of the ent.",
+                    "type": "integer"
+                },
+                "image": {
+                    "description": "Image holds the value of the \"image\" field.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Name holds the value of the \"name\" field.",
+                    "type": "string"
+                },
+                "name_cn": {
+                    "description": "NameCn holds the value of the \"name_cn\" field.",
+                    "type": "string"
+                },
+                "on_hold": {
+                    "description": "OnHold holds the value of the \"on_hold\" field.",
+                    "type": "integer"
+                },
+                "summary": {
+                    "description": "Summary holds the value of the \"summary\" field.",
+                    "type": "string"
+                },
+                "watched": {
+                    "description": "Watched holds the value of the \"watched\" field.",
+                    "type": "integer"
+                },
+                "wish": {
+                    "description": "Wish holds the value of the \"wish\" field.",
+                    "type": "integer"
+                }
+            }
+        },
+        "ent.SubjectEdges": {
+            "type": "object",
+            "properties": {
+                "collections": {
+                    "description": "Collections holds the value of the collections edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.Collection"
+                    }
+                }
+            }
+        },
+        "response.UserGetResp": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "description": "Avatar holds the value of the \"avatar\" field.",
+                    "type": "string"
+                },
+                "email": {
+                    "description": "Email holds the value of the \"email\" field.",
+                    "type": "string"
+                },
+                "gid": {
+                    "description": "Gid holds the value of the \"gid\" field.",
+                    "type": "integer"
+                },
+                "nickname": {
+                    "description": "Nickname holds the value of the \"nickname\" field.",
+                    "type": "string"
+                },
+                "register_time": {
+                    "description": "RegisterTime holds the value of the \"register_time\" field.",
+                    "type": "string"
+                },
+                "uid": {
+                    "description": "ID of the ent.",
+                    "type": "integer"
+                },
+                "username": {
+                    "description": "Username holds the value of the \"username\" field.",
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

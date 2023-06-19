@@ -25,7 +25,6 @@ type CollectionQuery struct {
 	predicates  []predicate.Collection
 	withMember  *MembersQuery
 	withSubject *SubjectQuery
-	withFKs     bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -405,19 +404,12 @@ func (cq *CollectionQuery) prepareQuery(ctx context.Context) error {
 func (cq *CollectionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Collection, error) {
 	var (
 		nodes       = []*Collection{}
-		withFKs     = cq.withFKs
 		_spec       = cq.querySpec()
 		loadedTypes = [2]bool{
 			cq.withMember != nil,
 			cq.withSubject != nil,
 		}
 	)
-	if cq.withMember != nil || cq.withSubject != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, collection.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Collection).scanValues(nil, columns)
 	}
@@ -455,10 +447,7 @@ func (cq *CollectionQuery) loadMember(ctx context.Context, query *MembersQuery, 
 	ids := make([]uint32, 0, len(nodes))
 	nodeids := make(map[uint32][]*Collection)
 	for i := range nodes {
-		if nodes[i].members_collections == nil {
-			continue
-		}
-		fk := *nodes[i].members_collections
+		fk := nodes[i].MemberID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -475,7 +464,7 @@ func (cq *CollectionQuery) loadMember(ctx context.Context, query *MembersQuery, 
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "members_collections" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "member_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -487,10 +476,7 @@ func (cq *CollectionQuery) loadSubject(ctx context.Context, query *SubjectQuery,
 	ids := make([]uint32, 0, len(nodes))
 	nodeids := make(map[uint32][]*Collection)
 	for i := range nodes {
-		if nodes[i].subject_collections == nil {
-			continue
-		}
-		fk := *nodes[i].subject_collections
+		fk := nodes[i].SubjectID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -507,7 +493,7 @@ func (cq *CollectionQuery) loadSubject(ctx context.Context, query *SubjectQuery,
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "subject_collections" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "subject_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -540,6 +526,12 @@ func (cq *CollectionQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != collection.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if cq.withMember != nil {
+			_spec.Node.AddColumnOnce(collection.FieldMemberID)
+		}
+		if cq.withSubject != nil {
+			_spec.Node.AddColumnOnce(collection.FieldSubjectID)
 		}
 	}
 	if ps := cq.predicates; len(ps) > 0 {

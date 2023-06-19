@@ -10,6 +10,7 @@ import (
 	"backend/internal/collection"
 	"backend/internal/logger"
 	collectionReq "backend/web/request/collection"
+	"backend/web/response"
 	"backend/web/util"
 )
 
@@ -46,7 +47,6 @@ func (h Handler) AddCollection(c echo.Context) (err error) {
 
 	return c.NoContent(http.StatusOK)
 }
-
 func (h Handler) UpdateCollection(c echo.Context) error {
 	var req collectionReq.AddOrUpdateCollectionReq
 	if err := c.Bind(&req); err != nil {
@@ -77,6 +77,14 @@ func (h Handler) UpdateCollection(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
+// @Title DeleteCollection
+//	@Description	Delete Collection by subject_id
+//	@Tags			Collection
+//	@Accept			json
+//	@Produce		json
+//	@Success		200				{object}
+//	@Router			/collection/:subject_id [delete]
+
 func (h Handler) DeleteCollection(c echo.Context) error {
 	uid := c.Get("uid").(uint32)
 	subjectId, err := strconv.ParseUint(c.Param("subject_id"), 10, 64)
@@ -92,8 +100,40 @@ func (h Handler) DeleteCollection(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
-func (h Handler) GetComment(c echo.Context) error {
-	return nil
+func (h Handler) GetSelfComment(c echo.Context) error {
+	MemberId, err := strconv.ParseUint(c.Param("member_id"), 10, 64)
+	if err != nil {
+		logger.Error("convert error")
+		return util.Error(c, http.StatusNotFound, err.Error())
+	}
+	collections, err := h.ctrl.GetCollectionById("member", uint32(MemberId))
+	if err != nil {
+		logger.Error("get error")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	comments := util.Map(collections, response.NewCommentResp)
+	responses := response.CommentsResp{
+		Comments: comments,
+	}
+	return util.Success(c, http.StatusOK, responses)
+}
+
+func (h Handler) GetCommentsBySubjectID(c echo.Context) error {
+	subjectId, err := strconv.ParseUint(c.Param("subject_id"), 10, 64)
+	if err != nil {
+		logger.Error("convert error")
+		return util.Error(c, http.StatusNotFound, err.Error())
+	}
+	collections, err := h.ctrl.GetCollectionById("subject", uint32(subjectId))
+	if err != nil {
+		logger.Error("get error")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	comments := util.Map(collections, response.NewCommentResp)
+	responses := response.CommentsResp{
+		Comments: comments,
+	}
+	return util.Success(c, http.StatusOK, responses)
 }
 
 func checkReq(req collectionReq.AddOrUpdateCollectionReq) error {

@@ -84,6 +84,16 @@ func EpStatus(v uint8) predicate.Collection {
 	return predicate.Collection(sql.FieldEQ(FieldEpStatus, v))
 }
 
+// MemberID applies equality check predicate on the "member_id" field. It's identical to MemberIDEQ.
+func MemberID(v uint32) predicate.Collection {
+	return predicate.Collection(sql.FieldEQ(FieldMemberID, v))
+}
+
+// SubjectID applies equality check predicate on the "subject_id" field. It's identical to SubjectIDEQ.
+func SubjectID(v uint32) predicate.Collection {
+	return predicate.Collection(sql.FieldEQ(FieldSubjectID, v))
+}
+
 // TypeEQ applies the EQ predicate on the "type" field.
 func TypeEQ(v uint8) predicate.Collection {
 	return predicate.Collection(sql.FieldEQ(FieldType, v))
@@ -342,6 +352,66 @@ func EpStatusLT(v uint8) predicate.Collection {
 // EpStatusLTE applies the LTE predicate on the "ep_status" field.
 func EpStatusLTE(v uint8) predicate.Collection {
 	return predicate.Collection(sql.FieldLTE(FieldEpStatus, v))
+}
+
+// MemberIDEQ applies the EQ predicate on the "member_id" field.
+func MemberIDEQ(v uint32) predicate.Collection {
+	return predicate.Collection(sql.FieldEQ(FieldMemberID, v))
+}
+
+// MemberIDNEQ applies the NEQ predicate on the "member_id" field.
+func MemberIDNEQ(v uint32) predicate.Collection {
+	return predicate.Collection(sql.FieldNEQ(FieldMemberID, v))
+}
+
+// MemberIDIn applies the In predicate on the "member_id" field.
+func MemberIDIn(vs ...uint32) predicate.Collection {
+	return predicate.Collection(sql.FieldIn(FieldMemberID, vs...))
+}
+
+// MemberIDNotIn applies the NotIn predicate on the "member_id" field.
+func MemberIDNotIn(vs ...uint32) predicate.Collection {
+	return predicate.Collection(sql.FieldNotIn(FieldMemberID, vs...))
+}
+
+// MemberIDIsNil applies the IsNil predicate on the "member_id" field.
+func MemberIDIsNil() predicate.Collection {
+	return predicate.Collection(sql.FieldIsNull(FieldMemberID))
+}
+
+// MemberIDNotNil applies the NotNil predicate on the "member_id" field.
+func MemberIDNotNil() predicate.Collection {
+	return predicate.Collection(sql.FieldNotNull(FieldMemberID))
+}
+
+// SubjectIDEQ applies the EQ predicate on the "subject_id" field.
+func SubjectIDEQ(v uint32) predicate.Collection {
+	return predicate.Collection(sql.FieldEQ(FieldSubjectID, v))
+}
+
+// SubjectIDNEQ applies the NEQ predicate on the "subject_id" field.
+func SubjectIDNEQ(v uint32) predicate.Collection {
+	return predicate.Collection(sql.FieldNEQ(FieldSubjectID, v))
+}
+
+// SubjectIDIn applies the In predicate on the "subject_id" field.
+func SubjectIDIn(vs ...uint32) predicate.Collection {
+	return predicate.Collection(sql.FieldIn(FieldSubjectID, vs...))
+}
+
+// SubjectIDNotIn applies the NotIn predicate on the "subject_id" field.
+func SubjectIDNotIn(vs ...uint32) predicate.Collection {
+	return predicate.Collection(sql.FieldNotIn(FieldSubjectID, vs...))
+}
+
+// SubjectIDIsNil applies the IsNil predicate on the "subject_id" field.
+func SubjectIDIsNil() predicate.Collection {
+	return predicate.Collection(sql.FieldIsNull(FieldSubjectID))
+}
+
+// SubjectIDNotNil applies the NotNil predicate on the "subject_id" field.
+func SubjectIDNotNil() predicate.Collection {
+	return predicate.Collection(sql.FieldNotNull(FieldSubjectID))
 }
 
 // HasMember applies the HasEdge predicate on the "member" edge.

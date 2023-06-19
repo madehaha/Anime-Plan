@@ -1,10 +1,6 @@
 package web
 
 import (
-	"github.com/labstack/echo/v4"
-	"github.com/spf13/cobra"
-	"go.uber.org/fx"
-
 	"backend/internal/collection"
 	"backend/internal/config"
 	"backend/internal/ctrl"
@@ -14,6 +10,12 @@ import (
 	"backend/internal/user"
 	"backend/web"
 	"backend/web/util"
+	"github.com/labstack/echo/v4"
+	"github.com/spf13/cobra"
+	echoSwagger "github.com/swaggo/echo-swagger"
+	"go.uber.org/fx"
+
+	_ "backend/docs"
 )
 
 var Command = &cobra.Command{
@@ -45,6 +47,6 @@ func start() error {
 	if err != nil {
 		return err
 	}
-
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
 	return web.Start(e, &cfg)
 }

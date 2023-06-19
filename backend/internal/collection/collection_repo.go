@@ -51,6 +51,23 @@ func (m MysqlRepo) UpdateCollection(
 	return err
 }
 
+func (m MysqlRepo) GetCollectionByID(ctx context.Context, searchType string, id uint32) (ent.Collections, error) {
+	switch searchType {
+	case "subject":
+		{
+			collections, err := m.Client.Collection.Query().Where(collection.HasSubjectWith(subject.ID(id))).All(ctx)
+			return collections, err
+		}
+	case "member":
+		{
+			collections, err := m.Client.Collection.Query().Where(collection.HasMemberWith(members.ID(id))).All(ctx)
+			return collections, err
+		}
+	default:
+		return nil, nil
+	}
+}
+
 func (m MysqlRepo) DeleteCollection(ctx context.Context, uid uint32, subjectId uint32) error {
 	// TODO
 	number, err := m.Client.Collection.Delete().Where(

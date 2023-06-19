@@ -1,9 +1,8 @@
 package response
 
 import (
-	"time"
-
 	"backend/ent"
+
 	"backend/internal/collection"
 )
 
@@ -11,11 +10,15 @@ type GetAllCollectionsResp struct {
 	Collections []ent.Collection `json:"Collections"`
 }
 
+type CommentsResp struct {
+	Comments []CommentResp `json:"comments"`
+}
+
 type CommentResp struct {
-	Username    string    `json:"Username"`
-	SubjectName string    `json:"SubjectName"`
-	Time        time.Time `json:"Time"`
-	Comment     string    `json:"Comment"`
+	SubjectId uint32 `json:"SubjectId"`
+	MemberID  uint32 `json:"MemberID"`
+	Time      string `json:"Time"`
+	Comment   string `json:"Comment"`
 }
 
 type GetCollectionResp struct {
@@ -35,15 +38,24 @@ type GetCollectionResp struct {
 	EpStatus uint8 `json:"ep_status,omitempty"`
 }
 
-func NewCollectionResp(collection *ent.Collection, subjectId uint32) GetCollectionResp {
+func NewCollectionResp(collection *ent.Collection) GetCollectionResp {
 	return GetCollectionResp{
 		ID:         collection.ID,
-		SubjectId:  subjectId,
+		SubjectId:  collection.Edges.Subject.ID,
 		Type:       collection.Type,
 		HasComment: collection.HasComment,
 		Comment:    collection.Comment,
 		Score:      collection.Score,
 		AddTime:    collection.AddTime,
 		EpStatus:   collection.EpStatus,
+	}
+}
+
+func NewCommentResp(collection *ent.Collection) CommentResp {
+	return CommentResp{
+		SubjectId: collection.SubjectID,
+		MemberID:  collection.MemberID,
+		Comment:   collection.Comment,
+		Time:      collection.AddTime,
 	}
 }

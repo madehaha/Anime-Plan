@@ -30,12 +30,14 @@ type Collection struct {
 	AddTime string `json:"add_time,omitempty"`
 	// EpStatus holds the value of the "ep_status" field.
 	EpStatus uint8 `json:"ep_status,omitempty"`
+	// MemberID holds the value of the "member_id" field.
+	MemberID uint32 `json:"member_id,omitempty"`
+	// SubjectID holds the value of the "subject_id" field.
+	SubjectID uint32 `json:"subject_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CollectionQuery when eager-loading is set.
-	Edges               CollectionEdges `json:"edges"`
-	members_collections *uint32
-	subject_collections *uint32
-	selectValues        sql.SelectValues
+	Edges        CollectionEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // CollectionEdges holds the relations/edges for other nodes in the graph.
@@ -82,14 +84,10 @@ func (*Collection) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case collection.FieldHasComment:
 			values[i] = new(sql.NullBool)
-		case collection.FieldID, collection.FieldType, collection.FieldScore, collection.FieldEpStatus:
+		case collection.FieldID, collection.FieldType, collection.FieldScore, collection.FieldEpStatus, collection.FieldMemberID, collection.FieldSubjectID:
 			values[i] = new(sql.NullInt64)
 		case collection.FieldComment, collection.FieldAddTime:
 			values[i] = new(sql.NullString)
-		case collection.ForeignKeys[0]: // members_collections
-			values[i] = new(sql.NullInt64)
-		case collection.ForeignKeys[1]: // subject_collections
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -147,19 +145,17 @@ func (c *Collection) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.EpStatus = uint8(value.Int64)
 			}
-		case collection.ForeignKeys[0]:
+		case collection.FieldMemberID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field members_collections", value)
+				return fmt.Errorf("unexpected type %T for field member_id", values[i])
 			} else if value.Valid {
-				c.members_collections = new(uint32)
-				*c.members_collections = uint32(value.Int64)
+				c.MemberID = uint32(value.Int64)
 			}
-		case collection.ForeignKeys[1]:
+		case collection.FieldSubjectID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field subject_collections", value)
+				return fmt.Errorf("unexpected type %T for field subject_id", values[i])
 			} else if value.Valid {
-				c.subject_collections = new(uint32)
-				*c.subject_collections = uint32(value.Int64)
+				c.SubjectID = uint32(value.Int64)
 			}
 		default:
 			c.selectValues.Set(columns[i], values[i])
@@ -224,6 +220,12 @@ func (c *Collection) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("ep_status=")
 	builder.WriteString(fmt.Sprintf("%v", c.EpStatus))
+	builder.WriteString(", ")
+	builder.WriteString("member_id=")
+	builder.WriteString(fmt.Sprintf("%v", c.MemberID))
+	builder.WriteString(", ")
+	builder.WriteString("subject_id=")
+	builder.WriteString(fmt.Sprintf("%v", c.SubjectID))
 	builder.WriteByte(')')
 	return builder.String()
 }

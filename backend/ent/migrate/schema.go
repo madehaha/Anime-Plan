@@ -17,8 +17,8 @@ var (
 		{Name: "score", Type: field.TypeUint8, Default: 0},
 		{Name: "add_time", Type: field.TypeString, Default: "2000-01-01"},
 		{Name: "ep_status", Type: field.TypeUint8, Default: 0},
-		{Name: "members_collections", Type: field.TypeUint32, Nullable: true},
-		{Name: "subject_collections", Type: field.TypeUint32, Nullable: true},
+		{Name: "member_id", Type: field.TypeUint32, Nullable: true},
+		{Name: "subject_id", Type: field.TypeUint32, Nullable: true},
 	}
 	// CollectionsTable holds the schema information for the "collections" table.
 	CollectionsTable = &schema.Table{

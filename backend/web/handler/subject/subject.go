@@ -1,6 +1,7 @@
 package subject
 
 import (
+	"backend/web/response"
 	"net/http"
 	"strconv"
 
@@ -18,10 +19,20 @@ func (h Handler) GetSubject(c echo.Context) error {
 		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
 
-	_ = c.JSON(http.StatusOK, subjects)
+	_ = c.JSON(http.StatusOK, util.Map(subjects, response.NewSubjectResp))
 	return nil
 }
 
+// GetSubjectByID godoc
+//
+//	 @Title GetSubjectByID
+//		@Description	Get Subject by id
+//		@Tags			Subject
+//		@Accept			json
+//		@Produce		json
+//	    @Param          subject_id 	path 	uint32   true "subject_id"
+//		@Success		200		 {object}   response.SubjectGetResp   "SubjectInfo"
+//		@Router			/subject/:subject_id [get]
 func (h Handler) GetSubjectByID(c echo.Context) error {
 	id := c.Param("subject_id")
 	Id, err := strconv.ParseUint(id, 10, 64)
@@ -30,7 +41,7 @@ func (h Handler) GetSubjectByID(c echo.Context) error {
 		logger.Error("Failed to find subject")
 		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
-	return util.Success(c, http.StatusOK, subjectEntity)
+	return util.Success(c, http.StatusOK, response.NewSubjectResp(subjectEntity))
 }
 
 // TODO Use WikiJWTAuth

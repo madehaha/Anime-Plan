@@ -22,13 +22,15 @@ func (Collection) Fields() []ent.Field {
 		field.Uint8("score").Default(0),
 		field.String("add_time").Default("2000-01-01"), // add date
 		field.Uint8("ep_status").Default(0),            // watching progress
+		field.Uint32("member_id").Optional(),
+		field.Uint32("subject_id").Optional(),
 	}
 }
 
 // Edges of the Collection.
 func (Collection) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("member", Members.Type).Ref("collections").Unique(),
-		edge.From("subject", Subject.Type).Ref("collections").Unique(),
+		edge.From("member", Members.Type).Field("member_id").Ref("collections").Unique(),
+		edge.From("subject", Subject.Type).Field("subject_id").Ref("collections").Unique(),
 	}
 }

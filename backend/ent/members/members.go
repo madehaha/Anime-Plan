@@ -38,7 +38,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "collection" package.
 	CollectionsInverseTable = "collections"
 	// CollectionsColumn is the table column denoting the collections relation/edge.
-	CollectionsColumn = "members_collections"
+	CollectionsColumn = "member_id"
 )
 
 // Columns holds all SQL columns for members fields.

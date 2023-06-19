@@ -5,6 +5,8 @@ import (
 	"errors"
 	"time"
 
+	"backend/ent"
+
 	"backend/internal/collection"
 	"backend/internal/logger"
 	"backend/internal/subject"
@@ -154,4 +156,12 @@ func (cc CollectionCtrl) UpdateCollection(
 
 func (cc CollectionCtrl) DeleteCollection(uid uint32, subjectId uint32) error {
 	return cc.collectionRepo.DeleteCollection(context.Background(), uid, subjectId)
+}
+
+func (cc CollectionCtrl) GetCollectionById(searchType string, id uint32) (ent.Collections, error) {
+	collections, err := cc.collectionRepo.GetCollectionByID(context.Background(), searchType, id)
+	if err != nil {
+		return nil, err
+	}
+	return collections, err
 }
