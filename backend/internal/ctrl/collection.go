@@ -46,7 +46,7 @@ func (cc CollectionCtrl) AddCollection(
 
 	collectionInfo := collection.Info{
 		Type:       req.Type,
-		HasComment: req.HasComment,
+		HasComment: *req.HasComment,
 		Comment:    req.Comment,
 		Score:      req.Score,
 		AddTime:    time.Now().Format("2006-01-02"),
@@ -90,7 +90,7 @@ func (cc CollectionCtrl) UpdateCollection(
 
 	collectionInfo := collection.Info{
 		Type:       req.Type,
-		HasComment: req.HasComment,
+		HasComment: *req.HasComment,
 		Comment:    req.Comment,
 		Score:      req.Score,
 		AddTime:    time.Now().Format("2006-01-02"),

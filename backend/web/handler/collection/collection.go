@@ -2,6 +2,7 @@ package collection
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -28,9 +29,10 @@ func (h Handler) AddCollection(c echo.Context) (err error) {
 		logger.Error("Failed to bind")
 		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
+	fmt.Println(req)
 	if err := c.Validate(&req); err != nil {
 		logger.Error("Failed to validate")
-		return util.Success(c, http.StatusBadRequest, err.Error())
+		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
 
 	// check
@@ -47,6 +49,7 @@ func (h Handler) AddCollection(c echo.Context) (err error) {
 
 	return c.NoContent(http.StatusOK)
 }
+
 func (h Handler) UpdateCollection(c echo.Context) error {
 	var req collectionReq.AddOrUpdateCollectionReq
 	if err := c.Bind(&req); err != nil {
@@ -140,7 +143,7 @@ func checkReq(req collectionReq.AddOrUpdateCollectionReq) error {
 	if req.Type == collection.Wish && (req.Score != 0 || req.EpStatus != 0) {
 		return errors.New("if type is wish, the score should be 0 or the ep_status should be 0")
 	}
-	if req.HasComment == (req.Comment == "") {
+	if *req.HasComment == (req.Comment == "") {
 		return errors.New("inconsistency between HasComment flag and Comment content")
 	}
 	return nil

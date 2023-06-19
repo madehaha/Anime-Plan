@@ -47,7 +47,7 @@ func (sc SubjectCtrl) CreateSubject(req subjectReq.CreateSubjectReq) error {
 	var subjectId uint32
 	var err error
 
-	if subjectEntity, _ := sc.subjectRepo.GetSubjectByName(ctx, req.Name); subjectEntity == nil {
+	if subjectEntity, _ := sc.subjectRepo.GetSubjectByName(ctx, req.Name); subjectEntity != nil {
 		logger.Error("The subject already exist")
 		return errors.New("subject already exist")
 	}
