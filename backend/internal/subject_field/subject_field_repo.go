@@ -171,15 +171,18 @@ func (m MysqlRepo) minusRateX(ctx context.Context, subjectId uint32, previousSco
 }
 
 func (m MysqlRepo) updateSubjectFieldScore(ctx context.Context, subjectField *ent.SubjectField) error {
-	score := float64(
-		subjectField.Rate1*1+subjectField.Rate2*2+subjectField.Rate3*3+subjectField.Rate4*4+
-			subjectField.Rate5*5+subjectField.Rate6*6+subjectField.Rate7*7+subjectField.Rate8*8+
-			subjectField.Rate9*9+subjectField.Rate10*10,
-	) /
-		float64(
-			subjectField.Rate1+subjectField.Rate2+subjectField.Rate3+subjectField.Rate4+subjectField.Rate5+
-				subjectField.Rate6+subjectField.Rate7+subjectField.Rate8+subjectField.Rate9+subjectField.Rate10,
-		)
+	var score float64
+	var number uint32 = subjectField.Rate1 + subjectField.Rate2 + subjectField.Rate3 + subjectField.Rate4 + subjectField.Rate5 +
+		subjectField.Rate6 + subjectField.Rate7 + subjectField.Rate8 + subjectField.Rate9 + subjectField.Rate10
+	if number == 0 {
+		score = 0
+	} else {
+		score = float64(
+			subjectField.Rate1*1+subjectField.Rate2*2+subjectField.Rate3*3+subjectField.Rate4*4+
+				subjectField.Rate5*5+subjectField.Rate6*6+subjectField.Rate7*7+subjectField.Rate8*8+
+				subjectField.Rate9*9+subjectField.Rate10*10,
+		) / float64(number)
+	}
 	return m.client.SubjectField.UpdateOne(subjectField).SetAverageScore(score).Exec(ctx)
 }
 

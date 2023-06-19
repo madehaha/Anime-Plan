@@ -64,7 +64,7 @@ func (cc CollectionCtrl) AddCollection(
 		return err
 	}
 
-	err = cc.subjectFieldRepo.UpdateSubjectFieldRate(ctx, subjectId, 0, req.Score)
+	err = cc.subjectFieldRepo.UpdateSubjectField(ctx, subjectId, 0, req.Score)
 	if err != nil {
 		logger.Error("Failed to add subject field")
 	}

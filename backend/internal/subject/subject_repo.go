@@ -82,7 +82,7 @@ func (m MysqlRepo) UpdateSubjectType(
 		logger.Error(err.Error())
 		return err
 	}
-	err = m.minusSubjectType(ctx, subjectId, previousNumber, newType)
+	err = m.minusSubjectType(ctx, subjectId, previousNumber, previousType)
 	return err
 }
 
