@@ -63,22 +63,22 @@ func (m MysqlRepo) UpdateSubjectFieldRate(
 	if score == previousScore {
 		return nil
 	}
-	if previousNumber, err = m.getRateX(ctx, subjectId, previousScore); err != nil {
-		logger.Error("Failed to get the previous number of score")
-		return err
-	}
 
-	if score == 0 {
-		// just minus
-		err = m.minusRateX(ctx, subjectId, previousScore, previousNumber)
-	} else if previousScore == 0 {
-		// just add
+	if previousScore == 0 {
 		err = m.addRateX(ctx, subjectId, score)
 	} else {
-		// add and minus
-		err = m.addRateX(ctx, subjectId, score)
-		err = m.minusRateX(ctx, subjectId, previousScore, previousNumber)
+		if previousNumber, err = m.getRateX(ctx, subjectId, previousScore); err != nil {
+			logger.Error("Failed to get the previous number of score")
+			return err
+		}
+		if score == 0 {
+			err = m.minusRateX(ctx, subjectId, previousScore, previousNumber)
+		} else {
+			err = m.addRateX(ctx, subjectId, score)
+			err = m.minusRateX(ctx, subjectId, previousScore, previousNumber)
+		}
 	}
+
 	return err
 }
 

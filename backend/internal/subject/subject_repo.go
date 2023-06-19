@@ -68,25 +68,37 @@ func (m MysqlRepo) AddSubjectType(
 func (m MysqlRepo) UpdateSubjectType(
 	ctx context.Context, subjectId uint32, previousType collection.CollectionType, newType collection.CollectionType,
 ) error {
-	subjectEntity, err := m.client.Subject.Query().Where(subject.ID(subjectId)).Only(ctx)
-	if err != nil {
+	flag, err := m.client.Subject.Query().Where(subject.ID(subjectId)).Exist(ctx)
+	if !flag {
 		return err
 	}
-	previousNumber, err := getTypeNumber(subjectEntity, previousType)
-	if err != nil {
-		logger.Error(err.Error())
-		return err
-	}
+
 	err = m.addSubjectType(ctx, subjectId, newType)
 	if err != nil {
 		logger.Error(err.Error())
 		return err
 	}
+	previousNumber, err := m.getTypeNumber(ctx, subjectId, previousType)
+	if err != nil {
+		logger.Error(err.Error())
+		return err
+	}
 	err = m.minusSubjectType(ctx, subjectId, previousNumber, previousType)
-	return err
+	if err != nil {
+		logger.Error(err.Error())
+		return err
+	}
+	return nil
 }
 
-func getTypeNumber(subjectEntity *ent.Subject, collectionType collection.CollectionType) (uint32, error) {
+func (m MysqlRepo) getTypeNumber(
+	ctx context.Context, subjectId uint32, collectionType collection.CollectionType,
+) (uint32, error) {
+	subjectEntity, err := m.client.Subject.Query().Where(subject.ID(subjectId)).Only(ctx)
+	if err != nil {
+		logger.Error("Failed to get subject by subject id")
+		return 0, err
+	}
 	switch collectionType {
 	case collection.Wish:
 		return subjectEntity.Wish, nil
