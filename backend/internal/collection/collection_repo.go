@@ -47,7 +47,7 @@ func (m MysqlRepo) UpdateCollection(
 	ctx context.Context, collectionId uint32, info Info,
 ) error {
 	err := m.Client.Collection.UpdateOneID(collectionId).SetType(info.Type).SetHasComment(info.HasComment).
-		SetComment(info.Comment).SetAddTime(info.AddTime).SetEpStatus(info.EpStatus).Exec(ctx)
+		SetComment(info.Comment).SetScore(info.Score).SetAddTime(info.AddTime).SetEpStatus(info.EpStatus).Exec(ctx)
 	return err
 }
 

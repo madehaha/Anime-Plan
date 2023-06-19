@@ -112,11 +112,6 @@ func (cc CollectionCtrl) UpdateCollection(
 	}
 
 	// update subject field
-	// err = cc.subjectFieldRepo.UpdateSubjectFieldRate(ctx, subjectId, collectionEntity.Score, req.Score)
-	// if err != nil {
-	// 	logger.Error("Failed to update subject field rate")
-	// 	return err
-	// }
 	err = cc.subjectFieldRepo.UpdateSubjectField(ctx, subjectId, collectionEntity.Score, req.Score)
 	if err != nil {
 		logger.Error("Failed to update subject field")

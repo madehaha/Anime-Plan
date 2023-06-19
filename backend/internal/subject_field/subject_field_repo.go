@@ -3,6 +3,7 @@ package subjectField
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"backend/ent"
 	"backend/ent/subject"
@@ -63,6 +64,8 @@ func (m MysqlRepo) UpdateSubjectFieldRate(
 	if score == previousScore {
 		return nil
 	}
+	s := fmt.Sprintf("previous: %d score: %d", previousScore, score)
+	logger.Info(s)
 
 	if previousScore == 0 {
 		err = m.addRateX(ctx, subjectId, score)
