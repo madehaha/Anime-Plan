@@ -61,13 +61,14 @@ Content-Type: application/json
 
 
 ### collection
-DELETE http://localhost:2333/collection/1
+PATCH http://localhost:2333/collection/1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjcsImdpZCI6MCwiZXhwIjoxNjg3NjgzMDMzfQ.RwB9mTgeU2wpg4BynYbjWkfLwA7EqPeHgaL6rFyHfKg
 Content-Type: application/json
 
 {
-  "comment": "非常非常非常非常非常好看xzc",
-  "type": 3
+  "comment": "非常非常非常非常非常好看ssss",
+  "type": 3,
+  "has_comment": true
 }
 
 ###

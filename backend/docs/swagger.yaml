@@ -1,138 +1,81 @@
 definitions:
-  ent.Collection:
+  collection.AddOrUpdateCollectionReq:
     properties:
-      add_time:
-        description: AddTime holds the value of the "add_time" field.
-        type: string
       comment:
-        description: Comment holds the value of the "comment" field.
         type: string
-      edges:
-        allOf:
-        - $ref: '#/definitions/ent.CollectionEdges'
-        description: |-
-          Edges holds the relations/edges for other nodes in the graph.
-          The values are being populated by the CollectionQuery when eager-loading is set.
       ep_status:
-        description: EpStatus holds the value of the "ep_status" field.
         type: integer
       has_comment:
-        description: HasComment holds the value of the "has_comment" field.
         type: boolean
-      id:
-        description: ID of the ent.
-        type: integer
       score:
-        description: Score holds the value of the "score" field.
         type: integer
       type:
-        description: Type holds the value of the "type" field.
-        type: integer
+        allOf:
+        - $ref: '#/definitions/collection.CollectionType'
+        maximum: 5
+        minimum: 1
+    required:
+    - has_comment
+    - type
     type: object
-  ent.CollectionEdges:
+  collection.CollectionType:
+    enum:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    type: integer
+    x-enum-varnames:
+    - Wish
+    - Watched
+    - Doing
+    - OnHold
+    - Dropped
+  response.CommentResp:
     properties:
-      member:
-        allOf:
-        - $ref: '#/definitions/ent.Members'
-        description: Member holds the value of the member edge.
-      subject:
-        allOf:
-        - $ref: '#/definitions/ent.Subject'
-        description: Subject holds the value of the subject edge.
-    type: object
-  ent.Members:
-    properties:
-      avatar:
-        description: Avatar holds the value of the "avatar" field.
+      Comment:
         type: string
-      edges:
-        allOf:
-        - $ref: '#/definitions/ent.MembersEdges'
-        description: |-
-          Edges holds the relations/edges for other nodes in the graph.
-          The values are being populated by the MembersQuery when eager-loading is set.
-      email:
-        description: Email holds the value of the "email" field.
-        type: string
-      gid:
-        description: Gid holds the value of the "gid" field.
+      MemberID:
         type: integer
-      id:
-        description: ID of the ent.
+      SubjectId:
         type: integer
-      nickname:
-        description: Nickname holds the value of the "nickname" field.
-        type: string
-      password:
-        description: Password holds the value of the "password" field.
-        type: string
-      register_time:
-        description: RegisterTime holds the value of the "register_time" field.
-        type: string
-      username:
-        description: Username holds the value of the "username" field.
+      Time:
         type: string
     type: object
-  ent.MembersEdges:
+  response.CommentsResp:
     properties:
-      collections:
-        description: Collections holds the value of the collections edge.
+      comments:
         items:
-          $ref: '#/definitions/ent.Collection'
+          $ref: '#/definitions/response.CommentResp'
         type: array
     type: object
-  ent.Subject:
+  response.GetSubjectResp:
     properties:
       date:
-        description: Date holds the value of the "date" field.
         type: string
       doing:
-        description: Doing holds the value of the "doing" field.
         type: integer
       dropped:
-        description: Dropped holds the value of the "dropped" field.
-        type: integer
-      edges:
-        allOf:
-        - $ref: '#/definitions/ent.SubjectEdges'
-        description: |-
-          Edges holds the relations/edges for other nodes in the graph.
-          The values are being populated by the SubjectQuery when eager-loading is set.
-      episodes:
-        description: Episodes holds the value of the "episodes" field.
         type: integer
       id:
-        description: ID of the ent.
         type: integer
       image:
-        description: Image holds the value of the "image" field.
         type: string
       name:
-        description: Name holds the value of the "name" field.
         type: string
       name_cn:
-        description: NameCn holds the value of the "name_cn" field.
         type: string
       on_hold:
-        description: OnHold holds the value of the "on_hold" field.
+        type: integer
+      subject_type:
         type: integer
       summary:
-        description: Summary holds the value of the "summary" field.
         type: string
       watched:
-        description: Watched holds the value of the "watched" field.
         type: integer
       wish:
-        description: Wish holds the value of the "wish" field.
         type: integer
-    type: object
-  ent.SubjectEdges:
-    properties:
-      collections:
-        description: Collections holds the value of the collections edge.
-        items:
-          $ref: '#/definitions/ent.Collection'
-        type: array
     type: object
   response.UserGetResp:
     properties:
@@ -158,6 +101,101 @@ definitions:
         description: Username holds the value of the "username" field.
         type: string
     type: object
+  response.UserLoginResp:
+    properties:
+      token:
+        type: string
+    type: object
+  subject.CreateSubjectReq:
+    properties:
+      date:
+        maximum: 31
+        minimum: 1
+        type: integer
+      episodes:
+        type: integer
+      image:
+        description: subject
+        type: string
+      month:
+        maximum: 12
+        minimum: 1
+        type: integer
+      name:
+        type: string
+      name_cn:
+        type: string
+      summary:
+        type: string
+      weekDay:
+        maximum: 7
+        minimum: 1
+        type: integer
+      year:
+        description: subject field
+        type: integer
+    required:
+    - date
+    - episodes
+    - month
+    - name
+    - name_cn
+    - summary
+    - weekDay
+    - year
+    type: object
+  user.Info:
+    properties:
+      email:
+        description: Email holds the value of the "email" field.
+        type: string
+      nickname:
+        description: Nickname holds the value of the "nickname" field.
+        type: string
+      password:
+        description: Password holds the value of the "password" field.
+        type: string
+      username:
+        description: Username holds the value of the "username" field.
+        type: string
+    required:
+    - email
+    - nickname
+    - password
+    - username
+    type: object
+  user.ModifyInfoReq:
+    properties:
+      info:
+        $ref: '#/definitions/user.Info'
+    required:
+    - info
+    type: object
+  user.UserLoginReq:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  user.UserRegisterReq:
+    properties:
+      email:
+        type: string
+      nickname:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - nickname
+    - password
+    type: object
 info:
   contact:
     email: support@swagger.io
@@ -171,6 +209,122 @@ info:
   title: Swagger Example API
   version: "1.0"
 paths:
+  /:member_id/member/comment:
+    get:
+      consumes:
+      - application/json
+      description: Get Comments By Uid
+      parameters:
+      - description: member_id
+        in: path
+        name: member_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: comments
+          schema:
+            $ref: '#/definitions/response.CommentsResp'
+      tags:
+      - Collection
+  /:subject_id/subject/comment:
+    get:
+      consumes:
+      - application/json
+      description: Get Comments By Id
+      parameters:
+      - description: subject_id
+        in: path
+        name: subject_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: comments
+          schema:
+            $ref: '#/definitions/response.CommentsResp'
+      tags:
+      - Collection
+  /cancel:
+    post:
+      consumes:
+      - application/json
+      description: Cancel
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - BearerAuth: []
+      tags:
+      - Member
+  /collection/:subject_id:
+    patch:
+      consumes:
+      - application/json
+      description: UpdateCollection
+      parameters:
+      - description: collection
+        in: body
+        name: collection
+        required: true
+        schema:
+          $ref: '#/definitions/collection.AddOrUpdateCollectionReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - BearerAuth: []
+      tags:
+      - Collection
+    post:
+      consumes:
+      - application/json
+      description: Get Subject by id
+      parameters:
+      - description: collection
+        in: body
+        name: collection
+        required: true
+        schema:
+          $ref: '#/definitions/collection.AddOrUpdateCollectionReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - BearerAuth: []
+      tags:
+      - Collection
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Login
+      parameters:
+      - description: login req
+        in: body
+        name: loginReq
+        required: true
+        schema:
+          $ref: '#/definitions/user.UserLoginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ' login success '
+          schema:
+            $ref: '#/definitions/response.UserLoginResp'
+      tags:
+      - Member
   /me:
     get:
       consumes:
@@ -185,6 +339,46 @@ paths:
             $ref: '#/definitions/response.UserGetResp'
       security:
       - BearerAuth: []
+      tags:
+      - Member
+  /modify:
+    put:
+      consumes:
+      - multipart/form-data
+      description: ModifyInfo
+      parameters:
+      - description: Modify Info
+        in: body
+        name: ModifyReq
+        required: true
+        schema:
+          $ref: '#/definitions/user.ModifyInfoReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - BearerAuth: []
+      tags:
+      - Member
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Register
+      parameters:
+      - description: register req
+        in: body
+        name: registerReq
+        required: true
+        schema:
+          $ref: '#/definitions/user.UserRegisterReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ' register success '
       tags:
       - Member
   /subject/:subject_id:
@@ -204,9 +398,68 @@ paths:
         "200":
           description: SubjectInfo
           schema:
-            $ref: '#/definitions/ent.Subject'
+            $ref: '#/definitions/response.GetSubjectResp'
       tags:
       - Subject
+  /subject/create:
+    post:
+      consumes:
+      - application/json
+      description: Create Subject
+      parameters:
+      - description: SubjectCreate
+        in: body
+        name: SubjectReq
+        required: true
+        schema:
+          $ref: '#/definitions/subject.CreateSubjectReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      security:
+      - BearerAuth: []
+      tags:
+      - Subject
+  /subject/get:
+    get:
+      consumes:
+      - application/json
+      description: Get All Subject
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: SubjectsInfo
+          schema:
+            items:
+              $ref: '#/definitions/response.GetSubjectResp'
+            type: array
+      tags:
+      - Subject
+  /user/:id/avatar:
+    get:
+      consumes:
+      - application/json
+      description: Get Avatar
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: MemberAvatar
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      tags:
+      - Member
 securityDefinitions:
   BearerAuth:
     in: header

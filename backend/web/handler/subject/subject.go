@@ -12,6 +12,15 @@ import (
 	"backend/web/util"
 )
 
+// GetSubject godoc
+//
+//	 @Title GetSubject
+//		@Description	Get All Subject
+//		@Tags			Subject
+//		@Accept			json
+//		@Produce		json
+//		@Success		200		 {object}   []response.GetSubjectResp "SubjectsInfo"
+//		@Router			/subject/get [get]
 func (h Handler) GetSubject(c echo.Context) error {
 	subjects, err := h.ctrl.GetSubject()
 	if err != nil {
@@ -31,7 +40,7 @@ func (h Handler) GetSubject(c echo.Context) error {
 //		@Accept			json
 //		@Produce		json
 //	    @Param          subject_id 	path 	uint32   true "subject_id"
-//		@Success		200		 {object}   response.SubjectGetResp   "SubjectInfo"
+//		@Success		200		 {object}   response.GetSubjectResp "SubjectInfo"
 //		@Router			/subject/:subject_id [get]
 func (h Handler) GetSubjectByID(c echo.Context) error {
 	id := c.Param("subject_id")
@@ -46,6 +55,17 @@ func (h Handler) GetSubjectByID(c echo.Context) error {
 
 // TODO Use WikiJWTAuth
 
+// CreateSubject godoc
+//
+//	 @Title CreateSubject
+//	     @Security BearerAuth
+//		@Description	Create Subject
+//		@Tags			Subject
+//		@Accept			json
+//		@Produce		json
+//	    @Param          SubjectReq body subject.CreateSubjectReq true "SubjectCreate"
+//		@Success		200		 {object}  nil
+//		@Router			/subject/create [post]
 func (h Handler) CreateSubject(c echo.Context) error {
 	var req subject.CreateSubjectReq
 	if err := c.Bind(&req); err != nil {

@@ -38,8 +38,8 @@ func AddRouters(
 	app.PATCH("/collection/:subject_id", collectionHandler.UpdateCollection, middleware.UserJWTAuth)
 	app.DELETE("/collection/:subject_id", collectionHandler.DeleteCollection, middleware.UserJWTAuth)
 	// TODO
-	app.GET("/collection/:subject_id/subject/comment", collectionHandler.GetCommentsBySubjectID)
-	app.GET("/collection/:member_id/member/comment", collectionHandler.GetSelfComment)
+	app.GET("/:subject_id/subject/comment", collectionHandler.GetCommentsBySubjectID)
+	app.GET("/:member_id/member/comment", collectionHandler.GetMemberComment)
 	app.Any(
 		"/*", func(c echo.Context) error {
 			return util.Error(c, http.StatusNotFound, "")

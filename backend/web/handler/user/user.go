@@ -15,7 +15,16 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// Register POST
+// Register godoc
+//
+//		 @Title Register
+//			@Description	Register
+//			@Tags			Member
+//	        @Accept			json
+//			@Produce		json
+//			@Param  	registerReq 	body 	user.UserRegisterReq 	true "register req"
+//			@Success		200		 {object}   nil " register success "
+//			@Router			/register [post]
 func (h Handler) Register(c echo.Context) error {
 	// TODO Error handling
 	var r user.UserRegisterReq
@@ -36,6 +45,16 @@ func (h Handler) Register(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
+// Login godoc
+//
+//		 @Title Login
+//			@Description	Login
+//			@Tags			Member
+//	        @Accept			json
+//			@Produce		json
+//			@Param  	loginReq 	body 	user.UserLoginReq 	true "login req"
+//			@Success		200		 {object}   response.UserLoginResp " login success "
+//			@Router			/login [post]
 func (h Handler) Login(c echo.Context) error {
 	var req user.UserLoginReq
 	var resp response.UserLoginResp
@@ -56,6 +75,16 @@ func (h Handler) Login(c echo.Context) error {
 	return util.Success(c, http.StatusOK, resp)
 }
 
+// Cancel godoc
+//
+//		 @Title Cancel
+//			@Description	Cancel
+//	     @Security BearerAuth
+//			@Tags			Member
+//	        @Accept			json
+//			@Produce		json
+//			@Success		200		 {object}   nil
+//			@Router			/cancel [post]
 func (h Handler) Cancel(c echo.Context) error {
 	uid := c.Get("uid").(uint32)
 	err := h.ctrl.Cancel(uid)
@@ -66,8 +95,19 @@ func (h Handler) Cancel(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
+// ModifyInfo godoc
+//
+//		 @Title ModifyInfo
+//			@Description	ModifyInfo
+//	     @Security BearerAuth
+//			@Tags			Member
+//	        @Accept			mpfd
+//			@Produce		json
+//			@Param         ModifyReq  body  user.ModifyInfoReq true "Modify Info"
+//			@Success		200		 {object}   nil
+//			@Router			/modify [put]
 func (h Handler) ModifyInfo(c echo.Context) (err error) {
-	var req user.UserModifyInfoResp
+	var req user.ModifyInfoReq
 	uid := c.Get("uid").(uint32)
 	jsonData := c.FormValue("info")
 	if err := jsoniter.Unmarshal([]byte(jsonData), &req.Info); err != nil {
@@ -87,6 +127,17 @@ func (h Handler) ModifyInfo(c echo.Context) (err error) {
 	return c.NoContent(http.StatusOK)
 }
 
+// GetAvatar godoc
+//
+//			 @Title GetAvatar
+//				@Description	Get Avatar
+//		        @Security       BearerAuth
+//				@Tags			Member
+//				@Accept			json
+//	         @Param          id      path   uint32   true "id"
+//				@Produce		json
+//				@Success		200		 {object}   string   "MemberAvatar"
+//				@Router			/user/:id/avatar [get]
 func (h Handler) GetAvatar(c echo.Context) error {
 	param := c.Param("id")
 	id, err := strconv.Atoi(param)
