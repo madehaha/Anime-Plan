@@ -23,6 +23,7 @@ func AddRouters(
 	app.PUT("/modify", userHandler.ModifyInfo, middleware.UserJWTAuth)
 	app.GET("/me", userHandler.GetMe, middleware.UserJWTAuth)
 	app.GET("/user/:id/avatar", userHandler.GetAvatar)
+	app.GET("/user/:member_id", userHandler.GetMember)
 
 	// Subject
 	app.GET("/subject/get", subjectHandler.GetSubject)

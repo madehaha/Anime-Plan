@@ -172,3 +172,28 @@ func (h Handler) GetMe(c echo.Context) error {
 	}
 	return util.Success(c, http.StatusOK, response.NewUserGetResp(member))
 }
+
+// GetMember godoc
+//
+//		 @Title GetMember
+//			@Description	GetMember
+//	     @Security BearerAuth
+//			@Tags			Member
+//			@Accept			json
+//			@Produce		json
+//			@Param       id    path   uint32    true  "member_id"
+//			@Success		200		 {object}   response.UserGetResp   "MemberInfo"
+//			@Router			/user/:member_id [get]
+func (h Handler) GetMember(c echo.Context) error {
+	id := c.Param("member_id")
+	uid, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		logger.Error("error get id")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	member, err := h.userRepo.GetByUid(context.Background(), uint32(uid))
+	if err != nil {
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	return util.Success(c, http.StatusOK, response.NewUserGetResp(member))
+}
