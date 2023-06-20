@@ -16,6 +16,193 @@
         "version": "1.0"
     },
     "paths": {
+        "/:member_id/member/comment": {
+            "get": {
+                "description": "Get Comments By Uid",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Collection"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "member_id",
+                        "name": "member_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "comments",
+                        "schema": {
+                            "$ref": "#/definitions/response.CommentsResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/:subject_id/subject/comment": {
+            "get": {
+                "description": "Get Comments By Id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Collection"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "subject_id",
+                        "name": "subject_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "comments",
+                        "schema": {
+                            "$ref": "#/definitions/response.CommentsResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/cancel": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Cancel",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Member"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/collection/:subject_id": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get Subject by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Collection"
+                ],
+                "parameters": [
+                    {
+                        "description": "collection",
+                        "name": "collection",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/collection.AddOrUpdateCollectionReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "UpdateCollection",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Collection"
+                ],
+                "parameters": [
+                    {
+                        "description": "collection",
+                        "name": "collection",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/collection.AddOrUpdateCollectionReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "description": "Login",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Member"
+                ],
+                "parameters": [
+                    {
+                        "description": "login req",
+                        "name": "loginReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.UserLoginReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": " login success ",
+                        "schema": {
+                            "$ref": "#/definitions/response.UserLoginResp"
+                        }
+                    }
+                }
+            }
+        },
         "/me": {
             "get": {
                 "security": [
@@ -39,6 +226,71 @@
                         "schema": {
                             "$ref": "#/definitions/response.UserGetResp"
                         }
+                    }
+                }
+            }
+        },
+        "/modify": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "ModifyInfo",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Member"
+                ],
+                "parameters": [
+                    {
+                        "description": "Modify Info",
+                        "name": "ModifyReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.ModifyInfoReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/register": {
+            "post": {
+                "description": "Register",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Member"
+                ],
+                "parameters": [
+                    {
+                        "description": "register req",
+                        "name": "registerReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.UserRegisterReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": " register success "
                     }
                 }
             }
@@ -68,7 +320,103 @@
                     "200": {
                         "description": "SubjectInfo",
                         "schema": {
-                            "$ref": "#/definitions/ent.Subject"
+                            "$ref": "#/definitions/response.GetSubjectResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/subject/create": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create Subject",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Subject"
+                ],
+                "parameters": [
+                    {
+                        "description": "SubjectCreate",
+                        "name": "SubjectReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/subject.CreateSubjectReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/subject/get": {
+            "get": {
+                "description": "Get All Subject",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Subject"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "SubjectsInfo",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.GetSubjectResp"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/user/:id/avatar": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get Avatar",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Member"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "MemberAvatar",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -76,195 +424,119 @@
         }
     },
     "definitions": {
-        "ent.Collection": {
+        "collection.AddOrUpdateCollectionReq": {
             "type": "object",
+            "required": [
+                "has_comment",
+                "type"
+            ],
             "properties": {
-                "add_time": {
-                    "description": "AddTime holds the value of the \"add_time\" field.",
-                    "type": "string"
-                },
                 "comment": {
-                    "description": "Comment holds the value of the \"comment\" field.",
                     "type": "string"
-                },
-                "edges": {
-                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the CollectionQuery when eager-loading is set.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/ent.CollectionEdges"
-                        }
-                    ]
                 },
                 "ep_status": {
-                    "description": "EpStatus holds the value of the \"ep_status\" field.",
                     "type": "integer"
                 },
                 "has_comment": {
-                    "description": "HasComment holds the value of the \"has_comment\" field.",
                     "type": "boolean"
                 },
-                "id": {
-                    "description": "ID of the ent.",
-                    "type": "integer"
-                },
                 "score": {
-                    "description": "Score holds the value of the \"score\" field.",
                     "type": "integer"
                 },
                 "type": {
-                    "description": "Type holds the value of the \"type\" field.",
-                    "type": "integer"
-                }
-            }
-        },
-        "ent.CollectionEdges": {
-            "type": "object",
-            "properties": {
-                "member": {
-                    "description": "Member holds the value of the member edge.",
+                    "maximum": 5,
+                    "minimum": 1,
                     "allOf": [
                         {
-                            "$ref": "#/definitions/ent.Members"
-                        }
-                    ]
-                },
-                "subject": {
-                    "description": "Subject holds the value of the subject edge.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/ent.Subject"
+                            "$ref": "#/definitions/collection.CollectionType"
                         }
                     ]
                 }
             }
         },
-        "ent.Members": {
+        "collection.CollectionType": {
+            "type": "integer",
+            "enum": [
+                1,
+                2,
+                3,
+                4,
+                5
+            ],
+            "x-enum-varnames": [
+                "Wish",
+                "Watched",
+                "Doing",
+                "OnHold",
+                "Dropped"
+            ]
+        },
+        "response.CommentResp": {
             "type": "object",
             "properties": {
-                "avatar": {
-                    "description": "Avatar holds the value of the \"avatar\" field.",
+                "Comment": {
                     "type": "string"
                 },
-                "edges": {
-                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the MembersQuery when eager-loading is set.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/ent.MembersEdges"
-                        }
-                    ]
-                },
-                "email": {
-                    "description": "Email holds the value of the \"email\" field.",
-                    "type": "string"
-                },
-                "gid": {
-                    "description": "Gid holds the value of the \"gid\" field.",
+                "MemberID": {
                     "type": "integer"
                 },
-                "id": {
-                    "description": "ID of the ent.",
+                "SubjectId": {
                     "type": "integer"
                 },
-                "nickname": {
-                    "description": "Nickname holds the value of the \"nickname\" field.",
-                    "type": "string"
-                },
-                "password": {
-                    "description": "Password holds the value of the \"password\" field.",
-                    "type": "string"
-                },
-                "register_time": {
-                    "description": "RegisterTime holds the value of the \"register_time\" field.",
-                    "type": "string"
-                },
-                "username": {
-                    "description": "Username holds the value of the \"username\" field.",
+                "Time": {
                     "type": "string"
                 }
             }
         },
-        "ent.MembersEdges": {
+        "response.CommentsResp": {
             "type": "object",
             "properties": {
-                "collections": {
-                    "description": "Collections holds the value of the collections edge.",
+                "comments": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/ent.Collection"
+                        "$ref": "#/definitions/response.CommentResp"
                     }
                 }
             }
         },
-        "ent.Subject": {
+        "response.GetSubjectResp": {
             "type": "object",
             "properties": {
                 "date": {
-                    "description": "Date holds the value of the \"date\" field.",
                     "type": "string"
                 },
                 "doing": {
-                    "description": "Doing holds the value of the \"doing\" field.",
                     "type": "integer"
                 },
                 "dropped": {
-                    "description": "Dropped holds the value of the \"dropped\" field.",
-                    "type": "integer"
-                },
-                "edges": {
-                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the SubjectQuery when eager-loading is set.",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/ent.SubjectEdges"
-                        }
-                    ]
-                },
-                "episodes": {
-                    "description": "Episodes holds the value of the \"episodes\" field.",
                     "type": "integer"
                 },
                 "id": {
-                    "description": "ID of the ent.",
                     "type": "integer"
                 },
                 "image": {
-                    "description": "Image holds the value of the \"image\" field.",
                     "type": "string"
                 },
                 "name": {
-                    "description": "Name holds the value of the \"name\" field.",
                     "type": "string"
                 },
                 "name_cn": {
-                    "description": "NameCn holds the value of the \"name_cn\" field.",
                     "type": "string"
                 },
                 "on_hold": {
-                    "description": "OnHold holds the value of the \"on_hold\" field.",
+                    "type": "integer"
+                },
+                "subject_type": {
                     "type": "integer"
                 },
                 "summary": {
-                    "description": "Summary holds the value of the \"summary\" field.",
                     "type": "string"
                 },
                 "watched": {
-                    "description": "Watched holds the value of the \"watched\" field.",
                     "type": "integer"
                 },
                 "wish": {
-                    "description": "Wish holds the value of the \"wish\" field.",
                     "type": "integer"
-                }
-            }
-        },
-        "ent.SubjectEdges": {
-            "type": "object",
-            "properties": {
-                "collections": {
-                    "description": "Collections holds the value of the collections edge.",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/ent.Collection"
-                    }
                 }
             }
         },
@@ -297,6 +569,139 @@
                 },
                 "username": {
                     "description": "Username holds the value of the \"username\" field.",
+                    "type": "string"
+                }
+            }
+        },
+        "response.UserLoginResp": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "subject.CreateSubjectReq": {
+            "type": "object",
+            "required": [
+                "date",
+                "episodes",
+                "month",
+                "name",
+                "name_cn",
+                "summary",
+                "weekDay",
+                "year"
+            ],
+            "properties": {
+                "date": {
+                    "type": "integer",
+                    "maximum": 31,
+                    "minimum": 1
+                },
+                "episodes": {
+                    "type": "integer"
+                },
+                "image": {
+                    "description": "subject",
+                    "type": "string"
+                },
+                "month": {
+                    "type": "integer",
+                    "maximum": 12,
+                    "minimum": 1
+                },
+                "name": {
+                    "type": "string"
+                },
+                "name_cn": {
+                    "type": "string"
+                },
+                "summary": {
+                    "type": "string"
+                },
+                "weekDay": {
+                    "type": "integer",
+                    "maximum": 7,
+                    "minimum": 1
+                },
+                "year": {
+                    "description": "subject field",
+                    "type": "integer"
+                }
+            }
+        },
+        "user.Info": {
+            "type": "object",
+            "required": [
+                "email",
+                "nickname",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "email": {
+                    "description": "Email holds the value of the \"email\" field.",
+                    "type": "string"
+                },
+                "nickname": {
+                    "description": "Nickname holds the value of the \"nickname\" field.",
+                    "type": "string"
+                },
+                "password": {
+                    "description": "Password holds the value of the \"password\" field.",
+                    "type": "string"
+                },
+                "username": {
+                    "description": "Username holds the value of the \"username\" field.",
+                    "type": "string"
+                }
+            }
+        },
+        "user.ModifyInfoReq": {
+            "type": "object",
+            "required": [
+                "info"
+            ],
+            "properties": {
+                "info": {
+                    "$ref": "#/definitions/user.Info"
+                }
+            }
+        },
+        "user.UserLoginReq": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.UserRegisterReq": {
+            "type": "object",
+            "required": [
+                "email",
+                "nickname",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "nickname": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }

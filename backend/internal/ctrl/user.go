@@ -82,7 +82,7 @@ func (uc UserCtrl) GetAvtar(uid uint32) (string, error) {
 	return member.Avatar, nil
 }
 
-func (uc UserCtrl) ModifyInfo(uid uint32, r userReq.UserModifyInfoResp) error {
+func (uc UserCtrl) ModifyInfo(uid uint32, r userReq.ModifyInfoReq) error {
 	// write file
 	fileHeader := r.FileData
 	filename := strconv.FormatUint(uint64(uid), 10) + "_" + time.Now().Format(

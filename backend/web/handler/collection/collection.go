@@ -15,10 +15,20 @@ import (
 	"backend/web/util"
 )
 
+// AddCollection godoc
+//
+//	 @Title AddCollection
+//		@Description	Get Subject by id
+//	    @Security BearerAuth
+//		@Tags			Collection
+//		@Accept			json
+//		@Produce		json
+//	    @Param          collection 	body 	collectionReq.AddOrUpdateCollectionReq   true "collection"
+//		@Success		200		 {object}   nil
+//		@Router			/collection/:subject_id [post]
 func (h Handler) AddCollection(c echo.Context) (err error) {
 	var req collectionReq.AddOrUpdateCollectionReq
 	var subjectId uint64
-
 	param := c.Param("subject_id")
 	if subjectId, err = strconv.ParseUint(param, 10, 32); err != nil {
 		logger.Error("convert error")
@@ -29,6 +39,7 @@ func (h Handler) AddCollection(c echo.Context) (err error) {
 		logger.Error("Failed to bind")
 		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
+
 	fmt.Println(req)
 	if err := c.Validate(&req); err != nil {
 		logger.Error("Failed to validate")
@@ -50,6 +61,17 @@ func (h Handler) AddCollection(c echo.Context) (err error) {
 	return c.NoContent(http.StatusOK)
 }
 
+// UpdateCollection godoc
+//
+//	 @Title UpdateCollection
+//		@Description	UpdateCollection
+//	    @Security BearerAuth
+//		@Tags			Collection
+//		@Accept			json
+//		@Produce		json
+//	    @Param          collection 	body 	collectionReq.AddOrUpdateCollectionReq   true "collection"
+//		@Success		200		 {object}   nil
+//		@Router			/collection/:subject_id [patch]
 func (h Handler) UpdateCollection(c echo.Context) error {
 	var req collectionReq.AddOrUpdateCollectionReq
 	if err := c.Bind(&req); err != nil {
@@ -80,12 +102,15 @@ func (h Handler) UpdateCollection(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
+// DeleteCollection godoc
 // @Title DeleteCollection
+//	    @Security BearerAuth
 //	@Description	Delete Collection by subject_id
 //	@Tags			Collection
 //	@Accept			json
 //	@Produce		json
-//	@Success		200				{object}
+//	@Param          subject_id 	path 	uint32   true "subject_id"
+//	@Success		200			{object}  nil
 //	@Router			/collection/:subject_id [delete]
 
 func (h Handler) DeleteCollection(c echo.Context) error {
@@ -103,7 +128,17 @@ func (h Handler) DeleteCollection(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
-func (h Handler) GetSelfComment(c echo.Context) error {
+// GetMemberComment godoc
+// @Title GetMemberComment
+//
+//	@Description	Get Comments By Uid
+//	@Tags			Collection
+//	@Accept			json
+//	@Produce		json
+//	@Param          member_id 	path 	uint32   true "member_id"
+//	@Success		200			{object}   response.CommentsResp   "comments"
+//	@Router			/:member_id/member/comment [get]
+func (h Handler) GetMemberComment(c echo.Context) error {
 	MemberId, err := strconv.ParseUint(c.Param("member_id"), 10, 64)
 	if err != nil {
 		logger.Error("convert error")
@@ -121,6 +156,16 @@ func (h Handler) GetSelfComment(c echo.Context) error {
 	return util.Success(c, http.StatusOK, responses)
 }
 
+// GetCommentsBySubjectID godoc
+// @Title GetCommentsBySubjectID
+//
+//	@Description	Get Comments By Id
+//	@Tags			Collection
+//	@Accept			json
+//	@Produce		json
+//	@Param          subject_id 	path 	uint32   true "subject_id"
+//	@Success		200			{object} response.CommentsResp  "comments"
+//	@Router			/:subject_id/subject/comment [get]
 func (h Handler) GetCommentsBySubjectID(c echo.Context) error {
 	subjectId, err := strconv.ParseUint(c.Param("subject_id"), 10, 64)
 	if err != nil {
