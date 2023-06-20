@@ -31,6 +31,10 @@ func AddRouters(
 		"/subject/create", subjectHandler.CreateSubject,
 		middleware.WikiJWTAuth,
 	) // verify if having permission to create subject
+	app.PUT(
+		"/subject/create", subjectHandler.CreateSubjectWithSave,
+		middleware.WikiJWTAuth,
+	) // verify if having permission to create subject
 
 	app.GET("/subject/:subject_id", subjectHandler.GetSubjectByID)
 

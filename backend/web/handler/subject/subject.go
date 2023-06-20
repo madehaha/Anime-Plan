@@ -2,6 +2,7 @@ package subject
 
 import (
 	"backend/web/response"
+	jsoniter "github.com/json-iterator/go"
 	"net/http"
 	"strconv"
 
@@ -28,7 +29,7 @@ func (h Handler) GetSubject(c echo.Context) error {
 		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
 
-	_ = c.JSON(http.StatusOK, util.Map(subjects, response.NewSubjectResp))
+	_ = c.JSON(http.StatusOK, util.Map(subjects, response.SubjectResp))
 	return nil
 }
 
@@ -40,17 +41,17 @@ func (h Handler) GetSubject(c echo.Context) error {
 //		@Accept			json
 //		@Produce		json
 //	    @Param          subject_id 	path 	uint32   true "subject_id"
-//		@Success		200		 {object}   response.GetSubjectResp "SubjectInfo"
+//		@Success		200		 {object}   response.GetSubjectWithFieldResp "SubjectInfo"
 //		@Router			/subject/:subject_id [get]
 func (h Handler) GetSubjectByID(c echo.Context) error {
 	id := c.Param("subject_id")
 	Id, err := strconv.ParseUint(id, 10, 64)
-	subjectEntity, err := h.ctrl.GetSubjectByID(uint32(Id))
+	subjectEntity, Field, err := h.ctrl.GetSubjectByID(uint32(Id))
 	if err != nil {
 		logger.Error("Failed to find subject")
 		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
-	return util.Success(c, http.StatusOK, response.NewSubjectResp(subjectEntity))
+	return util.Success(c, http.StatusOK, response.NewSubjectResp(subjectEntity, Field))
 }
 
 // TODO Use WikiJWTAuth
@@ -78,6 +79,30 @@ func (h Handler) CreateSubject(c echo.Context) error {
 	}
 	if err := h.ctrl.CreateSubject(req); err != nil {
 		logger.Error("create subject failed")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	return c.NoContent(http.StatusOK)
+}
+
+func (h Handler) CreateSubjectWithSave(c echo.Context) (err error) {
+	var req subject.CreateSubjectWithSaveReq
+	uid := c.Get("uid").(uint32)
+	gid := c.Get("gid").(uint8)
+	if gid == 0 {
+		return util.Error(c, http.StatusBadRequest, "no permission:have no root")
+	}
+	jsonData := c.FormValue("createSubject")
+	if err := jsoniter.Unmarshal([]byte(jsonData), &req.CreateSubject); err != nil {
+		logger.Error("Failed to parse json")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	req.FileData, err = c.FormFile("image")
+	if err != nil {
+		logger.Error("Failed to get file")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	if err := h.ctrl.CreateSubjectWithSave(uid, req); err != nil {
+		logger.Error("create subject with save failed")
 		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
 	return c.NoContent(http.StatusOK)

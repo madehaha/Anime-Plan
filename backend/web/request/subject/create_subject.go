@@ -1,5 +1,7 @@
 package subject
 
+import "mime/multipart"
+
 type CreateSubjectReq struct {
 	// subject
 	Image    string `json:"image"`
@@ -12,4 +14,9 @@ type CreateSubjectReq struct {
 	Month   uint8  `json:"month" validate:"required,lte=12,gte=1"`
 	Date    uint8  `json:"date" validate:"required,lte=31,gte=1"`
 	WeekDay uint8  `json:"weekDay" validate:"required,lte=7,gte=1"`
+}
+type CreateSubjectWithSaveReq struct {
+	// subject
+	CreateSubject CreateSubjectReq      `form:"createSubject" validate:"required"`
+	FileData      *multipart.FileHeader `form:"image" validate:"required" swaggerignore:"true"`
 }

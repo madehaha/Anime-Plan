@@ -23,6 +23,7 @@ type Info struct {
 	// Nickname holds the value of the "nickname" field.
 	Nickname string `json:"nickname,omitempty" validate:"required"`
 }
+
 type ModifyInfoReq struct {
 	Info     Info                  `form:"info" validate:"required"`
 	FileData *multipart.FileHeader `form:"image" validate:"required" swaggerignore:"true"`

@@ -6,6 +6,7 @@ import (
 
 	"backend/ent"
 	"backend/ent/subject"
+	"backend/ent/subjectfield"
 	"backend/internal/collection"
 	"backend/internal/logger"
 	subjectReq "backend/web/request/subject"
@@ -27,12 +28,16 @@ func (m MysqlRepo) GetSubject(ctx context.Context) (ent.Subjects, error) {
 	return subjectEntities, nil
 }
 
-func (m MysqlRepo) GetSubjectByID(ctx context.Context, subjectId uint32) (*ent.Subject, error) {
+func (m MysqlRepo) GetSubjectByID(ctx context.Context, subjectId uint32) (*ent.Subject, *ent.SubjectField, error) {
 	subjectEntity, err := m.client.Subject.Query().Where(subject.ID(subjectId)).First(ctx)
 	if err != nil {
-		return subjectEntity, err
+		return nil, nil, err
 	}
-	return subjectEntity, nil
+	field, err := m.client.SubjectField.Query().Where(subjectfield.HasSubjectWith(subject.ID(subjectId))).First(ctx)
+	if err != nil {
+		return subjectEntity, nil, err
+	}
+	return subjectEntity, field, nil
 }
 
 func (m MysqlRepo) GetSubjectByName(ctx context.Context, name string) (*ent.Subject, error) {
