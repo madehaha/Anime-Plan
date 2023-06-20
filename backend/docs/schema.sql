@@ -31,26 +31,28 @@ CREATE TABLE `subjects`
     `dropped`  int unsigned     NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`)
 ) CHARSET utf8mb4
-  COLLATE utf8mb4_bin;
+  COLLATE utf8mb4_bin
+  AUTO_INCREMENT 2;
 -- Create "collections" table
 CREATE TABLE `collections`
 (
-    `id`                  int unsigned     NOT NULL AUTO_INCREMENT,
-    `type`                tinyint unsigned NOT NULL,
-    `has_comment`         bool             NOT NULL DEFAULT 0,
-    `comment`             varchar(100)     NOT NULL DEFAULT "",
-    `score`               tinyint unsigned NOT NULL DEFAULT 0,
-    `add_time`            varchar(255)     NOT NULL DEFAULT "2000-01-01",
-    `ep_status`           tinyint unsigned NOT NULL DEFAULT 0,
-    `members_collections` int unsigned     NULL,
-    `subject_collections` int unsigned     NULL,
+    `id`          int unsigned     NOT NULL AUTO_INCREMENT,
+    `type`        tinyint unsigned NOT NULL,
+    `has_comment` bool             NOT NULL DEFAULT 0,
+    `comment`     varchar(100)     NOT NULL DEFAULT "",
+    `score`       tinyint unsigned NOT NULL DEFAULT 0,
+    `add_time`    varchar(255)     NOT NULL DEFAULT "2000-01-01",
+    `ep_status`   tinyint unsigned NOT NULL DEFAULT 0,
+    `member_id`   int unsigned     NULL,
+    `subject_id`  int unsigned     NULL,
     PRIMARY KEY (`id`),
-    INDEX `collections_members_collections` (`members_collections`),
-    INDEX `collections_subjects_collections` (`subject_collections`),
-    CONSTRAINT `collections_members_collections` FOREIGN KEY (`members_collections`) REFERENCES `members` (`uid`) ON UPDATE NO ACTION ON DELETE SET NULL,
-    CONSTRAINT `collections_subjects_collections` FOREIGN KEY (`subject_collections`) REFERENCES `subjects` (`id`) ON UPDATE NO ACTION ON DELETE SET NULL
+    INDEX `collections_members_collections` (`member_id`),
+    INDEX `collections_subjects_collections` (`subject_id`),
+    CONSTRAINT `collections_members_collections` FOREIGN KEY (`member_id`) REFERENCES `members` (`uid`) ON UPDATE NO ACTION ON DELETE SET NULL,
+    CONSTRAINT `collections_subjects_collections` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON UPDATE NO ACTION ON DELETE SET NULL
 ) CHARSET utf8mb4
-  COLLATE utf8mb4_bin;
+  COLLATE utf8mb4_bin
+  AUTO_INCREMENT 2;
 -- Create "subject_fields" table
 CREATE TABLE `subject_fields`
 (
@@ -66,7 +68,7 @@ CREATE TABLE `subject_fields`
     `rate_9`                int unsigned     NOT NULL DEFAULT 0,
     `rate_10`               int unsigned     NOT NULL DEFAULT 0,
     `average_score`         double           NOT NULL DEFAULT 0,
-    `rank`                  int unsigned     NOT NULL DEFAULT 4294967295,
+    `rank`                  int unsigned     NOT NULL DEFAULT 0,
     `year`                  int unsigned     NOT NULL,
     `month`                 tinyint unsigned NOT NULL,
     `date`                  tinyint unsigned NOT NULL,
@@ -76,4 +78,5 @@ CREATE TABLE `subject_fields`
     UNIQUE INDEX `subject_subject_field` (`subject_subject_field`),
     CONSTRAINT `subject_fields_subjects_subject_field` FOREIGN KEY (`subject_subject_field`) REFERENCES `subjects` (`id`) ON UPDATE NO ACTION ON DELETE SET NULL
 ) CHARSET utf8mb4
-  COLLATE utf8mb4_bin;
+  COLLATE utf8mb4_bin
+  AUTO_INCREMENT 2;
