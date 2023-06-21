@@ -1,0 +1,201 @@
+<template>
+  <div class="all">
+    <div id="head">
+      <div class="head">Anime-Plan</div>
+      <div class="date">2023-6-20加入</div>
+    </div>
+    <div class="comic">
+      <div class="myComic">我的动画</div>
+      <el-tabs type="card" class="demo-tabs">
+        <el-tab-pane
+          ><template #label>
+            <span class="seen-tabs-label"> {{ seenCount }}部看过 </span>
+          </template>
+          <div class="content">
+            <div class="show">
+              <img src="../assets/baokemeng.png" alt="" />
+              <div class="name">精灵宝可梦</div>
+              <div class="msg">1话/2009年10月12日/汤山邦彦</div>
+              <div class="time">2023-6-20</div>
+              <div class="comment">超级喜欢这个充满宝可梦的世界</div>
+              <el-button-group class="buttongroup" size="large">
+                <el-button type="primary" class="change"
+                  >修改</el-button
+                >
+                <el-button type="primary" class="remove">
+                  删除
+                </el-button>
+              </el-button-group>
+            </div>
+            <div class="show">
+              <img src="../assets/baokemeng.png" alt="" />
+              <div class="name">精灵宝可梦</div>
+              <div class="msg">1话/2009年10月12日/汤山邦彦</div>
+              <div class="time">2023-6-20</div>
+              <div class="comment">超级喜欢这个充满宝可梦的世界</div>
+            </div>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane>
+          <template #label>
+            <span class="wanted-tabs-label">
+              {{ wantedCount }}部想看
+            </span> </template
+          >Role</el-tab-pane
+        >
+        <el-tab-pane>
+          <template #label>
+            <span class="seen-tabs-label">
+              {{ discardCount }}部抛弃
+            </span> </template
+          >Task</el-tab-pane
+        >
+      </el-tabs>
+    </div>
+  </div>
+</template>
+<script setup>
+import { ref } from "vue";
+const seenCount = ref("5");
+const wantedCount = ref("2");
+const discardCount = ref("1");
+</script>
+
+<style scoped>
+* {
+  padding: 0;
+  margin: 0;
+}
+.all {
+  height: 100vh;
+  width: 60%;
+  position: relative;
+  left: 80px;
+}
+#head {
+  width: 100%;
+  height: 30px;
+  position: relative;
+  left: 0%;
+  top: 20px;
+}
+.comic {
+  width: 100%;
+  height: 350px;
+  position: relative;
+  top: 50px;
+}
+.myComic {
+  width: 100px;
+  height: 40px;
+  text-align: center;
+  line-height: 40px;
+  font-size: 24px;
+  color: hotpink;
+  display: inline-block;
+  position: absolute;
+  left: 0%;
+  top: 0%;
+}
+.demo-tabs {
+  width: 100%;
+  height: 40px;
+  display: inline-block;
+  position: absolute;
+  left: 110px;
+  top: 0%;
+}
+.show img {
+  width: 160px;
+  height: 160px;
+  display: inline-block;
+  position: absolute;
+  left: 0%;
+  top: 0%;
+}
+.show .name {
+  width: 780px;
+  height: 30px;
+  font-size: 24px;
+  color: deepskyblue;
+  text-align: left;
+  line-height: 30px;
+  position: absolute;
+  left: 180px;
+  top: 0%;
+}
+.show .msg {
+  width: 780px;
+  height: 30px;
+  text-align: left;
+  line-height: 30px;
+  position: absolute;
+  left: 180px;
+  top: 40px;
+}
+.show .time {
+  width: 400px;
+  height: 30px;
+  text-align: left;
+  line-height: 30px;
+  position: absolute;
+  left: 180px;
+  top: 75px;
+}
+.show .comment {
+  width: 780px;
+  height: 50px;
+  text-align: left;
+  line-height: 30px;
+  border-style: solid;
+  border-radius: 10px;
+  border-color: skyblue;
+  position: absolute;
+  left: 180px;
+  top: 110px;
+}
+.show .buttongroup{
+    width: 200px;
+border-block-color: black;
+}
+.show .change{
+    width: 100px;
+    color: black;
+background-color: white;
+
+}
+.show .remove{
+    width: 50px;
+    color: black;
+background-color:white;
+}
+.show {
+  width: 100%;
+  height: 160px;
+  margin: 5px;
+  position: relative;
+  display: inline-block;
+}
+.content {
+  height: 400px;
+  width: 100%;
+}
+.head {
+  width: 100px;
+  height: 30px;
+  text-align: center;
+  line-height: 30px;
+  position: absolute;
+  background-color: antiquewhite;
+  border-radius: 12px;
+}
+.date {
+  width: 120px;
+  height: 30px;
+  line-height: 30px;
+  text-align: left;
+  position: absolute;
+  top: 0%;
+  left: 110px;
+}
+</style>

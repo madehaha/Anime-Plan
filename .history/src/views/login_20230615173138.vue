@@ -1,0 +1,81 @@
+<template>
+  <div class="body">
+    <div class="main">
+      <el-form>
+        <el-form-item>
+          <el-input placeholder="请输入邮箱" v-model="user.email"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-input placeholder="请输入密码" v-model="user.password"></el-input>
+        </el-form-item>
+      </el-form>
+      <el-button @click="loginIn">登录</el-button>
+    </div>
+  </div>
+</template>
+ 
+<script setup>
+import { ref } from "vue";
+const user = ref({ email: "", password: "" })
+const loginIn = ()=>{
+    console.log(this.user.value.email)
+    console.log(this.user.value.password)
+}
+
+</script>
+ 
+<style scoped >
+*,
+*::after,
+*::before {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+.body {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Montserrat", sans-serif;
+  font-size: 12px;
+  background-color: #ecf0f3;
+  color: #a0a5a8;
+}
+
+.main {
+  position: relative;
+  width: 1000px;
+  min-width: 1000px;
+  min-height: 600px;
+  height: 600px;
+  padding: 25px;
+  background-color: #ecf0f3;
+  box-shadow: 10px 10px 10px #d1d9e6, -10px -10px 10px #f9f9f9;
+  border-radius: 20px;
+  overflow: hidden;
+}
+@media (max-width: 1200px) {
+  .main {
+    transform: scale(0.7);
+  }
+}
+@media (max-width: 1000px) {
+  .main {
+    transform: scale(0.6);
+  }
+}
+@media (max-width: 800px) {
+  .main {
+    transform: scale(0.5);
+  }
+}
+@media (max-width: 600px) {
+  .main {
+    transform: scale(0.4);
+  }
+}
+</style>
