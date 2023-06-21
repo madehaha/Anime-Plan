@@ -13,3 +13,17 @@ type Model struct {
 	Watched  uint32 `json:"watched"`
 	Episodes uint8  `json:"episodes,omitempty"`
 }
+
+type InitialInfo struct {
+	// subject
+	Image    string `json:"image"`
+	Summary  string `json:"summary"`
+	Name     string `json:"name"`
+	NameCN   string `json:"name_cn"`
+	Episodes uint8  `json:"episodes"`
+	// subject field
+	Year    uint32 `json:"year"`
+	Month   uint8  `json:"month"`
+	Date    uint8  `json:"date"`
+	WeekDay uint8  `json:"weekDay"`
+}

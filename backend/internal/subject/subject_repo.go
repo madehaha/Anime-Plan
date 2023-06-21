@@ -9,7 +9,6 @@ import (
 	"backend/ent/subjectfield"
 	"backend/internal/collection"
 	"backend/internal/logger"
-	subjectReq "backend/web/request/subject"
 )
 
 type MysqlRepo struct {
@@ -48,14 +47,14 @@ func (m MysqlRepo) GetSubjectByName(ctx context.Context, name string) (*ent.Subj
 	return subjectEntity, nil
 }
 
-func (m MysqlRepo) CreateSubject(ctx context.Context, req subjectReq.CreateSubjectReq) (uint32, error) {
-	if u, _ := m.client.Subject.Query().Where(subject.Name(req.Name)).First(ctx); u != nil {
+func (m MysqlRepo) CreateSubject(ctx context.Context, info InitialInfo) (uint32, error) {
+	if u, _ := m.client.Subject.Query().Where(subject.Name(info.Name)).First(ctx); u != nil {
 		logger.Error("created same subject")
 		err := errors.New("already created same subject")
 		return 0, err
 	}
-	subjectEntity, err := m.client.Subject.Create().SetImage(req.Image).SetSummary(req.Summary).SetName(req.Name).
-		SetNameCn(req.NameCN).SetEpisodes(req.Episodes).Save(ctx)
+	subjectEntity, err := m.client.Subject.Create().SetImage(info.Image).SetSummary(info.Summary).SetName(info.Name).
+		SetNameCn(info.NameCN).SetEpisodes(info.Episodes).Save(ctx)
 	if err != nil {
 		logger.Error("error to create the subject")
 		return 0, err

@@ -1,6 +1,10 @@
 package subject
 
-import "mime/multipart"
+import (
+	"mime/multipart"
+
+	"backend/internal/subject"
+)
 
 type CreateSubjectReq struct {
 	// subject
@@ -22,4 +26,18 @@ type CreateSubjectWithSaveReq struct {
 }
 
 type Search struct {
+}
+
+func NewInitialInfo(req CreateSubjectReq) subject.InitialInfo {
+	return subject.InitialInfo{
+		Image:    req.Image,
+		Summary:  req.Summary,
+		Name:     req.Name,
+		NameCN:   req.NameCN,
+		Episodes: req.Episodes,
+		Year:     req.Year,
+		Month:    req.Month,
+		Date:     req.Date,
+		WeekDay:  req.WeekDay,
+	}
 }

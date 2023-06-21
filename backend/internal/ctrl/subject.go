@@ -1,12 +1,6 @@
 package ctrl
 
 import (
-	"backend/ent"
-	"backend/internal/config"
-	"backend/internal/logger"
-	"backend/internal/subject"
-	subjectField "backend/internal/subject_field"
-	subjectReq "backend/web/request/subject"
 	"context"
 	"errors"
 	"io"
@@ -15,6 +9,13 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+
+	"backend/ent"
+	"backend/internal/config"
+	"backend/internal/logger"
+	"backend/internal/subject"
+	subjectField "backend/internal/subject_field"
+	subjectReq "backend/web/request/subject"
 )
 
 type SubjectCtrl struct {
@@ -23,7 +24,9 @@ type SubjectCtrl struct {
 	cfg              config.AppConfig
 }
 
-func NewSubjectCtrl(subjectRepo subject.MysqlRepo, subjectFieldRepo subjectField.MysqlRepo, cfg config.AppConfig) SubjectCtrl {
+func NewSubjectCtrl(
+	subjectRepo subject.MysqlRepo, subjectFieldRepo subjectField.MysqlRepo, cfg config.AppConfig,
+) SubjectCtrl {
 	return SubjectCtrl{
 		subjectRepo:      subjectRepo,
 		subjectFieldRepo: subjectFieldRepo,
@@ -59,7 +62,8 @@ func (sc SubjectCtrl) CreateSubject(req subjectReq.CreateSubjectReq) error {
 		logger.Error("The subject already exist")
 		return errors.New("subject already exist")
 	}
-	if subjectId, err = sc.subjectRepo.CreateSubject(ctx, req); err != nil {
+	info := subjectReq.NewInitialInfo(req)
+	if subjectId, err = sc.subjectRepo.CreateSubject(ctx, info); err != nil {
 		logger.Error("Fail to create subjects")
 		return err
 	}
@@ -93,13 +97,15 @@ func (sc SubjectCtrl) CreateSubjectWithSave(uid uint32, req subjectReq.CreateSub
 	imageUrl := sc.cfg.WebDomain + "/" + sc.cfg.StaticDirectory + "/" + filename
 	logger.Info(imageUrl)
 	req.CreateSubject.Image = imageUrl
-	if subjectId, err = sc.subjectRepo.CreateSubject(ctx, req.CreateSubject); err != nil {
+	info := subjectReq.NewInitialInfo(req.CreateSubject)
+	if subjectId, err = sc.subjectRepo.CreateSubject(ctx, info); err != nil {
 		logger.Error("Fail to create subjects")
 		return err
 	}
 
 	if err := sc.subjectFieldRepo.CreateSubjectField(
-		ctx, subjectId, req.CreateSubject.Year, req.CreateSubject.Month, req.CreateSubject.Date, req.CreateSubject.WeekDay,
+		ctx, subjectId, req.CreateSubject.Year, req.CreateSubject.Month, req.CreateSubject.Date,
+		req.CreateSubject.WeekDay,
 	); err != nil {
 		logger.Error("Failed to create subject field")
 		return err
