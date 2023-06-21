@@ -1,63 +1,64 @@
 package response
 
-import "backend/ent"
+import (
+	"backend/ent"
+	"backend/internal/subject"
+	subjectField "backend/internal/subject_field"
+)
 
 type GetSubjectWithFieldResp struct {
-	ID          uint32           `json:"id,omitempty"`
-	Image       string           `json:"image,omitempty"`
-	Summary     string           `json:"summary,omitempty"`
-	Name        string           `json:"name,omitempty"`
-	Date        string           `json:"date,omitempty"`
-	NameCn      string           `json:"name_cn,omitempty"`
-	OnHold      uint32           `json:"on_hold,omitempty"`
-	Wish        uint32           `json:"wish,omitempty"`
-	Doing       uint32           `json:"doing,omitempty"`
-	SubjectType uint8            `json:"subject_type,omitempty"`
-	Dropped     uint32           `json:"dropped,omitempty"`
-	Watched     uint32           `json:"watched,omitempty"`
-	Field       ent.SubjectField `json:"field"`
-}
-type GetSubjectResp struct {
-	ID          uint32 `json:"id,omitempty"`
-	Image       string `json:"image,omitempty"`
-	Summary     string `json:"summary,omitempty"`
-	Name        string `json:"name,omitempty"`
-	Date        string `json:"date,omitempty"`
-	NameCn      string `json:"name_cn,omitempty"`
-	OnHold      uint32 `json:"on_hold,omitempty"`
-	Wish        uint32 `json:"wish,omitempty"`
-	Doing       uint32 `json:"doing,omitempty"`
-	SubjectType uint8  `json:"subject_type,omitempty"`
-	Dropped     uint32 `json:"dropped,omitempty"`
-	Watched     uint32 `json:"watched,omitempty"`
+	Info  subject.Model
+	Field subjectField.Model `json:"field"`
 }
 
-func SubjectResp(subject *ent.Subject) GetSubjectResp {
+type GetSubjectResp struct {
+	Info subject.Model
+}
+
+func SubjectResp(Subject *ent.Subject) GetSubjectResp {
 	return GetSubjectResp{
-		ID:      subject.ID,
-		Image:   subject.Image,
-		Summary: subject.Summary,
-		Name:    subject.NameCn,
-		OnHold:  subject.OnHold,
-		Doing:   subject.Doing,
-		Dropped: subject.Dropped,
-		Wish:    subject.Wish,
-		Watched: subject.Watched,
-		NameCn:  subject.Name,
+		Info: GetInfo(Subject),
 	}
 }
-func NewSubjectResp(subject *ent.Subject, field *ent.SubjectField) GetSubjectWithFieldResp {
+func NewSubjectResp(Subject *ent.Subject, field *ent.SubjectField) GetSubjectWithFieldResp {
 	return GetSubjectWithFieldResp{
-		ID:      subject.ID,
-		Image:   subject.Image,
-		Summary: subject.Summary,
-		Name:    subject.NameCn,
-		OnHold:  subject.OnHold,
-		Doing:   subject.Doing,
-		Dropped: subject.Dropped,
-		Wish:    subject.Wish,
-		Watched: subject.Watched,
-		NameCn:  subject.Name,
-		Field:   *field,
+		Info:  GetInfo(Subject),
+		Field: GetField(field),
+	}
+}
+
+func GetInfo(Subject *ent.Subject) subject.Model {
+	return subject.Model{
+		ID:       Subject.ID,
+		Image:    Subject.Image,
+		Summary:  Subject.Summary,
+		Name:     Subject.Name,
+		NameCn:   Subject.NameCn,
+		Episodes: Subject.Episodes,
+		Wish:     Subject.Wish,
+		OnHold:   Subject.OnHold,
+		Doing:    Subject.Doing,
+		Watched:  Subject.Watched,
+		Dropped:  Subject.Dropped,
+	}
+}
+func GetField(Field *ent.SubjectField) subjectField.Model {
+	return subjectField.Model{
+		ID:           Field.ID,
+		Rate1:        Field.Rate1,
+		Rate2:        Field.Rate2,
+		Rate3:        Field.Rate3,
+		Rate4:        Field.Rate4,
+		Rate5:        Field.Rate5,
+		Rate6:        Field.Rate6,
+		Rate7:        Field.Rate7,
+		Rate8:        Field.Rate8,
+		Rate9:        Field.Rate9,
+		Rate10:       Field.Rate10,
+		AverageScore: Field.AverageScore,
+		Year:         Field.Year,
+		Month:        Field.Month,
+		Date:         Field.Date,
+		Weekday:      Field.Weekday,
 	}
 }
