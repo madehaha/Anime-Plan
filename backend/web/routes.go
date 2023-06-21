@@ -18,6 +18,7 @@ func AddRouters(
 	app *echo.Echo, middleware middleware.JwtMiddleware, userHandler user.Handler, subjectHandler subject.Handler,
 	collectionHandler collection.Handler,
 ) {
+	// logger
 	app.Use(
 		echoMiddleware.LoggerWithConfig(
 			echoMiddleware.LoggerConfig{
@@ -25,6 +26,9 @@ func AddRouters(
 			},
 		),
 	)
+	// cors
+	app.Use(echoMiddleware.CORS())
+
 	// User
 	app.POST("/register", userHandler.Register)
 	app.POST("/login", userHandler.Login)
@@ -47,11 +51,10 @@ func AddRouters(
 
 	app.GET("/subject/:subject_id", subjectHandler.GetSubjectByID)
 
-	// TODO update subject_field
 	app.POST("/collection/:subject_id", collectionHandler.AddCollection, middleware.UserJWTAuth)
 	app.PATCH("/collection/:subject_id", collectionHandler.UpdateCollection, middleware.UserJWTAuth)
 	app.DELETE("/collection/:subject_id", collectionHandler.DeleteCollection, middleware.UserJWTAuth)
-	// TODO
+
 	app.GET("/:subject_id/subject/comment", collectionHandler.GetCommentsBySubjectID)
 	app.GET("/:member_id/member/comment", collectionHandler.GetMemberComment)
 	app.Any(
