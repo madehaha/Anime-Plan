@@ -3,6 +3,8 @@ package web
 import (
 	"net/http"
 
+	echoMiddleware "github.com/labstack/echo/v4/middleware"
+
 	"backend/web/handler/collection"
 	"backend/web/handler/subject"
 	"backend/web/handler/user"
@@ -16,6 +18,13 @@ func AddRouters(
 	app *echo.Echo, middleware middleware.JwtMiddleware, userHandler user.Handler, subjectHandler subject.Handler,
 	collectionHandler collection.Handler,
 ) {
+	app.Use(
+		echoMiddleware.LoggerWithConfig(
+			echoMiddleware.LoggerConfig{
+				Format: "${time_rfc3339}, ${method}, ${uri}, ${status}\n",
+			},
+		),
+	)
 	// User
 	app.POST("/register", userHandler.Register)
 	app.POST("/login", userHandler.Login)
