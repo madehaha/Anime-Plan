@@ -16,7 +16,7 @@ func (Subject) Fields() []ent.Field {
 	return []ent.Field{
 		field.Uint32("id").Unique().Immutable(),
 		field.String("image").MaxLen(255).Default("https://lain.bgm.tv/pic/user/l/icon.jpg"),
-		field.String("summary").MaxLen(300).Default("No summary."),
+		field.String("summary").MaxLen(3000).Default("No summary."),
 		field.String("name"),
 		field.String("name_cn"),
 		field.Uint8("episodes"), // number of episodes
