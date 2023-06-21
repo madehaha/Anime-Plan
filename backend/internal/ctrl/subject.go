@@ -139,3 +139,29 @@ func (sc SubjectCtrl) saveFile(file *multipart.FileHeader, fileName string) erro
 	_, err = io.Copy(out, src)
 	return err
 }
+
+func (sc SubjectCtrl) Insert(data []subject.Subject) error {
+	for _, d := range data {
+		info := subject.InitialInfo{
+			Image:    d.Image,
+			Summary:  d.Summary,
+			Name:     d.Name,
+			NameCN:   d.NameCn,
+			Episodes: d.Episodes,
+			Year:     d.Year,
+			Month:    d.Month,
+			Date:     d.Date,
+			WeekDay:  d.Weekday,
+		}
+		subjectId, err := sc.subjectRepo.CreateSubject(context.Background(), info)
+		if err != nil {
+			logger.Error(err.Error())
+		}
+		err = sc.subjectFieldRepo.InsertSubjectField(context.Background(), subjectId, d)
+		if err != nil {
+			logger.Error(err.Error())
+		}
+	}
+
+	return nil
+}

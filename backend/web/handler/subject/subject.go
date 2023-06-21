@@ -1,14 +1,19 @@
 package subject
 
 import (
-	"backend/web/response"
-	jsoniter "github.com/json-iterator/go"
+	"io"
 	"net/http"
+	"os"
 	"strconv"
+
+	jsoniter "github.com/json-iterator/go"
+
+	"backend/web/response"
 
 	"github.com/labstack/echo/v4"
 
 	"backend/internal/logger"
+	subjectModel "backend/internal/subject"
 	"backend/web/request/subject"
 	"backend/web/util"
 )
@@ -107,6 +112,20 @@ func (h Handler) CreateSubjectWithSave(c echo.Context) (err error) {
 	if err := h.ctrl.CreateSubjectWithSave(uid, req); err != nil {
 		logger.Error("create subject with save failed")
 		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	return c.NoContent(http.StatusOK)
+}
+
+func (h Handler) Insert(c echo.Context) error {
+	var data []subjectModel.Subject
+	file, _ := os.Open("./bin/tt.json")
+	content, _ := io.ReadAll(file)
+
+	_ = jsoniter.Unmarshal(content, &data)
+	err := h.ctrl.Insert(data)
+	if err != nil {
+		logger.Error(err.Error())
+		return err
 	}
 	return c.NoContent(http.StatusOK)
 }

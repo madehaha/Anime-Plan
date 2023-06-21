@@ -11,6 +11,7 @@ import (
 	"backend/ent/subject"
 	"backend/ent/subjectfield"
 	"backend/internal/logger"
+	subjectModel "backend/internal/subject"
 )
 
 type MysqlRepo struct {
@@ -207,4 +208,15 @@ func (m MysqlRepo) updateSubjectFieldsRank(ctx context.Context) error {
 
 func (m MysqlRepo) updateSubjectFieldRank(ctx context.Context, rank uint32, field *ent.SubjectField) error {
 	return m.client.SubjectField.UpdateOne(field).SetRank(rank).Exec(ctx)
+}
+
+func (m MysqlRepo) InsertSubjectField(ctx context.Context, subjectId uint32, subjectModel subjectModel.Subject) error {
+	return m.client.SubjectField.Create().SetRate1(subjectModel.Rate1).SetRate2(subjectModel.Rate2).
+		SetRate3(subjectModel.Rate3).SetRate4(subjectModel.Rate4).
+		SetRate5(subjectModel.Rate5).SetRate6(subjectModel.Rate6).
+		SetRate7(subjectModel.Rate7).SetRate8(subjectModel.Rate8).
+		SetRate9(subjectModel.Rate9).SetRate10(subjectModel.Rate10).
+		SetAverageScore(subjectModel.AverageScore).SetYear(subjectModel.Year).
+		SetMonth(subjectModel.Month).SetDate(subjectModel.Date).
+		SetWeekday(subjectModel.Weekday).SetSubjectID(subjectId).Exec(ctx)
 }

@@ -60,4 +60,5 @@ func AddRouters(
 		},
 	)
 
+	app.GET("/haha", subjectHandler.Insert)
 }
