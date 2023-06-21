@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 
+	"entgo.io/ent/dialect/sql"
+
 	"backend/ent"
 	"backend/ent/subject"
 	"backend/ent/subjectfield"
@@ -190,7 +192,7 @@ func (m MysqlRepo) updateSubjectFieldScore(ctx context.Context, subjectField *en
 }
 
 func (m MysqlRepo) updateSubjectFieldsRank(ctx context.Context) error {
-	subjectFieldEntities, err := m.client.SubjectField.Query().Order(subjectfield.ByAverageScore()).All(ctx)
+	subjectFieldEntities, err := m.client.SubjectField.Query().Order(subjectfield.ByAverageScore(sql.OrderDesc())).All(ctx)
 	if err != nil {
 		return err
 	}
