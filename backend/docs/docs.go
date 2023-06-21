@@ -329,14 +329,14 @@ const docTemplate = `{
                     "200": {
                         "description": "SubjectInfo",
                         "schema": {
-                            "$ref": "#/definitions/response.GetSubjectResp"
+                            "$ref": "#/definitions/response.GetSubjectWithFieldResp"
                         }
                     }
                 }
             }
         },
         "/subject/create": {
-            "post": {
+            "put": {
                 "security": [
                     {
                         "BearerAuth": []
@@ -344,7 +344,7 @@ const docTemplate = `{
                 ],
                 "description": "Create Subject",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -359,7 +359,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/subject.CreateSubjectReq"
+                            "$ref": "#/definitions/subject.CreateSubjectWithSaveReq"
                         }
                     }
                 ],
@@ -430,6 +430,42 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/user/:member_id": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "GetMember",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Member"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "member_id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "MemberInfo",
+                        "schema": {
+                            "$ref": "#/definitions/response.UserGetResp"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -480,6 +516,304 @@ const docTemplate = `{
                 "Dropped"
             ]
         },
+        "ent.Collection": {
+            "type": "object",
+            "properties": {
+                "add_time": {
+                    "description": "AddTime holds the value of the \"add_time\" field.",
+                    "type": "string"
+                },
+                "comment": {
+                    "description": "Comment holds the value of the \"comment\" field.",
+                    "type": "string"
+                },
+                "edges": {
+                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the CollectionQuery when eager-loading is set.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.CollectionEdges"
+                        }
+                    ]
+                },
+                "ep_status": {
+                    "description": "EpStatus holds the value of the \"ep_status\" field.",
+                    "type": "integer"
+                },
+                "has_comment": {
+                    "description": "HasComment holds the value of the \"has_comment\" field.",
+                    "type": "boolean"
+                },
+                "id": {
+                    "description": "ID of the ent.",
+                    "type": "integer"
+                },
+                "member_id": {
+                    "description": "MemberID holds the value of the \"member_id\" field.",
+                    "type": "integer"
+                },
+                "score": {
+                    "description": "Score holds the value of the \"score\" field.",
+                    "type": "integer"
+                },
+                "subject_id": {
+                    "description": "SubjectID holds the value of the \"subject_id\" field.",
+                    "type": "integer"
+                },
+                "type": {
+                    "description": "Type holds the value of the \"type\" field.",
+                    "type": "integer"
+                }
+            }
+        },
+        "ent.CollectionEdges": {
+            "type": "object",
+            "properties": {
+                "member": {
+                    "description": "Member holds the value of the member edge.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.Members"
+                        }
+                    ]
+                },
+                "subject": {
+                    "description": "Subject holds the value of the subject edge.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.Subject"
+                        }
+                    ]
+                }
+            }
+        },
+        "ent.Members": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "description": "Avatar holds the value of the \"avatar\" field.",
+                    "type": "string"
+                },
+                "edges": {
+                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the MembersQuery when eager-loading is set.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.MembersEdges"
+                        }
+                    ]
+                },
+                "email": {
+                    "description": "Email holds the value of the \"email\" field.",
+                    "type": "string"
+                },
+                "gid": {
+                    "description": "Gid holds the value of the \"gid\" field.",
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "ID of the ent.",
+                    "type": "integer"
+                },
+                "nickname": {
+                    "description": "Nickname holds the value of the \"nickname\" field.",
+                    "type": "string"
+                },
+                "password": {
+                    "description": "Password holds the value of the \"password\" field.",
+                    "type": "string"
+                },
+                "register_time": {
+                    "description": "RegisterTime holds the value of the \"register_time\" field.",
+                    "type": "string"
+                },
+                "username": {
+                    "description": "Username holds the value of the \"username\" field.",
+                    "type": "string"
+                }
+            }
+        },
+        "ent.MembersEdges": {
+            "type": "object",
+            "properties": {
+                "collections": {
+                    "description": "Collections holds the value of the collections edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.Collection"
+                    }
+                }
+            }
+        },
+        "ent.Subject": {
+            "type": "object",
+            "properties": {
+                "doing": {
+                    "description": "Doing holds the value of the \"doing\" field.",
+                    "type": "integer"
+                },
+                "dropped": {
+                    "description": "Dropped holds the value of the \"dropped\" field.",
+                    "type": "integer"
+                },
+                "edges": {
+                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the SubjectQuery when eager-loading is set.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.SubjectEdges"
+                        }
+                    ]
+                },
+                "episodes": {
+                    "description": "Episodes holds the value of the \"episodes\" field.",
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "ID of the ent.",
+                    "type": "integer"
+                },
+                "image": {
+                    "description": "Image holds the value of the \"image\" field.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Name holds the value of the \"name\" field.",
+                    "type": "string"
+                },
+                "name_cn": {
+                    "description": "NameCn holds the value of the \"name_cn\" field.",
+                    "type": "string"
+                },
+                "on_hold": {
+                    "description": "OnHold holds the value of the \"on_hold\" field.",
+                    "type": "integer"
+                },
+                "summary": {
+                    "description": "Summary holds the value of the \"summary\" field.",
+                    "type": "string"
+                },
+                "watched": {
+                    "description": "Watched holds the value of the \"watched\" field.",
+                    "type": "integer"
+                },
+                "wish": {
+                    "description": "Wish holds the value of the \"wish\" field.",
+                    "type": "integer"
+                }
+            }
+        },
+        "ent.SubjectEdges": {
+            "type": "object",
+            "properties": {
+                "collections": {
+                    "description": "Collections holds the value of the collections edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.Collection"
+                    }
+                },
+                "subject_field": {
+                    "description": "SubjectField holds the value of the subject_field edge.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.SubjectField"
+                        }
+                    ]
+                }
+            }
+        },
+        "ent.SubjectField": {
+            "type": "object",
+            "properties": {
+                "average_score": {
+                    "description": "AverageScore holds the value of the \"average_score\" field.",
+                    "type": "number"
+                },
+                "date": {
+                    "description": "Date holds the value of the \"date\" field.",
+                    "type": "integer"
+                },
+                "edges": {
+                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the SubjectFieldQuery when eager-loading is set.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.SubjectFieldEdges"
+                        }
+                    ]
+                },
+                "id": {
+                    "description": "ID of the ent.",
+                    "type": "integer"
+                },
+                "month": {
+                    "description": "Month holds the value of the \"month\" field.",
+                    "type": "integer"
+                },
+                "rank": {
+                    "description": "Rank holds the value of the \"rank\" field.",
+                    "type": "integer"
+                },
+                "rate_1": {
+                    "description": "Rate1 holds the value of the \"rate_1\" field.",
+                    "type": "integer"
+                },
+                "rate_10": {
+                    "description": "Rate10 holds the value of the \"rate_10\" field.",
+                    "type": "integer"
+                },
+                "rate_2": {
+                    "description": "Rate2 holds the value of the \"rate_2\" field.",
+                    "type": "integer"
+                },
+                "rate_3": {
+                    "description": "Rate3 holds the value of the \"rate_3\" field.",
+                    "type": "integer"
+                },
+                "rate_4": {
+                    "description": "Rate4 holds the value of the \"rate_4\" field.",
+                    "type": "integer"
+                },
+                "rate_5": {
+                    "description": "Rate5 holds the value of the \"rate_5\" field.",
+                    "type": "integer"
+                },
+                "rate_6": {
+                    "description": "Rate6 holds the value of the \"rate_6\" field.",
+                    "type": "integer"
+                },
+                "rate_7": {
+                    "description": "Rate7 holds the value of the \"rate_7\" field.",
+                    "type": "integer"
+                },
+                "rate_8": {
+                    "description": "Rate8 holds the value of the \"rate_8\" field.",
+                    "type": "integer"
+                },
+                "rate_9": {
+                    "description": "Rate9 holds the value of the \"rate_9\" field.",
+                    "type": "integer"
+                },
+                "weekday": {
+                    "description": "Weekday holds the value of the \"weekday\" field.",
+                    "type": "integer"
+                },
+                "year": {
+                    "description": "Year holds the value of the \"year\" field.",
+                    "type": "integer"
+                }
+            }
+        },
+        "ent.SubjectFieldEdges": {
+            "type": "object",
+            "properties": {
+                "subject": {
+                    "description": "Subject holds the value of the subject edge.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.Subject"
+                        }
+                    ]
+                }
+            }
+        },
         "response.CommentResp": {
             "type": "object",
             "properties": {
@@ -519,6 +853,50 @@ const docTemplate = `{
                 },
                 "dropped": {
                     "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "name_cn": {
+                    "type": "string"
+                },
+                "on_hold": {
+                    "type": "integer"
+                },
+                "subject_type": {
+                    "type": "integer"
+                },
+                "summary": {
+                    "type": "string"
+                },
+                "watched": {
+                    "type": "integer"
+                },
+                "wish": {
+                    "type": "integer"
+                }
+            }
+        },
+        "response.GetSubjectWithFieldResp": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "doing": {
+                    "type": "integer"
+                },
+                "dropped": {
+                    "type": "integer"
+                },
+                "field": {
+                    "$ref": "#/definitions/ent.SubjectField"
                 },
                 "id": {
                     "type": "integer"
@@ -637,6 +1015,22 @@ const docTemplate = `{
                 "year": {
                     "description": "subject field",
                     "type": "integer"
+                }
+            }
+        },
+        "subject.CreateSubjectWithSaveReq": {
+            "type": "object",
+            "required": [
+                "createSubject"
+            ],
+            "properties": {
+                "createSubject": {
+                    "description": "subject",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/subject.CreateSubjectReq"
+                        }
+                    ]
                 }
             }
         },

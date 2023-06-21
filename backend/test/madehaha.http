@@ -6,7 +6,7 @@ Content-Type: application/json
   "email": "lajizr@sssser.com",
   "nickname": "ass",
   "password": "b",
-  "username": "ssbssssss"
+  "username": "ssb"
 }
 
 ### Create Subject
@@ -25,6 +25,7 @@ Content-Type: application/json
   "episodes": 20,
   "weekDay": 5
 }
+
 
 ### Login
 POST http://localhost:2333/login
@@ -60,14 +61,15 @@ Content-Type: application/json
 
 
 ### collection
-PATCH http://localhost:2333/collection/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjcsImdpZCI6MCwiZXhwIjoxNjg3NjgzMDMzfQ.RwB9mTgeU2wpg4BynYbjWkfLwA7EqPeHgaL6rFyHfKg
+POST http://localhost:2333/collection/3
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjUsImdpZCI6MCwiZXhwIjoxNjg3OTE0NTk1fQ.BAygxINh5xcEifqCwOVCaTRh48SXfDeKcLjjoP1mJ8g
 Content-Type: application/json
 
 {
   "comment": "非常非常非常非常非常好看ssss",
-  "type": 3,
-  "has_comment": true
+  "type": 4,
+  "has_comment": true,
+  "score" : 10
 }
 
 ###
@@ -100,7 +102,7 @@ GET http://localhost:2333/user/1
 Content-Type: application/json
 
 ###  Get Subject and its field
-GET http://localhost:2333/subject/1
+GET http://localhost:2333/subject/2
 Content-Type: application/json
 
 ### Create Subject
@@ -113,7 +115,7 @@ Content-Disposition: form-data; name="createSubject"
 Content-Type: application/json
 
 {
-  "name": "Comic girlssssss",
+  "name": "Comic girls",
   "name_cn": "动漫女孩",
   "image": "http://www.csdn.com",
   "year" : 2023,

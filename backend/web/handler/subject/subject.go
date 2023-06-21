@@ -51,22 +51,14 @@ func (h Handler) GetSubjectByID(c echo.Context) error {
 		logger.Error("Failed to find subject")
 		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
+
 	return util.Success(c, http.StatusOK, response.NewSubjectResp(subjectEntity, Field))
 }
 
 // TODO Use WikiJWTAuth
+func (h Handler) SearchSubject(c echo.Context) {
 
-// CreateSubject godoc
-//
-//	 @Title CreateSubject
-//	     @Security BearerAuth
-//		@Description	Create Subject
-//		@Tags			Subject
-//		@Accept			json
-//		@Produce		json
-//	    @Param          SubjectReq body subject.CreateSubjectReq true "SubjectCreate"
-//		@Success		200		 {object}  nil
-//		@Router			/subject/create [post]
+}
 func (h Handler) CreateSubject(c echo.Context) error {
 	var req subject.CreateSubjectReq
 	if err := c.Bind(&req); err != nil {
@@ -84,6 +76,17 @@ func (h Handler) CreateSubject(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
+// CreateSubjectWithSave godoc
+//
+//	 @Title CreateSubjectWithSave
+//	     @Security BearerAuth
+//		@Description	Create Subject
+//		@Tags			Subject
+//		@Accept			mpfd
+//		@Produce		json
+//	    @Param          SubjectReq body subject.CreateSubjectWithSaveReq true "SubjectCreate"
+//		@Success		200		 {object}  nil
+//		@Router			/subject/create [put]
 func (h Handler) CreateSubjectWithSave(c echo.Context) (err error) {
 	var req subject.CreateSubjectWithSaveReq
 	uid := c.Get("uid").(uint32)

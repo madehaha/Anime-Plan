@@ -20,3 +20,6 @@ type CreateSubjectWithSaveReq struct {
 	CreateSubject CreateSubjectReq      `form:"createSubject" validate:"required"`
 	FileData      *multipart.FileHeader `form:"image" validate:"required" swaggerignore:"true"`
 }
+
+type Search struct {
+}
