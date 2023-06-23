@@ -251,6 +251,8 @@ definitions:
         type: integer
       Time:
         type: string
+      Type:
+        $ref: '#/definitions/collection.CollectionType'
     type: object
   response.CommentsResp:
     properties:
@@ -261,59 +263,15 @@ definitions:
     type: object
   response.GetSubjectResp:
     properties:
-      date:
-        type: string
-      doing:
-        type: integer
-      dropped:
-        type: integer
-      id:
-        type: integer
-      image:
-        type: string
-      name:
-        type: string
-      name_cn:
-        type: string
-      on_hold:
-        type: integer
-      subject_type:
-        type: integer
-      summary:
-        type: string
-      watched:
-        type: integer
-      wish:
-        type: integer
+      info:
+        $ref: '#/definitions/subject.Model'
     type: object
   response.GetSubjectWithFieldResp:
     properties:
-      date:
-        type: string
-      doing:
-        type: integer
-      dropped:
-        type: integer
       field:
-        $ref: '#/definitions/ent.SubjectField'
-      id:
-        type: integer
-      image:
-        type: string
-      name:
-        type: string
-      name_cn:
-        type: string
-      on_hold:
-        type: integer
-      subject_type:
-        type: integer
-      summary:
-        type: string
-      watched:
-        type: integer
-      wish:
-        type: integer
+        $ref: '#/definitions/subjectField.Model'
+      info:
+        $ref: '#/definitions/subject.Model'
     type: object
   response.UserGetResp:
     properties:
@@ -391,6 +349,68 @@ definitions:
     required:
     - createSubject
     type: object
+  subject.Model:
+    properties:
+      doing:
+        type: integer
+      dropped:
+        type: integer
+      episodes:
+        type: integer
+      id:
+        type: integer
+      image:
+        type: string
+      name:
+        type: string
+      name_cn:
+        type: string
+      on_hold:
+        type: integer
+      summary:
+        type: string
+      watched:
+        type: integer
+      wish:
+        type: integer
+    type: object
+  subjectField.Model:
+    properties:
+      average_score:
+        type: number
+      date:
+        type: integer
+      id:
+        type: integer
+      month:
+        type: integer
+      rank:
+        type: integer
+      rate_1:
+        type: integer
+      rate_2:
+        type: integer
+      rate_3:
+        type: integer
+      rate_4:
+        type: integer
+      rate_5:
+        type: integer
+      rate_6:
+        type: integer
+      rate_7:
+        type: integer
+      rate_8:
+        type: integer
+      rate_9:
+        type: integer
+      rate_10:
+        type: integer
+      weekday:
+        type: integer
+      year:
+        type: integer
+    type: object
   user.Info:
     properties:
       email:
@@ -408,7 +428,6 @@ definitions:
     required:
     - email
     - nickname
-    - password
     - username
     type: object
   user.ModifyInfoReq:
@@ -494,6 +513,28 @@ paths:
           description: comments
           schema:
             $ref: '#/definitions/response.CommentsResp'
+      tags:
+      - Collection
+  /:type/collection:
+    get:
+      consumes:
+      - application/json
+      description: Get Comments By type
+      parameters:
+      - description: type
+        in: path
+        name: type
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: collections
+          schema:
+            items:
+              $ref: '#/definitions/ent.Collection'
+            type: array
       tags:
       - Collection
   /cancel:

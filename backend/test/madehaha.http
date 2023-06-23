@@ -131,7 +131,7 @@ GET http://localhost:2333/subject/2
 Content-Type: application/json
 
 ### Get Ranks
-GET http://localhost:2333/subject/ranks
+GET http://10.19.128.195:2333/subject/ranks
 Content-Type: application/json
 
 ### Get Ranks

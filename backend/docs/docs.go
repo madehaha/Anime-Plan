@@ -87,6 +87,40 @@ const docTemplate = `{
                 }
             }
         },
+        "/:type/collection": {
+            "get": {
+                "description": "Get Comments By type",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Collection"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "type",
+                        "name": "type",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "collections",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/ent.Collection"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/cancel": {
             "post": {
                 "security": [
@@ -828,6 +862,9 @@ const docTemplate = `{
                 },
                 "Time": {
                     "type": "string"
+                },
+                "Type": {
+                    "$ref": "#/definitions/collection.CollectionType"
                 }
             }
         },
@@ -845,85 +882,19 @@ const docTemplate = `{
         "response.GetSubjectResp": {
             "type": "object",
             "properties": {
-                "date": {
-                    "type": "string"
-                },
-                "doing": {
-                    "type": "integer"
-                },
-                "dropped": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "image": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "name_cn": {
-                    "type": "string"
-                },
-                "on_hold": {
-                    "type": "integer"
-                },
-                "subject_type": {
-                    "type": "integer"
-                },
-                "summary": {
-                    "type": "string"
-                },
-                "watched": {
-                    "type": "integer"
-                },
-                "wish": {
-                    "type": "integer"
+                "info": {
+                    "$ref": "#/definitions/subject.Model"
                 }
             }
         },
         "response.GetSubjectWithFieldResp": {
             "type": "object",
             "properties": {
-                "date": {
-                    "type": "string"
-                },
-                "doing": {
-                    "type": "integer"
-                },
-                "dropped": {
-                    "type": "integer"
-                },
                 "field": {
-                    "$ref": "#/definitions/ent.SubjectField"
+                    "$ref": "#/definitions/subjectField.Model"
                 },
-                "id": {
-                    "type": "integer"
-                },
-                "image": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "name_cn": {
-                    "type": "string"
-                },
-                "on_hold": {
-                    "type": "integer"
-                },
-                "subject_type": {
-                    "type": "integer"
-                },
-                "summary": {
-                    "type": "string"
-                },
-                "watched": {
-                    "type": "integer"
-                },
-                "wish": {
-                    "type": "integer"
+                "info": {
+                    "$ref": "#/definitions/subject.Model"
                 }
             }
         },
@@ -1034,12 +1005,105 @@ const docTemplate = `{
                 }
             }
         },
+        "subject.Model": {
+            "type": "object",
+            "properties": {
+                "doing": {
+                    "type": "integer"
+                },
+                "dropped": {
+                    "type": "integer"
+                },
+                "episodes": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "name_cn": {
+                    "type": "string"
+                },
+                "on_hold": {
+                    "type": "integer"
+                },
+                "summary": {
+                    "type": "string"
+                },
+                "watched": {
+                    "type": "integer"
+                },
+                "wish": {
+                    "type": "integer"
+                }
+            }
+        },
+        "subjectField.Model": {
+            "type": "object",
+            "properties": {
+                "average_score": {
+                    "type": "number"
+                },
+                "date": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "month": {
+                    "type": "integer"
+                },
+                "rank": {
+                    "type": "integer"
+                },
+                "rate_1": {
+                    "type": "integer"
+                },
+                "rate_10": {
+                    "type": "integer"
+                },
+                "rate_2": {
+                    "type": "integer"
+                },
+                "rate_3": {
+                    "type": "integer"
+                },
+                "rate_4": {
+                    "type": "integer"
+                },
+                "rate_5": {
+                    "type": "integer"
+                },
+                "rate_6": {
+                    "type": "integer"
+                },
+                "rate_7": {
+                    "type": "integer"
+                },
+                "rate_8": {
+                    "type": "integer"
+                },
+                "rate_9": {
+                    "type": "integer"
+                },
+                "weekday": {
+                    "type": "integer"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
         "user.Info": {
             "type": "object",
             "required": [
                 "email",
                 "nickname",
-                "password",
                 "username"
             ],
             "properties": {
