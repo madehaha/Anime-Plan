@@ -2,6 +2,7 @@ package subject
 
 import (
 	"context"
+	"entgo.io/ent/dialect/sql"
 	"errors"
 
 	"backend/ent"
@@ -30,9 +31,6 @@ func (m MysqlRepo) GetSubject(ctx context.Context) (ent.Subjects, error) {
 
 func (m MysqlRepo) GetSubjectByID(ctx context.Context, subjectId uint32) (*ent.Subject, *ent.SubjectField, error) {
 	subjectEntity, err := m.client.Subject.Query().Where(subject.ID(subjectId)).First(ctx)
-	if err != nil {
-		return nil, nil, err
-	}
 	field, err := m.client.SubjectField.Query().Where(subjectfield.HasSubjectWith(subject.ID(subjectId))).First(ctx)
 	if err != nil {
 		return subjectEntity, nil, err
@@ -40,14 +38,47 @@ func (m MysqlRepo) GetSubjectByID(ctx context.Context, subjectId uint32) (*ent.S
 	return subjectEntity, field, nil
 }
 
-func (m MysqlRepo) GetSubjectByName(ctx context.Context, name string) (*ent.Subject, error) {
+func (m MysqlRepo) Rankings(ctx context.Context) ([]Middle, error) {
+	subjects, err := m.client.Subject.Query().Order(subject.BySubjectFieldField(subjectfield.FieldAverageScore, sql.OrderDesc())).All(ctx)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, errors.New("no ranks")
+	}
+	length := len(subjects)
+	res := make([]Middle, length)
+	for key, value := range subjects {
+		res[key].Subject = new(ent.Subject)
+		*res[key].Subject = *value
+		res[key].Field = new(ent.SubjectField)
+		mid, _ := subjects[key].QuerySubjectField().First(ctx)
+		*res[key].Field = *mid
+	}
+
+	return res, nil
+}
+func (m MysqlRepo) GetSubjectByName(ctx context.Context, name string) (*ent.Subject, *ent.SubjectField, error) {
 	subjectEntity, err := m.client.Subject.Query().Where(subject.Name(name)).First(ctx)
 	if err != nil {
-		return subjectEntity, err
+		return subjectEntity, nil, err
 	}
-	return subjectEntity, nil
+	field, err := m.client.SubjectField.Query().Where(subjectfield.HasSubjectWith(subject.Name(name))).First(ctx)
+	if err != nil {
+		return subjectEntity, nil, err
+	}
+	return subjectEntity, field, nil
 }
+func (m MysqlRepo) GetSubjectByNameCN(ctx context.Context, name string) (*ent.Subject, *ent.SubjectField, error) {
+	subjectEntity, err := m.client.Subject.Query().Where(subject.NameCn(name)).First(ctx)
+	if err != nil {
+		return subjectEntity, nil, err
+	}
+	field, err := m.client.SubjectField.Query().Where(subjectfield.HasSubjectWith(subject.NameCn(name))).First(ctx)
+	if err != nil {
+		return subjectEntity, nil, err
+	}
+	return subjectEntity, field, nil
 
+}
 func (m MysqlRepo) CreateSubject(ctx context.Context, req subjectReq.CreateSubjectReq) (uint32, error) {
 	if u, _ := m.client.Subject.Query().Where(subject.Name(req.Name)).First(ctx); u != nil {
 		logger.Error("created same subject")

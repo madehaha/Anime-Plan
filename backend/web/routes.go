@@ -37,6 +37,7 @@ func AddRouters(
 	) // verify if having permission to create subject
 
 	app.GET("/subject/:subject_id", subjectHandler.GetSubjectByID)
+	app.GET("/subject/ranks", subjectHandler.Rankings)
 
 	// TODO update subject_field
 	app.POST("/collection/:subject_id", collectionHandler.AddCollection, middleware.UserJWTAuth)

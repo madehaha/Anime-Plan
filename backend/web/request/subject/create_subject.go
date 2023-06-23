@@ -22,4 +22,5 @@ type CreateSubjectWithSaveReq struct {
 }
 
 type Search struct {
+	NameCN string `json:"nameCN" validate:"required"`
 }

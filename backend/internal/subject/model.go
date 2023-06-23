@@ -1,5 +1,7 @@
 package subject
 
+import "backend/ent"
+
 type Model struct {
 	ID       uint32 `json:"id,omitempty"`
 	Image    string `json:"image,omitempty"`
@@ -12,4 +14,8 @@ type Model struct {
 	Dropped  uint32 `json:"dropped"`
 	Watched  uint32 `json:"watched"`
 	Episodes uint8  `json:"episodes,omitempty"`
+}
+type Middle struct {
+	Subject *ent.Subject
+	Field   *ent.SubjectField
 }

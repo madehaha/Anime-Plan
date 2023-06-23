@@ -7,6 +7,7 @@ import (
 	"backend/internal/subject"
 	subjectField "backend/internal/subject_field"
 	subjectReq "backend/web/request/subject"
+
 	"context"
 	"errors"
 	"io"
@@ -49,13 +50,38 @@ func (sc SubjectCtrl) GetSubjectByID(subjectId uint32) (*ent.Subject, *ent.Subje
 
 	return subjectEntity, Field, nil
 }
+func (sc SubjectCtrl) GetSubjectByName(name string) (*ent.Subject, *ent.SubjectField, error) {
+	subjectEntity1, field1, err1 := sc.subjectRepo.GetSubjectByNameCN(context.Background(), name)
+	subjectEntity2, field2, err2 := sc.subjectRepo.GetSubjectByName(context.Background(), name)
+	if (err1 != nil) && (err2 != nil) {
+		logger.Error("Failed to Get subjects by id ")
+		return nil, nil, err1
+	}
+	if err1 != nil {
+		return subjectEntity2, field2, err2
+	}
+	if err2 != nil {
+		return subjectEntity1, field1, err1
+	}
+	if subjectEntity1.ID == subjectEntity2.ID {
+		return subjectEntity1, field1, err1
+	}
 
+	return nil, nil, errors.New("compare error")
+}
+func (sc SubjectCtrl) Rankings() ([]subject.Middle, error) {
+	res, err := sc.subjectRepo.Rankings(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	return res, err
+}
 func (sc SubjectCtrl) CreateSubject(req subjectReq.CreateSubjectReq) error {
 	ctx := context.Background()
 	var subjectId uint32
 	var err error
 
-	if subjectEntity, _ := sc.subjectRepo.GetSubjectByName(ctx, req.Name); subjectEntity != nil {
+	if subjectEntity, _, _ := sc.subjectRepo.GetSubjectByName(ctx, req.Name); subjectEntity != nil {
 		logger.Error("The subject already exist")
 		return errors.New("subject already exist")
 	}
@@ -75,7 +101,7 @@ func (sc SubjectCtrl) CreateSubjectWithSave(uid uint32, req subjectReq.CreateSub
 	ctx := context.Background()
 	var subjectId uint32
 	var err error
-	if subjectEntity, _ := sc.subjectRepo.GetSubjectByName(ctx, req.CreateSubject.Name); subjectEntity != nil {
+	if subjectEntity, _, _ := sc.subjectRepo.GetSubjectByName(ctx, req.CreateSubject.Name); subjectEntity != nil {
 		logger.Error("The subject already exist")
 		return errors.New("subject already exist")
 	}

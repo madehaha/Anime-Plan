@@ -14,16 +14,20 @@ type GetSubjectWithFieldResp struct {
 type GetSubjectResp struct {
 	Info subject.Model
 }
+type SubjectWithField struct {
+	Subject *ent.Subject
+	Field   *ent.SubjectField
+}
 
 func SubjectResp(Subject *ent.Subject) GetSubjectResp {
 	return GetSubjectResp{
 		Info: GetInfo(Subject),
 	}
 }
-func NewSubjectResp(Subject *ent.Subject, field *ent.SubjectField) GetSubjectWithFieldResp {
+func NewSubjectResp(Field SubjectWithField) GetSubjectWithFieldResp {
 	return GetSubjectWithFieldResp{
-		Info:  GetInfo(Subject),
-		Field: GetField(field),
+		Info:  GetInfo(Field.Subject),
+		Field: GetField(Field.Field),
 	}
 }
 
@@ -45,6 +49,7 @@ func GetInfo(Subject *ent.Subject) subject.Model {
 func GetField(Field *ent.SubjectField) subjectField.Model {
 	return subjectField.Model{
 		ID:           Field.ID,
+		Rank:         Field.Rank,
 		Rate1:        Field.Rate1,
 		Rate2:        Field.Rate2,
 		Rate3:        Field.Rate3,

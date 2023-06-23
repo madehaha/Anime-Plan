@@ -1,8 +1,10 @@
 package subject
 
 import (
+	"backend/ent"
 	"backend/web/response"
 	jsoniter "github.com/json-iterator/go"
+
 	"net/http"
 	"strconv"
 
@@ -51,14 +53,54 @@ func (h Handler) GetSubjectByID(c echo.Context) error {
 		logger.Error("Failed to find subject")
 		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
-
-	return util.Success(c, http.StatusOK, response.NewSubjectResp(subjectEntity, Field))
+	Subjectwithfield := response.SubjectWithField{
+		Subject: subjectEntity,
+		Field:   Field,
+	}
+	return util.Success(c, http.StatusOK, response.NewSubjectResp(Subjectwithfield))
 }
 
 // TODO Use WikiJWTAuth
-func (h Handler) SearchSubject(c echo.Context) {
-
+func (h Handler) SearchSubject(c echo.Context) error {
+	var req subject.Search
+	if err := c.Bind(&req); err != nil {
+		logger.Error("Search Subject request bind failed")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	if err := c.Validate(&req); err != nil {
+		logger.Error("Search Subject request validate failed")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	subjectEntity, Field, err := h.ctrl.GetSubjectByName(req.NameCN)
+	if err != nil {
+		logger.Error("search failed")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	subjectwithfield := response.SubjectWithField{
+		Field:   Field,
+		Subject: subjectEntity,
+	}
+	return util.Success(c, http.StatusOK, subjectwithfield)
 }
+
+func (h Handler) Rankings(c echo.Context) error {
+	subjects, err := h.ctrl.Rankings()
+	if err != nil {
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	length := len(subjects)
+	res := make([]response.SubjectWithField, length)
+
+	for key, value := range subjects {
+		res[key].Subject = new(ent.Subject)
+		res[key].Subject = value.Subject
+		res[key].Field = new(ent.SubjectField)
+		res[key].Field = value.Field
+	}
+
+	return util.Success(c, http.StatusOK, util.Map(res, response.NewSubjectResp))
+}
+
 func (h Handler) CreateSubject(c echo.Context) error {
 	var req subject.CreateSubjectReq
 	if err := c.Bind(&req); err != nil {

@@ -11,6 +11,7 @@ import (
 	"backend/web"
 	"backend/web/util"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/spf13/cobra"
 	echoSwagger "github.com/swaggo/echo-swagger"
 	"go.uber.org/fx"
@@ -47,6 +48,7 @@ func start() error {
 	if err != nil {
 		return err
 	}
+	e.Use(middleware.CORS())
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 	return web.Start(e, &cfg)
 }

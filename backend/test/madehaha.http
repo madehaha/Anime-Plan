@@ -28,7 +28,7 @@ Content-Type: application/json
 
 
 ### Login
-POST http://localhost:2333/login
+POST http://aivwe.top/login
 Content-Type: application/json
 
 {
@@ -46,7 +46,7 @@ GET http://localhost:2333/subject/get
 Content-Type: application/json
 
 ### GET subject by ID
-GET http://localhost:2333/subject/2/sdfasdf
+GET http://localhost:2333/subject/2
 Content-Type: application/json
 
 ### collection
@@ -55,8 +55,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjMsImdpZCI6M
 Content-Type: application/json
 
 ### Get Comments
-GET http://localhost:2333/collection/self/comment
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjcsImdpZCI6MCwiZXhwIjoxNjg3NjgzMDMzfQ.RwB9mTgeU2wpg4BynYbjWkfLwA7EqPeHgaL6rFyHfKg
+GET http://localhost:2333/1/subject/comment
 Content-Type: application/json
 
 
@@ -105,6 +104,10 @@ Content-Type: application/json
 GET http://localhost:2333/subject/2
 Content-Type: application/json
 
+### Get Ranks
+GET http://localhost:2333/subject/ranks
+Content-Type: application/json
+
 ### Create Subject
 PUT http://localhost:2333/subject/create
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsImdpZCI6MSwiZXhwIjoxNjg3ODcyNzkzfQ.VE_8nGL2tX0LF4q8xACTVOrntBljcyA7ErmpF-m57no
@@ -131,6 +134,10 @@ Content-Disposition: form-data; name="image"; filename="ruby.jpg"
 < ./image/ruby.jpg
 --WebAppBoundary--
 
+###
+GET http://aivwe.top/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsImdpZCI6MSwiZXhwIjoxNjg3ODcyNzkzfQ.VE_8nGL2tX0LF4q8xACTVOrntBljcyA7ErmpF-m57no
+Content-Type: multipart/form-data; boundary=WebAppBoundary
 
 ### Modify information and avatar
 PUT http://localhost:2333/modify
