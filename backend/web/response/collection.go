@@ -15,11 +15,11 @@ type CommentsResp struct {
 }
 
 type CommentResp struct {
-	SubjectId   uint32 `json:"SubjectId"`
-	MemberID    uint32 `json:"MemberID"`
-	Time        string `json:"Time"`
-	Comment     string `json:"Comment"`
-	SubjectName string `json:"SubjectName"`
+	SubjectId uint32                    `json:"SubjectId"`
+	MemberID  uint32                    `json:"MemberID"`
+	Time      string                    `json:"Time"`
+	Comment   string                    `json:"Comment"`
+	Type      collection.CollectionType `json:"Type"`
 }
 
 type GetCollectionResp struct {
@@ -39,24 +39,25 @@ type GetCollectionResp struct {
 	EpStatus uint8 `json:"ep_status,omitempty"`
 }
 
-func NewCollectionResp(collection *ent.Collection) GetCollectionResp {
+func NewCollectionResp(Collection *ent.Collection) GetCollectionResp {
 	return GetCollectionResp{
-		ID:         collection.ID,
-		SubjectId:  collection.Edges.Subject.ID,
-		Type:       collection.Type,
-		HasComment: collection.HasComment,
-		Comment:    collection.Comment,
-		Score:      collection.Score,
-		AddTime:    collection.AddTime,
-		EpStatus:   collection.EpStatus,
+		ID:         Collection.ID,
+		SubjectId:  Collection.Edges.Subject.ID,
+		Type:       Collection.Type,
+		HasComment: Collection.HasComment,
+		Comment:    Collection.Comment,
+		Score:      Collection.Score,
+		AddTime:    Collection.AddTime,
+		EpStatus:   Collection.EpStatus,
 	}
 }
 
-func NewCommentResp(collection *ent.Collection) CommentResp {
+func NewCommentResp(Collection *ent.Collection) CommentResp {
 	return CommentResp{
-		SubjectId: collection.SubjectID,
-		MemberID:  collection.MemberID,
-		Comment:   collection.Comment,
-		Time:      collection.AddTime,
+		SubjectId: Collection.SubjectID,
+		MemberID:  Collection.MemberID,
+		Comment:   Collection.Comment,
+		Time:      Collection.AddTime,
+		Type:      Collection.Type,
 	}
 }

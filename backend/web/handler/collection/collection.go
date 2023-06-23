@@ -181,7 +181,34 @@ func (h Handler) GetCommentsBySubjectID(c echo.Context) error {
 	}
 	return util.Success(c, http.StatusOK, responses)
 }
+func (h Handler) GetCollection(c echo.Context) error {
+	uid := c.Get("uid").(uint32)
+	subjectId, err := strconv.ParseUint(c.Param("subject_id"), 10, 64)
+	if err != nil {
+		logger.Error("convert error")
+		return util.Error(c, http.StatusNotFound, err.Error())
+	}
+	Collection, err := h.ctrl.GetSelfCollection(uint32(subjectId), uid)
+	if err != nil {
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	return util.Success(c, http.StatusOK, Collection)
+}
 
+func (h Handler) GetSelfCollections(c echo.Context) error {
+	uid := c.Get("uid").(uint32)
+	Type, err := strconv.ParseUint(c.Param("type"), 10, 64)
+	if err != nil {
+		logger.Error("convert error")
+		return util.Error(c, http.StatusNotFound, err.Error())
+	}
+	Collection, err := h.ctrl.GetSelfCollections(uid, uint8(Type))
+
+	if err != nil {
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	return util.Success(c, http.StatusOK, Collection)
+}
 func checkReq(req collectionReq.AddOrUpdateCollectionReq) error {
 	if req.Type == collection.Wish && (req.Score != 0 || req.EpStatus != 0) {
 		return errors.New("if type is wish, the score should be 0 or the ep_status should be 0")

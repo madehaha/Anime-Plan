@@ -160,3 +160,18 @@ func (cc CollectionCtrl) GetCollectionById(searchType string, id uint32) (ent.Co
 	}
 	return collections, err
 }
+
+func (cc CollectionCtrl) GetSelfCollection(subject_id uint32, member_id uint32) (*ent.Collection, error) {
+	Collection, err := cc.collectionRepo.GetCollectionByUidAndSubjectId(context.Background(), member_id, subject_id)
+	if err != nil {
+		return Collection, err
+	}
+	return Collection, nil
+}
+func (cc CollectionCtrl) GetSelfCollections(member_id uint32, Type uint8) (ent.Collections, error) {
+	Collection, err := cc.collectionRepo.GetCollectionByUidAndType(context.Background(), member_id, Type)
+	if err != nil {
+		return Collection, err
+	}
+	return Collection, nil
+}

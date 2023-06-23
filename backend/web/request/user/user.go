@@ -19,7 +19,7 @@ type Info struct {
 	// Email holds the value of the "email" field.
 	Email string `json:"email,omitempty" validate:"required"`
 	// Password holds the value of the "password" field.
-	Password string `json:"password,omitempty" validate:"required"`
+	Password string `json:"password,omitempty"`
 	// Nickname holds the value of the "nickname" field.
 	Nickname string `json:"nickname,omitempty" validate:"required"`
 }

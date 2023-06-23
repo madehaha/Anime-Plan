@@ -43,7 +43,7 @@ func (h Handler) GetSubject(c echo.Context) error {
 //		@Accept			json
 //		@Produce		json
 //	    @Param          subject_id 	path 	uint32   true "subject_id"
-//		@Success		200		 {object}   response.GetSubjectWithFieldResp "SubjectInfo"
+//		@Success		200		 {object}   response.NewSubjectResp "SubjectInfo"
 //		@Router			/subject/:subject_id [get]
 func (h Handler) GetSubjectByID(c echo.Context) error {
 	id := c.Param("subject_id")

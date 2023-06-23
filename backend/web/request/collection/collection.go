@@ -11,3 +11,7 @@ type AddOrUpdateCollectionReq struct {
 	Score      uint8                     `json:"score"`
 	EpStatus   uint8                     `json:"ep_status"`
 }
+
+type SelfCollectionsReq struct {
+	Type collection.CollectionType `json:"Type" validate:"required"`
+}

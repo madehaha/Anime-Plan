@@ -9,6 +9,11 @@ Content-Type: application/json
   "username": "ssb"
 }
 
+###
+GET http://localhost:2333/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsImdpZCI6MSwiZXhwIjoxNjg3ODcyNzkzfQ.VE_8nGL2tX0LF4q8xACTVOrntBljcyA7ErmpF-m57no
+Content-Type: application/json
+
 ### Create Subject
 POST http://localhost:2333/subject/create
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsImdpZCI6MSwiZXhwIjoxNjg3ODcyNzkzfQ.VE_8nGL2tX0LF4q8xACTVOrntBljcyA7ErmpF-m57no
@@ -60,27 +65,43 @@ Content-Type: application/json
 
 
 ### collection
-POST http://localhost:2333/collection/3
+POST http://localhost:2333/collection/1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjUsImdpZCI6MCwiZXhwIjoxNjg3OTE0NTk1fQ.BAygxINh5xcEifqCwOVCaTRh48SXfDeKcLjjoP1mJ8g
 Content-Type: application/json
 
 {
-  "comment": "非常非常非常非常非常好看ssss",
+  "comment": "非常非常非常非常非常好看",
   "type": 4,
   "has_comment": true,
   "score" : 10
 }
 
 ###
-PATCH http://localhost:2333/collection/update/2
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjQsImdpZCI6MCwiZXhwIjoxNjg3NDkwNDM3fQ.LHHcTywhLkEW6NNKaDU2brHvvk7ETE1mDTGjAiXIi5k
+PATCH http://localhost:2333/collection/2
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjUsImdpZCI6MCwiZXhwIjoxNjg3OTE0NTk1fQ.BAygxINh5xcEifqCwOVCaTRh48SXfDeKcLjjoP1mJ8g
 Content-Type: application/json
 
 {
   "comment": "非常非常非常非常非常好看",
   "score": 10,
-  "collectionType": 3
+  "collectionType": 3,
+  "has_comment" : true,
+  "Type" : 2
 }
+
+###
+GET http://localhost:2333/2/collection
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjUsImdpZCI6MCwiZXhwIjoxNjg3OTE0NTk1fQ.BAygxINh5xcEifqCwOVCaTRh48SXfDeKcLjjoP1mJ8g
+Content-Type: application/json
+
+###
+GET http://localhost:2333/subject/get
+Content-Type: application/json
+
+###
+GET http://localhost:2333/collection/2
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjUsImdpZCI6MCwiZXhwIjoxNjg3OTE0NTk1fQ.BAygxINh5xcEifqCwOVCaTRh48SXfDeKcLjjoP1mJ8g
+Content-Type: application/json
 
 ###
 GET http://localhost:2333/comments

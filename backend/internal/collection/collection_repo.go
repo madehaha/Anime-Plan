@@ -32,6 +32,14 @@ func (m MysqlRepo) GetCollectionByUidAndSubjectId(
 	return
 }
 
+func (m MysqlRepo) GetCollectionByUidAndType(
+	ctx context.Context, uid uint32,
+	Type uint8,
+) (collectionEntity ent.Collections, err error) {
+	collectionEntity, err = m.Client.Collection.Query().Where(collection.HasMemberWith(members.ID(uid))).Where(collection.Type(Type)).All(ctx)
+	return
+}
+
 func (m MysqlRepo) AddCollection(
 	ctx context.Context, uid uint32, subjectId uint32, collectionInfo Info,
 ) error {

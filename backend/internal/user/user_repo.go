@@ -67,6 +67,9 @@ func (m MysqlRepo) DeleteByUid(ctx context.Context, uid uint32) error {
 func (m MysqlRepo) UpdateByUid(
 	ctx context.Context, uid uint32, info userReq.Info, avatarUrl string,
 ) error {
+	if info.Password == "" {
+
+	}
 	encryptedPassword, err := bcrypt.GenerateFromPassword(
 		[]byte(info.Password), bcrypt.DefaultCost,
 	)

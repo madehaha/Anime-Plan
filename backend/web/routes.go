@@ -56,6 +56,8 @@ func AddRouters(
 	app.POST("/collection/:subject_id", collectionHandler.AddCollection, middleware.UserJWTAuth)
 	app.PATCH("/collection/:subject_id", collectionHandler.UpdateCollection, middleware.UserJWTAuth)
 	app.DELETE("/collection/:subject_id", collectionHandler.DeleteCollection, middleware.UserJWTAuth)
+	app.GET("/collection/:subject_id", collectionHandler.GetCollection, middleware.UserJWTAuth)
+	app.GET("/:type/collection", collectionHandler.GetSelfCollections, middleware.UserJWTAuth)
 
 	app.GET("/:subject_id/subject/comment", collectionHandler.GetCommentsBySubjectID)
 	app.GET("/:member_id/member/comment", collectionHandler.GetMemberComment)
