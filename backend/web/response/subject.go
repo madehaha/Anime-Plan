@@ -7,16 +7,16 @@ import (
 )
 
 type GetSubjectWithFieldResp struct {
-	Info  subject.Model
+	Info  subject.Model      `json:"info"`
 	Field subjectField.Model `json:"field"`
 }
 
 type GetSubjectResp struct {
-	Info subject.Model
+	Info subject.Model `json:"info"`
 }
 type SubjectWithField struct {
-	Subject *ent.Subject
-	Field   *ent.SubjectField
+	Subject *ent.Subject      `json:"subject"`
+	Field   *ent.SubjectField `json:"field"`
 }
 
 func SubjectResp(Subject *ent.Subject) GetSubjectResp {
