@@ -2,7 +2,6 @@ package subject
 
 import (
 	"context"
-	"entgo.io/ent/dialect/sql"
 	"errors"
 
 	"backend/ent"
@@ -38,7 +37,7 @@ func (m MysqlRepo) GetSubjectByID(ctx context.Context, subjectId uint32) (*ent.S
 }
 
 func (m MysqlRepo) Rankings(ctx context.Context) ([]Middle, error) {
-	subjects, err := m.client.Subject.Query().Order(subject.BySubjectFieldField(subjectfield.FieldAverageScore, sql.OrderDesc())).All(ctx)
+	subjects, err := m.client.Subject.Query().Order(subject.BySubjectFieldField(subjectfield.FieldRank)).All(ctx)
 	if err != nil {
 		logger.Error(err.Error())
 		return nil, errors.New("no ranks")

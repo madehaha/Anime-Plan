@@ -37,8 +37,8 @@ POST http://aivwe.top/login
 Content-Type: application/json
 
 {
-  "email": "lajizr@sssser.com",
-  "password": "b"
+  "email": "1@1.com",
+  "password": "114514"
 }
 
 ### Cancel
@@ -65,25 +65,25 @@ Content-Type: application/json
 
 
 ### collection
-POST http://localhost:2333/collection/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjUsImdpZCI6MCwiZXhwIjoxNjg3OTE0NTk1fQ.BAygxINh5xcEifqCwOVCaTRh48SXfDeKcLjjoP1mJ8g
+POST http://localhost:2333/collection/4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsImdpZCI6MSwiZXhwIjoxNjg4MTMyMTMxfQ.FMr-YEMZAcxAYjr1blmun5ZXN8GRphVDIhUp-tHW4OU
 Content-Type: application/json
 
 {
   "comment": "非常非常非常非常非常好看",
   "type": 4,
   "has_comment": true,
-  "score" : 10
+  "score" : 9
 }
 
 ###
-PATCH http://localhost:2333/collection/2
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjUsImdpZCI6MCwiZXhwIjoxNjg3OTE0NTk1fQ.BAygxINh5xcEifqCwOVCaTRh48SXfDeKcLjjoP1mJ8g
+PATCH http://localhost:2333/collection/4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsImdpZCI6MSwiZXhwIjoxNjg4MTMyOTg4fQ.gmXLZxkJ0y_UMbpPSAYck_NAtkcdX2sH4h2amYX3iMU
 Content-Type: application/json
 
 {
   "comment": "非常非常非常非常非常好看",
-  "score": 10,
+  "score": 9,
   "collectionType": 3,
   "has_comment" : true,
   "Type" : 2
@@ -134,6 +134,10 @@ Content-Type: application/json
 GET http://localhost:2333/subject/ranks
 Content-Type: application/json
 
+### Get Ranks
+GET http://aivwe.top/subject/ranks
+Content-Type: application/json
+
 ### Create Subject
 PUT http://localhost:2333/subject/create
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsImdpZCI6MSwiZXhwIjoxNjg3ODcyNzkzfQ.VE_8nGL2tX0LF4q8xACTVOrntBljcyA7ErmpF-m57no
@@ -144,7 +148,7 @@ Content-Disposition: form-data; name="createSubject"
 Content-Type: application/json
 
 {
-  "name": "Comic girls",
+  "name": "Comic girlshaha",
   "name_cn": "动漫女孩",
   "image": "http://www.csdn.com",
   "year" : 2023,

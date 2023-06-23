@@ -195,6 +195,16 @@ func (h Handler) GetCollection(c echo.Context) error {
 	return util.Success(c, http.StatusOK, Collection)
 }
 
+// GetSelfCollections godoc
+// @Title GetSelfCollections
+//
+//	@Description	Get Comments By type
+//	@Tags			Collection
+//	@Accept			json
+//	@Produce		json
+//	@Param          type 	path 	uint8   true "type"
+//	@Success		200			{object} ent.Collections  "collections"
+//	@Router			/:type/collection [get]
 func (h Handler) GetSelfCollections(c echo.Context) error {
 	uid := c.Get("uid").(uint32)
 	Type, err := strconv.ParseUint(c.Param("type"), 10, 64)
