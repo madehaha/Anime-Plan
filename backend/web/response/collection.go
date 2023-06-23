@@ -15,10 +15,11 @@ type CommentsResp struct {
 }
 
 type CommentResp struct {
-	SubjectId uint32 `json:"SubjectId"`
-	MemberID  uint32 `json:"MemberID"`
-	Time      string `json:"Time"`
-	Comment   string `json:"Comment"`
+	SubjectId   uint32 `json:"SubjectId"`
+	MemberID    uint32 `json:"MemberID"`
+	Time        string `json:"Time"`
+	Comment     string `json:"Comment"`
+	SubjectName string `json:"SubjectName"`
 }
 
 type GetCollectionResp struct {

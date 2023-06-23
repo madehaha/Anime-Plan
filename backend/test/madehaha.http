@@ -92,7 +92,12 @@ GET http://localhost:2333/user/12/dsadas
 Content-Type: application/json
 
 ### Get Comments
-GET http://localhost:2333/collection/7/member/comment
+GET http://localhost:2333/7/member/comment
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjcsImdpZCI6MCwiZXhwIjoxNjg3NjgzMDMzfQ.RwB9mTgeU2wpg4BynYbjWkfLwA7EqPeHgaL6rFyHfKg
+Content-Type: application/json
+
+### Get Comments
+GET http://localhost:2333/2/subject/comment
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjcsImdpZCI6MCwiZXhwIjoxNjg3NjgzMDMzfQ.RwB9mTgeU2wpg4BynYbjWkfLwA7EqPeHgaL6rFyHfKg
 Content-Type: application/json
 
@@ -160,5 +165,12 @@ Content-Disposition: form-data; name="image"; filename="ruby.jpg"
 < ./image/ruby.jpg
 --WebAppBoundary--
 
+###
+GET http://localhost:2333/search
+Content-Type: application/json
+
+{
+  "name": "动漫女孩"
+}
 
 

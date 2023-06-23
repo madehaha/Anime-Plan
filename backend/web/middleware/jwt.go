@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -27,14 +28,15 @@ func (jm JwtMiddleware) extractAndCheckToken(ctx echo.Context) (
 	token = ctx.Request().Header.Get("Authorization")
 	bearerLength := len(PREFIX)
 	if len(token) < bearerLength {
-		// TODO Error handling
+		err = errors.New("please provide token")
 		return
-	}
-	token = token[bearerLength:]
-	claims, err = jm.Util.ParseToken(token)
-	if err != nil {
-		logger.Error("JWT parse token failed")
-		return
+	} else {
+		token = token[bearerLength:]
+		claims, err = jm.Util.ParseToken(token)
+		if err != nil {
+			logger.Error("JWT parse token failed")
+			return
+		}
 	}
 	return
 }

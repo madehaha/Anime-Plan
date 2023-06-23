@@ -1,0 +1,98 @@
+### Register
+POST http://localhost:2333/register
+Content-Type: application/json
+
+{
+  "username": "sss11341",
+  "email": "9@99.com",
+  "nickname": "a",
+  "password": "b"
+}
+
+### Login
+POST http://localhost:2333/login
+Content-Type: application/json
+
+{
+  "email": "9@99.com",
+  "password": "b"
+}
+
+### Cancel
+POST http://localhost:2333/cancel
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjksImdpZCI6MCwiZXhwIjoxNjg3MzEzMjM1fQ.ifJ-gY5O0_t73aYab0C9pwGHYpbLdeuJqM34LP3VR2w
+
+### Get me
+GET http://localhost:2333/me
+Content-Type: application/json
+# Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjksImdpZCI6MCwiZXhwIjoxNjg3MzA5NTcyfQ.sZvpb-pvsP5QNFYRRdQJKiPhO-gozWq-2RmzEH2kLzU
+
+### Get avatar
+GET http://localhost:2333/user/12/avatar
+Content-Type: application/json
+
+### Modify information and avatar
+PUT http://localhost:2333/modify
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjE0LCJnaWQiOjAsImV4cCI6MTY4NzMxOTE5OX0.Kwd8m2YKTTtm9AItvbSrP0yrKzpjqI_xHxLaHFMh5Mg
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="info"
+Content-Type: application/json
+
+{
+"username": "__114514",
+"nickname": "_1919810",
+"password": "1037+666",
+"email": "ssesm@ssesmsmsm.com"
+}
+--WebAppBoundary
+Content-Disposition: form-data; name="image"; filename="ruby.jpg"
+
+< ./image/ruby.jpg
+--WebAppBoundary--
+
+### POST create subject
+POST http://localhost:2333/subject/create
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsImdpZCI6MSwiZXhwIjoxNjg3NzQzODQ1fQ.vajduUFdVhjUcpI1zKwk8Yz6YYiz0Q_vW8CQ8xweVPs
+Content-Type: application/json
+
+{
+"name": "扣你记哇 哦呀斯密",
+"name_cn": "你好 晚安",
+"episodes": 114,
+"summary": "No Summary",
+"year": 2022,
+"month": 12,
+"date": 25,
+"weekday": 7
+}
+
+### POST
+POST http://localhost:2333/collection/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsImdpZCI6MSwiZXhwIjoxNjg3NzQzODQ1fQ.vajduUFdVhjUcpI1zKwk8Yz6YYiz0Q_vW8CQ8xweVPs
+Content-Type: application/json
+
+{
+"type": 5,
+"has_comment": false,
+"comment": ""
+}
+
+### PATCH
+PATCH http://localhost:2333/collection/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsImdpZCI6MSwiZXhwIjoxNjg3NzQzODQ1fQ.vajduUFdVhjUcpI1zKwk8Yz6YYiz0Q_vW8CQ8xweVPs
+Content-Type: application/json
+
+{
+"type": 2,
+"has_comment": true,
+"comment": "wonderful",
+"score": 9
+}
+
+### DELETE
+DELETE http://localhost:2333/collection/2
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjUsImdpZCI6MTEsImV4cCI6MTY4NzQ4Mzg5OH0.PO-7-dv3cnpLg31_e5W7w27hbq6w2np94TDHnG0lFSA
+

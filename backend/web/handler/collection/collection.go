@@ -2,7 +2,6 @@ package collection
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -40,7 +39,6 @@ func (h Handler) AddCollection(c echo.Context) (err error) {
 		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
 
-	fmt.Println(req)
 	if err := c.Validate(&req); err != nil {
 		logger.Error("Failed to validate")
 		return util.Error(c, http.StatusBadRequest, err.Error())

@@ -3,6 +3,8 @@ package web
 import (
 	"net/http"
 
+	echoMiddleware "github.com/labstack/echo/v4/middleware"
+
 	"backend/web/handler/collection"
 	"backend/web/handler/subject"
 	"backend/web/handler/user"
@@ -16,6 +18,17 @@ func AddRouters(
 	app *echo.Echo, middleware middleware.JwtMiddleware, userHandler user.Handler, subjectHandler subject.Handler,
 	collectionHandler collection.Handler,
 ) {
+	// logger
+	app.Use(
+		echoMiddleware.LoggerWithConfig(
+			echoMiddleware.LoggerConfig{
+				Format: "${time_rfc3339}, ${method}, ${uri}, ${status}\n",
+			},
+		),
+	)
+	// cors
+	app.Use(echoMiddleware.CORS())
+
 	// User
 	app.POST("/register", userHandler.Register)
 	app.POST("/login", userHandler.Login)
@@ -38,12 +51,12 @@ func AddRouters(
 
 	app.GET("/subject/:subject_id", subjectHandler.GetSubjectByID)
 	app.GET("/subject/ranks", subjectHandler.Rankings)
+	app.GET("/search", subjectHandler.SearchSubject)
 
-	// TODO update subject_field
 	app.POST("/collection/:subject_id", collectionHandler.AddCollection, middleware.UserJWTAuth)
 	app.PATCH("/collection/:subject_id", collectionHandler.UpdateCollection, middleware.UserJWTAuth)
 	app.DELETE("/collection/:subject_id", collectionHandler.DeleteCollection, middleware.UserJWTAuth)
-	// TODO
+
 	app.GET("/:subject_id/subject/comment", collectionHandler.GetCommentsBySubjectID)
 	app.GET("/:member_id/member/comment", collectionHandler.GetMemberComment)
 	app.Any(

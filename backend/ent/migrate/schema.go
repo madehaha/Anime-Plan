@@ -61,7 +61,7 @@ var (
 	SubjectsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint32, Increment: true},
 		{Name: "image", Type: field.TypeString, Size: 255, Default: "https://lain.bgm.tv/pic/user/l/icon.jpg"},
-		{Name: "summary", Type: field.TypeString, Size: 300, Default: "No summary."},
+		{Name: "summary", Type: field.TypeString, Size: 3000, Default: "No summary."},
 		{Name: "name", Type: field.TypeString},
 		{Name: "name_cn", Type: field.TypeString},
 		{Name: "episodes", Type: field.TypeUint8},
