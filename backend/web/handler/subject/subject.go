@@ -152,3 +152,18 @@ func (h Handler) CreateSubjectWithSave(c echo.Context) (err error) {
 	}
 	return c.NoContent(http.StatusOK)
 }
+
+func (h Handler) BoardCast(c echo.Context) error {
+	id := c.Param("weekday")
+	Day, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		logger.Error("error day")
+		return util.Success(c, http.StatusBadRequest, err.Error())
+	}
+	Board, err := h.ctrl.BoardCast(uint8(Day))
+	if err != nil {
+		logger.Error("get boardcast error")
+		return util.Success(c, http.StatusBadRequest, err.Error())
+	}
+	return util.Success(c, http.StatusOK, util.Map(Board, response.SubjectResp))
+}

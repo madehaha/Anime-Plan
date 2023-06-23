@@ -40,8 +40,7 @@ func AddRouters(
 
 	// Subject
 	app.GET("/subject/get", subjectHandler.GetSubject)
-	app.POST(
-		"/subject/create", subjectHandler.CreateSubject,
+	app.POST("/subject/create", subjectHandler.CreateSubject,
 		middleware.WikiJWTAuth,
 	) // verify if having permission to create subject
 	app.PUT(
@@ -52,6 +51,7 @@ func AddRouters(
 	app.GET("/subject/:subject_id", subjectHandler.GetSubjectByID)
 	app.GET("/subject/ranks", subjectHandler.Rankings)
 	app.GET("/search", subjectHandler.SearchSubject)
+	app.GET("/board_cast/:weekday", subjectHandler.BoardCast)
 
 	app.POST("/collection/:subject_id", collectionHandler.AddCollection, middleware.UserJWTAuth)
 	app.PATCH("/collection/:subject_id", collectionHandler.UpdateCollection, middleware.UserJWTAuth)

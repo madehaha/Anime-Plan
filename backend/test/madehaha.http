@@ -63,18 +63,26 @@ Content-Type: application/json
 GET http://localhost:2333/1/subject/comment
 Content-Type: application/json
 
+### Get BoardCast
+GET http://localhost:2333/board_cast/1
+Content-Type: application/json
 
 ### collection
-POST http://localhost:2333/collection/4
+POST http://aivwe.top/collection/67
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsImdpZCI6MSwiZXhwIjoxNjg4MTMyMTMxfQ.FMr-YEMZAcxAYjr1blmun5ZXN8GRphVDIhUp-tHW4OU
 Content-Type: application/json
 
 {
   "comment": "非常非常非常非常非常好看",
-  "type": 4,
+  "type": 5,
   "has_comment": true,
-  "score" : 9
+   "score": 8
 }
+
+### collection
+GET http://aivwe.top/collection/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsImdpZCI6MSwiZXhwIjoxNjg4MTMyMTMxfQ.FMr-YEMZAcxAYjr1blmun5ZXN8GRphVDIhUp-tHW4OU
+Content-Type: application/json
 
 ###
 PATCH http://localhost:2333/collection/4

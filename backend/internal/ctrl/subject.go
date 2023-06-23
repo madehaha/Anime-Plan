@@ -100,6 +100,11 @@ func (sc SubjectCtrl) CreateSubject(req subjectReq.CreateSubjectReq) error {
 	}
 	return nil
 }
+
+func (sc SubjectCtrl) BoardCast(Day uint8) (subjects ent.Subjects, err error) {
+	subjects, err = sc.subjectRepo.BoardCast(context.Background(), Day)
+	return
+}
 func (sc SubjectCtrl) CreateSubjectWithSave(uid uint32, req subjectReq.CreateSubjectWithSaveReq) error {
 	ctx := context.Background()
 	var subjectId uint32

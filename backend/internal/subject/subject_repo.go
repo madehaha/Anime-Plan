@@ -3,6 +3,7 @@ package subject
 import (
 	"context"
 	"errors"
+	"time"
 
 	"backend/ent"
 	"backend/ent/subject"
@@ -54,6 +55,25 @@ func (m MysqlRepo) Rankings(ctx context.Context) ([]Middle, error) {
 
 	return res, nil
 }
+
+func (m MysqlRepo) BoardCast(ctx context.Context, Day uint8) (ent.Subjects, error) {
+	year := uint32(time.Now().Year())
+	month := uint8(time.Now().Month())
+	println(month)
+	subjectEntity, err := m.client.Subject.Query().Where(
+		subject.And(
+			subject.HasSubjectFieldWith(subjectfield.Year(year)),
+			subject.HasSubjectFieldWith(subjectfield.Weekday(Day)),
+			subject.HasSubjectFieldWith(subjectfield.MonthGTE(month+3)),
+			subject.HasSubjectFieldWith(subjectfield.MonthLTE(month-3)),
+		),
+	).All(ctx)
+	if err != nil {
+		return subjectEntity, err
+	}
+	return subjectEntity, nil
+}
+
 func (m MysqlRepo) GetSubjectByName(ctx context.Context, name string) (*ent.Subject, *ent.SubjectField, error) {
 	subjectEntity, err := m.client.Subject.Query().Where(subject.Name(name)).First(ctx)
 	if err != nil {
