@@ -62,8 +62,16 @@ func (h Handler) GetSubjectByID(c echo.Context) error {
 
 // TODO Use WikiJWTAuth
 func (h Handler) SearchSubject(c echo.Context) error {
-	name := c.QueryParam("name")
-	subjectEntity, Field, err := h.ctrl.GetSubjectByName(name)
+	var req subject.SearchName
+	if err := c.Bind(&req); err != nil {
+		logger.Error("Create Subject request bind failed")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	if err := c.Validate(&req); err != nil {
+		logger.Error("Create Subject request validate failed")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	subjectEntity, Field, err := h.ctrl.GetSubjectByName(req.Name)
 	if err != nil {
 		logger.Error("search failed caused error")
 		return util.Error(c, http.StatusBadRequest, err.Error())

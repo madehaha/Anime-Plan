@@ -50,7 +50,7 @@ func AddRouters(
 
 	app.GET("/subject/:subject_id", subjectHandler.GetSubjectByID)
 	app.GET("/subject/ranks", subjectHandler.Rankings)
-	app.GET("/search", subjectHandler.SearchSubject)
+	app.POST("/search", subjectHandler.SearchSubject)
 	app.GET("/board_cast/:weekday", subjectHandler.BoardCast)
 
 	app.POST("/collection/:subject_id", collectionHandler.AddCollection, middleware.UserJWTAuth)

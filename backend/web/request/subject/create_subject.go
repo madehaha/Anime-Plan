@@ -25,6 +25,10 @@ type CreateSubjectWithSaveReq struct {
 	FileData      *multipart.FileHeader `form:"image" validate:"required" swaggerignore:"true"`
 }
 
+type SearchName struct {
+	Name string `json:"name" validate:"required"`
+}
+
 func NewInitialInfo(req CreateSubjectReq) subject.InitialInfo {
 	return subject.InitialInfo{
 		Image:    req.Image,

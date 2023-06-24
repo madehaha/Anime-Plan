@@ -199,7 +199,7 @@ Content-Disposition: form-data; name="image"; filename="ruby.jpg"
 --WebAppBoundary--
 
 ###
-GET http://aivwe.top/search
+GET http://aivwe.top/search?name=你看看我的好东西湖广会馆湖广会馆湖广会馆湖广会馆嘎嘎嘎
 Content-Type: application/json
 
 
