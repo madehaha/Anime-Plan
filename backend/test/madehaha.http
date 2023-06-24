@@ -20,8 +20,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsImdpZCI6M
 Content-Type: application/json
 
 {
-  "name": "Comic girlsssss",
-  "name_cn": "动漫女孩",
+  "name": "动漫女孩",
+  "name_cn": "",
   "image": "http://www.csdn.com",
   "year" : 2023,
   "month" : 12,
@@ -199,11 +199,8 @@ Content-Disposition: form-data; name="image"; filename="ruby.jpg"
 --WebAppBoundary--
 
 ###
-GET http://localhost:2333/search
+GET http://aivwe.top/search
 Content-Type: application/json
 
-{
-  "name": "动漫女孩"
-}
 
 
