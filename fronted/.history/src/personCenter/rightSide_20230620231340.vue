@@ -1,0 +1,20 @@
+<template>
+    <div class="all"></div>
+</template>
+<script setup>
+console.log('hello,right')
+</script>
+
+<style scoped>
+*{
+    padding: 0;
+  margin: 0;
+}
+.all{
+  height: 100vh;
+  width: 40%;
+  display: inline-block;
+  position: relative;
+  background: url('../assets/f540d4d6be891c7bffd5c55b606f10f6.jpeg');
+}
+</style>

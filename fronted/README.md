@@ -1,4 +1,4 @@
-# fk2
+# hrx-comic
 
 ## Project setup
 ```

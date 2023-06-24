@@ -68,7 +68,7 @@ GET http://localhost:2333/board_cast/1
 Content-Type: application/json
 
 ### collection
-POST http://aivwe.top/collection/67
+POST http://aivwe.top/collection/29
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsImdpZCI6MSwiZXhwIjoxNjg4MTMyMTMxfQ.FMr-YEMZAcxAYjr1blmun5ZXN8GRphVDIhUp-tHW4OU
 Content-Type: application/json
 
@@ -76,7 +76,8 @@ Content-Type: application/json
   "comment": "非常非常非常非常非常好看",
   "type": 5,
   "has_comment": true,
-   "score": 8
+   "score": 8,
+  "ep_stastus": 3
 }
 
 ### collection
@@ -199,8 +200,13 @@ Content-Disposition: form-data; name="image"; filename="ruby.jpg"
 --WebAppBoundary--
 
 ###
-GET http://aivwe.top/search?name=你看看我的好东西湖广会馆湖广会馆湖广会馆湖广会馆嘎嘎嘎
+# @no-redirect
+POST http://aivwe.top/search
 Content-Type: application/json
+
+{
+  "name": "絆のアリル"
+}
 
 
 

@@ -104,7 +104,7 @@ func (h Handler) Cancel(c echo.Context) error {
 //	        @Accept			mpfd
 //			@Produce		json
 //			@Param         ModifyReq  body  user.ModifyInfoReq true "Modify Info"
-//			@Success		200		 {object}   nil
+//			@Success		200		 {object}   nil`12q	3 wv
 //			@Router			/modify [put]
 func (h Handler) ModifyInfo(c echo.Context) (err error) {
 	var req user.ModifyInfoReq
