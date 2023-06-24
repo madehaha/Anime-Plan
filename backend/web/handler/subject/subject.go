@@ -65,7 +65,11 @@ func (h Handler) SearchSubject(c echo.Context) error {
 	name := c.QueryParam("name")
 	subjectEntity, Field, err := h.ctrl.GetSubjectByName(name)
 	if err != nil {
-		logger.Error("search failed")
+		logger.Error("search failed caused error")
+		return util.Error(c, http.StatusBadRequest, err.Error())
+	}
+	if subjectEntity != nil {
+		logger.Error("search failed because of nil")
 		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
 	subjectwithfield := response.SubjectWithField{
