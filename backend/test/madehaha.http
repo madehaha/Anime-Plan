@@ -199,11 +199,11 @@ Content-Disposition: form-data; name="image"; filename="ruby.jpg"
 --WebAppBoundary--
 
 ###
-GET http://localhost:2333/search
+GET http://aivwe.top/search
 Content-Type: application/json
 
 {
-  "name": "动漫女孩"
+  "name": "th"
 }
 
 

@@ -59,7 +59,6 @@ func (m MysqlRepo) Rankings(ctx context.Context) ([]Middle, error) {
 func (m MysqlRepo) BoardCast(ctx context.Context, Day uint8) (ent.Subjects, error) {
 	year := uint32(time.Now().Year())
 	month := uint8(time.Now().Month())
-	println(month)
 	subjectEntity, err := m.client.Subject.Query().Where(
 		subject.And(
 			subject.HasSubjectFieldWith(subjectfield.Year(year)),

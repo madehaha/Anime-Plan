@@ -67,10 +67,7 @@ func (h Handler) SearchSubject(c echo.Context) error {
 		logger.Error("Search Subject request bind failed")
 		return util.Error(c, http.StatusBadRequest, err.Error())
 	}
-	if err := c.Validate(&req); err != nil {
-		logger.Error("Search Subject request validate failed")
-		return util.Error(c, http.StatusBadRequest, err.Error())
-	}
+
 	subjectEntity, Field, err := h.ctrl.GetSubjectByName(req.Name)
 	if err != nil {
 		logger.Error("search failed")
