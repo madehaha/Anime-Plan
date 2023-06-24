@@ -64,8 +64,8 @@ func (m MysqlRepo) BoardCast(ctx context.Context, Day uint8) (ent.Subjects, erro
 		subject.And(
 			subject.HasSubjectFieldWith(subjectfield.Year(year)),
 			subject.HasSubjectFieldWith(subjectfield.Weekday(Day)),
-			subject.HasSubjectFieldWith(subjectfield.MonthGTE(month+3)),
-			subject.HasSubjectFieldWith(subjectfield.MonthLTE(month-3)),
+			subject.HasSubjectFieldWith(subjectfield.MonthLTE(month+3)),
+			subject.HasSubjectFieldWith(subjectfield.MonthGTE(month-3)),
 		),
 	).All(ctx)
 	if err != nil {
